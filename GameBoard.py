@@ -1,7 +1,6 @@
 # - - - - - - - - - - - - - - - - - - - -
 # COP 4521 -- Term Project
 # Daniel Fletcher, Connor Klekamp, Jacob Gregie
-
 # PANDEMIC board game implementation
 # - - - - - - - - - - - - - - - - - - - -
 
