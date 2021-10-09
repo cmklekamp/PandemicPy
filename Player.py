@@ -34,10 +34,18 @@ class Player(object):
     def __init__(self, role_num, starting_city):
         pass
 
+    # - - - GETTER FUNCTIONS - - -
+    # get_username() 
+    @property
+    def username(self):
+        return self._username
+
+    # - - - SETTER FUNCTIONS - - -
     # set_username()
     # Sets the player's username to the given parameter
+    @username.setter
     def set_username(self, username):
-        pass
+        self._username = username
 
     # acquire_card()
     # Adds a card to the player's hand
@@ -54,6 +62,3 @@ class Player(object):
     # Takes special case of Role #7 (Scientist) into consideration
     def can_turn_in(self):
         pass
-
-    # Getter functions
-    # ...
