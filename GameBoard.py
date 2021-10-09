@@ -43,7 +43,7 @@ class GameBoard(object):
         self._yellow_eradicated = False
 
         self._red_remaining = 24
-        self._blue = 24
+        self._blue_remaining = 24
         self._black_remaining = 24
         self._yellow_remaining = 24
 
