@@ -25,12 +25,7 @@ class GameBoard(object):
     # Constructor -- initializes components of game board based on number of players
     def __init__(self, num_players):
 
-        #Initilize Cities
-        self._city_list = dict()
-        self.initialize_cities()
 
-        #Initial Research Station in Atlanta
-        self._city_list["Atlanta"].has_station = True
 
         #Initialize Member Data
         self._outbreak_counter = 0
@@ -47,12 +42,25 @@ class GameBoard(object):
         self._black_eradicated = False
         self._yellow_eradicated = False
 
-        self._num_research_stations = 5
+        self._red_remaining = 24
+        self._blue = 24
+        self._black_remaining = 24
+        self._yellow_remaining = 24
+
+        #Accounts for the initial station
+        self._research_stations_remaining = 5
 
         self._player_deck = PlayerDeck()
         self._infection_deck = InfectionDeck()
 
         self._actions_remaining = 4
+
+        #Initilize Cities
+        self._city_list = dict()
+        self.initialize_cities()
+
+        #Initial Research Station in Atlanta
+        self._city_list["Atlanta"].add_station()
 
         #Initialize Players, gives them a random role, no duplicates
         self._player_list = []
@@ -61,40 +69,51 @@ class GameBoard(object):
         for x in range(num_players):
             self._player_list.append(Player(role_list[x], "Atlanta"))
 
+        '''
         #CHECK!
         #Make sure this works once Deck class has been made
+        #Do we need a discard pile list?
         #Infect Cities
+        
         for x in range(9):
             infect_amount = 3 - (x % 3)
             card = self._infection_deck.bottom_card()
             if (card._city._color == "red"):
                 card._city._red = infect_amount
+                self._red_remaining -= infect_amount
             if (card._city._color == "blue"):
                 card._city._blue = infect_amount
+                self._blue_remaining -= infect_amount
             if (card._city._color == "black"):
                 card._city._black = infect_amount
+                self._black_remaining -= infect_amount
             if (card._city._color == "yellow"):
                 card._city._yellow = infect_amount
-            
+                self._yellow_remaining -= infect_amount
+        
+        #CHECK!
+        #Make sure this works once Deck class has been made      
         #Give Out Cards
+
         # 2-players = 4, 3-players = 3, 4-players = 2
         num_cards = -(num_players - 2) + 4
 
-        #for x in range(num_cards):
+        for x in self._player_list:
+            for y in range(num_cards):
+                self._player_list[x].acquire_card()
 
         #Prepare Deck
         self._player_deck.prepare()
 
-
         #Should usernames be set up in the main program?
         #self.set_usernames()
-
+        '''
 
     # set_usernames()
     # Sets player usernames to names contained in list of strings
     def set_usernames(self, names_list):
         for x in names_list:
-            self._player_list[x]._username = names_list[x]
+            self._player_list[x].username = names_list[x]
 
 
     # - - - (1) ACTION PHASE: EIGHT MAIN ACTIONS - - -
@@ -266,61 +285,136 @@ class GameBoard(object):
 
     # initialize_cities()
     # Helper function to initilialize cities
-    def initialize_cities():
-        city_list = dict()
-        city_list["Bogotá"] = City("Bogotá", "yellow",["Miami", "Mexico City", "Lima", "Buenos Aires", "São Paulo"])
-        city_list["Johannesburg"] = City("Johannesburg", "yellow",["Kinshasa", "Khartoum"])
-        city_list["Buenos Aires"] = City("Buenos Aires", "yellow",["São Paulo", "Bogotá"])
-        city_list["Mexico City"] = City("Mexico City", "yellow",["Los Angeles", "Chicago", "Miami", "Bogotá", "Lima"])
-        city_list["Lima"] = City("Lima", "yellow",["Mexico City", "Bogotá", "Santiago"])
-        city_list["Los Angeles"] = City("Los Angeles", "yellow",["Mexico City", "Chicago", "San Francisco", "Sydney"])
-        city_list["Miami"] = City("Miami", "yellow",["Atlanta", "Washington", "Mexico City", "Bogotá"])
-        city_list["Kinshasa"] = City("Kinshasa", "yellow",["Lagos", "Khartoum", "Johannesburg"])
-        city_list["São Paulo"] = City("São Paulo", "yellow",["Bogotá", "Buenos Aires", "Madrid", "Lagos"])
-        city_list["Santiago"] = City("Santiago", "yellow",["Lima"])
-        city_list["Khartoum"] = City("Khartoum", "yellow",["Cairo", "Lagos", "Kinshasa", "Johannesburg"])
-        city_list["Lagos"] = City("Lagos", "yellow",["São Paulo", "Kinshasa", "Khartoum"])
+    def initialize_cities(self):
+        self._city_list["Bogotá"] = City("Bogotá", "yellow",["Miami", "Mexico City", "Lima", "Buenos Aires", "São Paulo"])
+        self._city_list["Johannesburg"] = City("Johannesburg", "yellow",["Kinshasa", "Khartoum"])
+        self._city_list["Buenos Aires"] = City("Buenos Aires", "yellow",["São Paulo", "Bogotá"])
+        self._city_list["Mexico City"] = City("Mexico City", "yellow",["Los Angeles", "Chicago", "Miami", "Bogotá", "Lima"])
+        self._city_list["Lima"] = City("Lima", "yellow",["Mexico City", "Bogotá", "Santiago"])
+        self._city_list["Los Angeles"] = City("Los Angeles", "yellow",["Mexico City", "Chicago", "San Francisco", "Sydney"])
+        self._city_list["Miami"] = City("Miami", "yellow",["Atlanta", "Washington", "Mexico City", "Bogotá"])
+        self._city_list["Kinshasa"] = City("Kinshasa", "yellow",["Lagos", "Khartoum", "Johannesburg"])
+        self._city_list["São Paulo"] = City("São Paulo", "yellow",["Bogotá", "Buenos Aires", "Madrid", "Lagos"])
+        self._city_list["Santiago"] = City("Santiago", "yellow",["Lima"])
+        self._city_list["Khartoum"] = City("Khartoum", "yellow",["Cairo", "Lagos", "Kinshasa", "Johannesburg"])
+        self._city_list["Lagos"] = City("Lagos", "yellow",["São Paulo", "Kinshasa", "Khartoum"])
 
-        city_list["Istanbul"] = City("Istanbul", "black",["Milan", "St. Petersburg", "Moscow", "Baghdad", "Cairo", "Algiers"])
-        city_list["Kolkata"] = City("Kolkata", "black",["Delhi", "Chennai", "Bangkok", "Hong Kong"])
-        city_list["Tehran"] = City("Tehran", "black",["Moscow", "Baghdad", "Karachi", "Delhi"])
-        city_list["Cairo"] = City("Cairo", "black",["Algiers", "Istanbul", "Baghdad", "Riyadh", "Khartoum"])
-        city_list["Algiers"] = City("Algiers", "black",["Madrid", "Paris", "Istanbul", "Cairo"])
-        city_list["Moscow"] = City("Moscow", "black",["St. Petersburg", "Istanbul", "Tehran"])
-        city_list["Chennai"] = City("Chennai", "black",["Mumbai", "Delhi", "Kolkata", "Bangkok", "Jakarta"])
-        city_list["Karachi"] = City("Karachi", "black",["Riyadh", "Baghdad", "Tehran", "Delhi", "Mumbai"])
-        city_list["Delhi"] = City("Delhi", "black",["Tehran", "Karachi", "Mumbai", "Chennai", "Kolkata"])
-        city_list["Mumbai"] = City("Mumbai", "black",["Karachi", "Delhi", "Chennai"])
-        city_list["Riyadh"] = City("Riyadh", "black",["Cairo", "Baghdad", "Karachi"])
-        city_list["Baghdad"] = City("Baghdad", "black",["Istanbul", "Cairo", "Riyadh", "Karachi", "Tehran"])
+        self._city_list["Istanbul"] = City("Istanbul", "black",["Milan", "St. Petersburg", "Moscow", "Baghdad", "Cairo", "Algiers"])
+        self._city_list["Kolkata"] = City("Kolkata", "black",["Delhi", "Chennai", "Bangkok", "Hong Kong"])
+        self._city_list["Tehran"] = City("Tehran", "black",["Moscow", "Baghdad", "Karachi", "Delhi"])
+        self._city_list["Cairo"] = City("Cairo", "black",["Algiers", "Istanbul", "Baghdad", "Riyadh", "Khartoum"])
+        self._city_list["Algiers"] = City("Algiers", "black",["Madrid", "Paris", "Istanbul", "Cairo"])
+        self._city_list["Moscow"] = City("Moscow", "black",["St. Petersburg", "Istanbul", "Tehran"])
+        self._city_list["Chennai"] = City("Chennai", "black",["Mumbai", "Delhi", "Kolkata", "Bangkok", "Jakarta"])
+        self._city_list["Karachi"] = City("Karachi", "black",["Riyadh", "Baghdad", "Tehran", "Delhi", "Mumbai"])
+        self._city_list["Delhi"] = City("Delhi", "black",["Tehran", "Karachi", "Mumbai", "Chennai", "Kolkata"])
+        self._city_list["Mumbai"] = City("Mumbai", "black",["Karachi", "Delhi", "Chennai"])
+        self._city_list["Riyadh"] = City("Riyadh", "black",["Cairo", "Baghdad", "Karachi"])
+        self._city_list["Baghdad"] = City("Baghdad", "black",["Istanbul", "Cairo", "Riyadh", "Karachi", "Tehran"])
 
-        city_list["San Francisco"] = City("San Francisco", "blue",["Tokyo", "Manila", "Los Angeles", "Chicago"])
-        city_list["Atlanta"] = City("Atlanta", "blue",["Chicago", "Washington", "Miami"])
-        city_list["Madrid"] = City("Madrid", "blue",["New York", "London", "Paris", "Algiers", "São Paulo"])
-        city_list["New York"] = City("New York", "blue",["Montréal", "Washington", "Madrid", "London"])
-        city_list["Essen"] = City("Essen", "blue",["London", "Paris", "Milan", "St. Petersburg"])
-        city_list["Chicago"] = City("Chicago", "blue",["San Francisco", "Los Angeles", "Mexico City", "Atlanta", "Montréal"])
-        city_list["St. Petersburg"] = City("St. Petersburg", "blue",["Essen", "Istanbul", "Moscow"])
-        city_list["Montréal"] = City("Montréal", "blue",["Chicago", "Washington", "New York"])
-        city_list["London"] = City("London", "blue",["New York", "Madrid", "Paris", "Essen"])
-        city_list["Paris"] = City("Paris", "blue",["Madrid", "London", "Essen", "Milan", "Algiers"])
-        city_list["Milan"] = City("Milan", "blue",["Essen", "Paris", "Istanbul"])
-        city_list["Washington"] = City("Washington", "blue",["Miami", "Atlanta", "Montréal", "New York"])
+        self._city_list["San Francisco"] = City("San Francisco", "blue",["Tokyo", "Manila", "Los Angeles", "Chicago"])
+        self._city_list["Atlanta"] = City("Atlanta", "blue",["Chicago", "Washington", "Miami"])
+        self._city_list["Madrid"] = City("Madrid", "blue",["New York", "London", "Paris", "Algiers", "São Paulo"])
+        self._city_list["New York"] = City("New York", "blue",["Montréal", "Washington", "Madrid", "London"])
+        self._city_list["Essen"] = City("Essen", "blue",["London", "Paris", "Milan", "St. Petersburg"])
+        self._city_list["Chicago"] = City("Chicago", "blue",["San Francisco", "Los Angeles", "Mexico City", "Atlanta", "Montréal"])
+        self._city_list["St. Petersburg"] = City("St. Petersburg", "blue",["Essen", "Istanbul", "Moscow"])
+        self._city_list["Montréal"] = City("Montréal", "blue",["Chicago", "Washington", "New York"])
+        self._city_list["London"] = City("London", "blue",["New York", "Madrid", "Paris", "Essen"])
+        self._city_list["Paris"] = City("Paris", "blue",["Madrid", "London", "Essen", "Milan", "Algiers"])
+        self._city_list["Milan"] = City("Milan", "blue",["Essen", "Paris", "Istanbul"])
+        self._city_list["Washington"] = City("Washington", "blue",["Miami", "Atlanta", "Montréal", "New York"])
 
-        city_list["Tokyo"] = City("Tokyo", "red",["Seoul", "Shanghai", "Osaka", "San Francisco"])
-        city_list["Beijing"] = City("Beijing", "red",["Shanghai", "Seoul"])
-        city_list["Shanghai"] = City("Shanghai", "red",["Beijing", "Seoul", "Tokyo", "Hong Kong", "Taipei"])
-        city_list["Bangkok"] = City("Bangkok", "red",["Chennai", "Kolkata", "Hong Kong", "Ho Chi Minh City", "Jakarta"])
-        city_list["Manila"] = City("Manila", "red",["Ho Chi Minh City", "Hong Kong", "Taipei", "San Francisco", "Sydney"])
-        city_list["Ho Chi Minh City"] = City("Ho Chi Minh City", "red",["Jakarta", "Bangkok", "Hong Kong", "Manila"])
-        city_list["Sydney"] = City("Sydney", "red",["Jakarta", "Manila", "Los Angeles"])
-        city_list["Seoul"] = City("Seoul", "red",["Beijing", "Shanghai", "Tokyo"])
-        city_list["Taipei"] = City("Taipei", "red",["Manila", "Hong Kong", "Shanghai", "Osaka"])
-        city_list["Jakarta"] = City("Jakarta", "red",["Chennai", "Bangkok", "Ho Chi Minh City", "Sydney"])
-        city_list["Osaka"] = City("Osaka", "red",["Taipei", "Tokyo"])
-        city_list["Hong Kong"] = City("Hong Kong", "red",["Kolkata", "Shanghai", "Taipei", "Manila", "Ho Chi Minh City", "Bangkok"])
+        self._city_list["Tokyo"] = City("Tokyo", "red",["Seoul", "Shanghai", "Osaka", "San Francisco"])
+        self._city_list["Beijing"] = City("Beijing", "red",["Shanghai", "Seoul"])
+        self._city_list["Shanghai"] = City("Shanghai", "red",["Beijing", "Seoul", "Tokyo", "Hong Kong", "Taipei"])
+        self._city_list["Bangkok"] = City("Bangkok", "red",["Chennai", "Kolkata", "Hong Kong", "Ho Chi Minh City", "Jakarta"])
+        self._city_list["Manila"] = City("Manila", "red",["Ho Chi Minh City", "Hong Kong", "Taipei", "San Francisco", "Sydney"])
+        self._city_list["Ho Chi Minh City"] = City("Ho Chi Minh City", "red",["Jakarta", "Bangkok", "Hong Kong", "Manila"])
+        self._city_list["Sydney"] = City("Sydney", "red",["Jakarta", "Manila", "Los Angeles"])
+        self._city_list["Seoul"] = City("Seoul", "red",["Beijing", "Shanghai", "Tokyo"])
+        self._city_list["Taipei"] = City("Taipei", "red",["Manila", "Hong Kong", "Shanghai", "Osaka"])
+        self._city_list["Jakarta"] = City("Jakarta", "red",["Chennai", "Bangkok", "Ho Chi Minh City", "Sydney"])
+        self._city_list["Osaka"] = City("Osaka", "red",["Taipei", "Tokyo"])
+        self._city_list["Hong Kong"] = City("Hong Kong", "red",["Kolkata", "Shanghai", "Taipei", "Manila", "Ho Chi Minh City", "Bangkok"])
 
     # - - - GETTER FUNCTIONS - - -
+    @property
+    def city_list(self):
+        return self._city_list
 
-    # Any getter functions that might be necessary...
-    # ...
+    @property
+    def outbreak_counter (self):
+        return self._outbreak_counter
+
+    @property
+    def infection_rate_counter(self):
+        return self._infection_rate_counter
+
+    @property
+    def infection_rate(self):
+        return self._infection_rate
+
+    @property
+    def red_cured(self):
+        return self._red_cured
+
+    @property
+    def blue_cured(self):
+        return self._blue_cured
+
+    @property
+    def black_cured(self):
+        return self._black_cured
+
+    @property
+    def yellow_cured(self):
+        return self._yellow_cured
+
+    @property
+    def red_eradicated(self):
+        return self._red_eradicated
+
+    @property
+    def blue_eradicated(self):
+        return self._blue_eradicated
+
+    @property
+    def black_eradicated(self):
+        return self._black_eradicated
+
+    @property
+    def yellow_eradicated(self):
+        return self._yellow_eradicated
+
+    @property
+    def red_remaining(self):
+        return self._red_remaining
+
+    @property
+    def blue_remaining(self):
+        return self._blue_remaining
+
+    @property
+    def black_remaining(self):
+        return self._black_remaining
+
+    @property
+    def yellow_remaining(self):
+        return self._yellow_remaining
+
+    @property
+    def research_stations_remaining(self):
+        return self._research_stations_remaining
+
+    @property
+    def player_list(self):
+        return self._player_list
+
+    @property
+    def num_players(self):
+        return self._num_players
+
+    @property
+    def actions_remaining(self):
+        return self._actions_remaining
