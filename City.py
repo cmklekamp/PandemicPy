@@ -53,5 +53,10 @@ class City(object):
     # Getter functions
     # ...
 
+    @property
+    def connected_cities(self):
+        return self._connected_cities
+
+    @property
     def has_station(self):
         return self._has_station
