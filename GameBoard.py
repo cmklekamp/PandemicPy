@@ -25,8 +25,6 @@ class GameBoard(object):
     # Constructor -- initializes components of game board based on number of players
     def __init__(self, num_players):
 
-
-
         #Initialize Member Data
         self._outbreak_counter = 0
         self._infection_rate_counter = 0
@@ -55,6 +53,8 @@ class GameBoard(object):
 
         self._actions_remaining = 4
 
+        self._player_turn = 1
+
         #Initilize Cities
         self._city_list = dict()
         self.initialize_cities()
@@ -79,16 +79,20 @@ class GameBoard(object):
             infect_amount = 3 - (x % 3)
             card = self._infection_deck.bottom_card()
             if (card._city._color == "red"):
-                card._city._red = infect_amount
+                for y in range(infect_amount)
+                    card._city.add_cube("red")
                 self._red_remaining -= infect_amount
             if (card._city._color == "blue"):
-                card._city._blue = infect_amount
+                for y in range(infect_amount)
+                    card._city.add_cube("blue")
                 self._blue_remaining -= infect_amount
             if (card._city._color == "black"):
-                card._city._black = infect_amount
+                for y in range(infect_amount)
+                    card._city.add_cube("black")
                 self._black_remaining -= infect_amount
             if (card._city._color == "yellow"):
-                card._city._yellow = infect_amount
+                for y in range(infect_amount)
+                    card._city.add_cube("yellow")
                 self._yellow_remaining -= infect_amount
         
         #CHECK!
@@ -108,6 +112,9 @@ class GameBoard(object):
         #Should usernames be set up in the main program?
         #self.set_usernames()
         '''
+        
+        #set up temp_board in case there needs to be a reset
+        self.temp_board = self
 
     # set_usernames()
     # Sets player usernames to names contained in list of strings
@@ -121,29 +128,103 @@ class GameBoard(object):
 
     # simple_move()
     # Moves a player to a connected city (Drive / Ferry action)
-    def simple_move(self):
-        pass
+    # Used by the dispatcher to move other players
+    def simple_move(self, city_name, player = Player(0,"")):
+
+        #sets the moving player to the current player's turn if not specified in parameters
+        if (player.current_city == ""):
+            player = self._player_list[self._player_turn - 1]
+
+        #moves the current player if the city requested is connected to the current city
+        if (city_name in self._city_list[player.current_city].connected_cities):
+            player.current_city = city_name
+            self._actions_remaining -= 1
+            return True           
+        else:
+            return False
+
 
     # direct_flight()
     # Player must discard a City card to move to the city named on the card
-    def direct_flight(self):
-        pass
+    def direct_flight(self, city_name, player = Player(0,"")):
+
+        #sets the moving player to the current player's turn if not specified in parameters
+        if (player.current_city == ""):
+            player = self._player_list[self._player_turn - 1]
+
+        #CHECK!
+        #make sure Player class has a hand of cards
+        if (city_name in player.hand):
+            player.discard(city_name)
+            player.current_city = city_name
+            self._actions_remaining -= 1
+            return True
+        else:
+            return False
 
     # charter_flight()
     # Player must discard the City that matches where they are to move anywhere
-    def charter_flight(self):
-        pass
+    def charter_flight(self, city_name, player = Player(0,"")):
+        
+        #sets the moving player to the current player's turn if not specified in parameters
+        if (player.current_city == ""):
+            player = self._player_list[self._player_turn - 1]
+
+        #CHECK!
+        #make sure Player class has a hand of cards
+        if (player.current_city in player.hand):
+            player.discard(player.current_city)
+            player.current_city = city_name
+            self._actions_remaining -= 1
+            return True
+        else:
+            return False
 
     # shuttle_flight()
     # Moves a player from a city with a research station to another city with a research station
-    def shuttle_flight(self):
-        pass
+    def shuttle_flight(self, city_name, player = Player(0,"")):
 
+        #sets the moving player to the current player's turn if not specified in parameters
+        if (player.current_city == ""):
+            player = self._player_list[self._player_turn - 1]
+
+        #CHECK!
+        #make sure Player class has a hand of cards
+        if (self._city_list[player.current_city].has_station and self._citylist[city_name].has_station):
+            player.current_city = city_name
+            
+        else:
+            return False
+            
     # build_station()
     # Builds a research station in the city a player is in, if they discard that city
     # Takes into account special role 2
     def build_station(self):
-        pass
+
+        #return false if no more remaining stations        
+        if (self._research_stations_remaining == 0):
+                return False
+
+        player = self._player_list[self._player_turn - 1]
+
+        #CHECK!
+        #make sure Player class has a hand of cards
+        #check if player is operations expert      
+        if (player.role == 2):
+            if (self._city_list.add_station() == False):
+                return False
+
+        #check if the player has the current city card
+        else:
+            if (player.current_city in player.hand):
+                if (self._city_list.add_station() == False):
+                    return False
+                else:
+                    player.discard(player.current_city)
+
+        self._actions_remaining -= 1
+        return True  
+
 
     # treat_disease()
     # Removes 1 disease cube of specified color in current city; all cubes if disease is cured
@@ -219,9 +300,14 @@ class GameBoard(object):
         pass 
 
     # dispatcher_move_other()
-    # Move another player's pawn
-    def dispatcher_move_other(self):
-        pass 
+    # Move another player's pawn as if it were your own
+    # CHECK!
+    # seperate function for each type of move?
+    def dispatcher_move_other(self, city_name, player):
+        pass
+        #if (self._player_list[self.player_turn - 1].role == 1):
+        #   return self.simple_move(city_name, player)
+
 
     # dispatcher_move_p2p()
     # Move one player to another player ("player 2 player")
@@ -270,18 +356,24 @@ class GameBoard(object):
     # Advances the turn counter and resets number of actions remaining
     # Captures the current state of the board as member data for use with reset()
     def next_turn(self):
-        pass
+        self.temp_board = self
 
     # reset()
     # Resets the state of the board to the way it was before a player took actions that turn
     # Only allowed during action phase of turn
     def reset(self):
-        pass
+        self = self.temp_board
 
     # discard()
     # Allows the player to discard when they have gone over the hand limit
     def discard(self):
         pass
+
+    # remove_station()
+    # removes station if the remaining stations is 0
+    def remove_station(self, city_name):
+        if (self.research_stations_remaining == 0 and self.city_list[city_name].remove_station()):
+            self._research_stations_remaining += 1
 
     # initialize_cities()
     # Helper function to initilialize cities
@@ -418,3 +510,7 @@ class GameBoard(object):
     @property
     def actions_remaining(self):
         return self._actions_remaining
+
+    @property
+    def player_turn(self):
+        return self._player_turn
