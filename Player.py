@@ -32,7 +32,9 @@ class Player(object):
     # Constructor with parameters
     # Initializes player role number (1-7), corresponding color, and current city
     def __init__(self, role_num, starting_city):
-        pass
+        self._role = role_num
+        self._current_city = starting_city
+        self._username = ""
 
     # - - - GETTER FUNCTIONS - - -
     # get_username() 
