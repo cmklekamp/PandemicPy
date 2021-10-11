@@ -1,8 +1,13 @@
 #Check!
-# How to handle passive abilities like medics (call a helper function from within the move functions?)
+# How to handle medic passive abilitiy (call a helper function from within the move functions?)
 # Should we pass in the names of the cards or the cards themselves?
-# special attribute for contingency planner so they can have an extra card?
+# special attribute for contingency planner so they can have an extra card? just set to a EventCard
+#    of value 0, make a setter for this variable and it can be set in contingency_planner_take()
 # change order of who goes first based on city population
+# should the current city be a string of the name or a city object
+# are we doing difficulty levels?
+# add attribute to city class: had_outbreak, either true or false, set back to false in next_turn method
+# separate function for each type of dispatcher move?
 
 # - - - - - - - - - - - - - - - - - - - -
 # COP 4521 -- Term Project
@@ -76,8 +81,6 @@ class GameBoard(object):
         self._city_list["Atlanta"].add_station()
 
         #Initialize Players, gives them a random role, no duplicates
-        #Check!
-        #should the current city be a string of the name or a city object
         self._player_list = []
         self._num_players = num_players
         role_list = random.sample(range(1,8), num_players)
@@ -92,7 +95,7 @@ class GameBoard(object):
             self._infection_discard_pile.append(card)
         
         #CHECK!
-        #Make sure this works once Player class has been made      
+        #Make sure this works once Player class has been made (acquire_card())     
         # Give Out Cards
         # 2-players = 4, 3-players = 3, 4-players = 2
         num_cards = -(num_players - 2) + 4
@@ -102,8 +105,6 @@ class GameBoard(object):
                 self._player_list[x].acquire_card(card)
         
         #Prepare Deck
-        #Check!
-        # are we doing difficulty levels?
         self._player_deck.prepare(4)
         
         #set up temp_board in case there needs to be a reset
@@ -132,7 +133,10 @@ class GameBoard(object):
         if (city_name in self._city_list[player.current_city].connected_cities):
             player.current_city = city_name
             self._actions_remaining -= 1
-            return True           
+
+            #Check!
+            # medic passive check
+            return True                    
         else:
             return False
 
@@ -145,13 +149,14 @@ class GameBoard(object):
         if (player.current_city == ""):
             player = self._player_list[self._player_turn - 1]
 
-        #CHECK!
-        #make sure Player class has a hand of cards
         if (city_name in player.playerhand):
             self._player_discard_pile.append(self._city_list[city_name])
             player.discard(self._city_list[city_name])
             player.current_city = city_name
             self._actions_remaining -= 1
+
+            #Check!
+            # medic passive check
             return True
         else:
             return False
@@ -164,12 +169,13 @@ class GameBoard(object):
         if (player.current_city == ""):
             player = self._player_list[self._player_turn - 1]
 
-        #CHECK!
-        #make sure Player class has a hand of cards
         if (player.current_city in player.playerhand):
             player.discard(self._city_list[player.current_city])
             player.current_city = city_name
             self._actions_remaining -= 1
+
+            #Check!
+            # medic passive check
             return True
         else:
             return False
@@ -182,11 +188,11 @@ class GameBoard(object):
         if (player.current_city == ""):
             player = self._player_list[self._player_turn - 1]
 
-        #CHECK!
-        #make sure Player class has a hand of cards
         if (self._city_list[player.current_city].has_station and self._citylist[city_name].has_station):
             player.current_city = city_name
             self._actions_remaining -= 1
+            #Check!
+            # medic passive check
             return True
             
         else:
@@ -203,8 +209,6 @@ class GameBoard(object):
 
         player = self._player_list[self._player_turn - 1]
 
-        #CHECK!
-        #make sure Player class has a hand of cards
         #check if player is operations expert      
         if (player.role == 2):
             if (self._city_list.add_station() == False):
@@ -535,6 +539,7 @@ class GameBoard(object):
         #player = self._player_list[self._player_turn - 1]
 
         #if (player.role == 5 and card is EventCard and card in self._player_discard_pile):
+        #reduce action by 1
             
 
 
@@ -546,6 +551,10 @@ class GameBoard(object):
         pass
         #if (self._player_list[self.player_turn - 1].role == 1):
         #   return self.simple_move(city_name, player)
+
+        #Check!
+        # medic passive check
+        # reduce actions
 
 
     # dispatcher_move_p2p()
@@ -561,6 +570,8 @@ class GameBoard(object):
         if (contains_player == False):
             return False
 
+        #Check!
+        # medic passive check
         player.current_city = city_name
         self._actions_remaining -= 1
         return True
@@ -597,6 +608,8 @@ class GameBoard(object):
     # pass in the player using the card and where they are building the station
     def government_grant(self, player, city_name):
 
+        # Check!
+        # Use the correct syntax, also check for the contingency planner card
         if (self._research_stations_remaining == 0 or "Government Grant" not in player.playerhand):
             return False
         if (self._city_list.add_station() == False):
@@ -611,6 +624,9 @@ class GameBoard(object):
     # airlift()
     # Does Event card #4 -- Airlift
     def airlift(self, card_player, moving_player, city_name):
+
+        # Check!
+        # Use the correct syntax, also check for the contingency planner card
         if ("Airlift" not in card_player.playerhand or city_name not in self._city_list):
             return False
         else:
@@ -618,6 +634,9 @@ class GameBoard(object):
             moving_player.current_city = city_name
             #Check!
             #if player is using their contingency planner event card, don't put it in the discard pile
+
+            #Check!
+            # medic passive check
             self._player_discard_pile.append("Airlift")
             return True
 
