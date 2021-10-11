@@ -1,3 +1,8 @@
+#Check!
+# How to handle passive abilities like medics (call treat disease from within the move functions?)
+# Should we pass in the names of the cards or the cards themselves?
+# special attribute for contingency planner so they can have an extra card?
+
 # - - - - - - - - - - - - - - - - - - - -
 # COP 4521 -- Term Project
 # Daniel Fletcher, Connor Klekamp, Jacob Gregie
@@ -52,8 +57,15 @@ class GameBoard(object):
         self._infection_deck = InfectionDeck()
 
         self._actions_remaining = 4
-
         self._player_turn = 1
+
+        #discard pile of card objects for each type of card
+        self._infection_discard_pile = []
+        self._player_discard_pile = []
+
+        #flags for victory or defeat
+        self._victory = False
+        self._defeat = False
 
         #Initilize Cities
         self._city_list = dict()
@@ -63,6 +75,8 @@ class GameBoard(object):
         self._city_list["Atlanta"].add_station()
 
         #Initialize Players, gives them a random role, no duplicates
+        #Check!
+        #should the current city be a string of the name or a city object
         self._player_list = []
         self._num_players = num_players
         role_list = random.sample(range(1,8), num_players)
@@ -72,7 +86,6 @@ class GameBoard(object):
         '''
         #CHECK!
         #Make sure this works once Deck class has been made
-        #Do we need a discard pile list?
         #Infect Cities
         
         for x in range(9):
@@ -94,6 +107,7 @@ class GameBoard(object):
                 for y in range(infect_amount)
                     card._city.add_cube("yellow")
                 self._yellow_remaining -= infect_amount
+            self._infection_discard_pile.append(card)
         
         #CHECK!
         #Make sure this works once Deck class has been made      
@@ -108,9 +122,6 @@ class GameBoard(object):
 
         #Prepare Deck
         self._player_deck.prepare()
-
-        #Should usernames be set up in the main program?
-        #self.set_usernames()
         '''
         
         #set up temp_board in case there needs to be a reset
@@ -155,7 +166,8 @@ class GameBoard(object):
         #CHECK!
         #make sure Player class has a hand of cards
         if (city_name in player.hand):
-            player.discard(city_name)
+            self._player_discard_pile.append(self._city_list[city_name])
+            player.discard(self._city_list[city_name])
             player.current_city = city_name
             self._actions_remaining -= 1
             return True
@@ -173,7 +185,7 @@ class GameBoard(object):
         #CHECK!
         #make sure Player class has a hand of cards
         if (player.current_city in player.hand):
-            player.discard(player.current_city)
+            player.discard(self._city_list[player.current_city])
             player.current_city = city_name
             self._actions_remaining -= 1
             return True
@@ -192,6 +204,8 @@ class GameBoard(object):
         #make sure Player class has a hand of cards
         if (self._city_list[player.current_city].has_station and self._citylist[city_name].has_station):
             player.current_city = city_name
+            self._actions_remaining -= 1
+            return True
             
         else:
             return False
@@ -220,7 +234,7 @@ class GameBoard(object):
                 if (self._city_list.add_station() == False):
                     return False
                 else:
-                    player.discard(player.current_city)
+                    player.discard(self._city_list[player.current_city])
 
         self._actions_remaining -= 1
         return True  
@@ -230,25 +244,155 @@ class GameBoard(object):
     # Removes 1 disease cube of specified color in current city; all cubes if disease is cured
     # Updates cube pools (and possibly, eradicated flags) accordingly
     # Takes into account special role 3
-    def treat_disease(self):
-        pass
+    def treat_disease(self, color):
+        player = self._player_list[self._player_turn - 1]
+
+        if (color == "red"):
+            #return if the selected color can't be treated
+            if (player.current_city.red == 0):
+                return False
+
+            #remove all cubes if the disease is cured or if the player is the medic
+            if (self._red_cured or player.role == 3):
+                for x in range (player.current_city.red):
+                    player.current_city.removecube("red")
+                    self._red_remaining += 1
+
+                #eradicate if necessary
+                if (self._red_cured and self._red_remaining == 24):
+                    self._red_eradicated = True
+
+            #remove one cube            
+            else:
+                player.current_city.removecube("red")
+                self._red_remaining += 1
+
+        elif (color == "blue"):
+            if (player.current_city.blue == 0):
+                return False
+            if (self._blue_cured or player.role == 3):
+                for x in range (player.current_city.blue):
+                    player.current_city.removecube("blue")
+                    self._blue_remaining += 1
+                if (self._blue_cured and self._blue_remaining == 24):
+                    self._blue_eradicated = True
+            else:
+                player.current_city.removecube("blue")
+                self._blue_remaining += 1
+
+        elif (color == "black"):
+            if (player.current_city.black == 0):
+                return False
+            if (self._black_cured or player.role == 3):
+                for x in range (player.current_city.black):
+                    player.current_city.removecube("black")
+                    self._black_remaining += 1
+                if (self._black_cured and self._black_remaining == 24):
+                    self._black_eradicated = True
+            else:
+                player.current_city.removecube("black")
+                self._black_remaining += 1
+
+        elif (color == "yellow"):
+            if (player.current_city.yellow == 0):
+                return False
+            if (self._yellow_cured or player.role == 3):
+                for x in range (player.current_city.yellow):
+                    player.current_city.removecube("yellow")
+                    self._yellow_remaining += 1
+                if (self._yellow_cured and self._yellow_remaining == 24):
+                    self._yellow_eradicated = True
+            else:
+                player.current_city.removecube("yellow")
+                self._yellow_remaining += 1
+
+        else:
+            return False
+
+        self.actions_remaining -= 1
+        return True
 
     # share_knowledge()
     # Give or take City card that matches current city
+    # The first player in the parameter list is always the one giving the card
     # Checks for hand limit and responds appropriately, when necessary
     # Takes into account special role 4
-    def share_knowledge(self):
-        pass
+    def share_knowledge(self, giving_player, taking_player, card_name):
+
+        #return false if the giving player doesn't have the card, card limit reached,
+        #  or players aren't in the same city
+        if (card_name not in giving_player.hand or taking_player.over_hand_limit()
+                or giving_player.current_city != taking_player.current_city):
+            return False
+        
+        #exchange cards if the giving player is the researcher or the card matches current city
+        if (giving_player.role == 4 or giving_player.current_city == card_name):
+            taking_player.acquire_card(self._city_list[card_name])
+            giving_player.discard(self._city_list[card_name])
+            self._actions_remaining -= 1
+            return True
+
+        else:
+            return False    
 
     # discover_cure()
     # Discard 5 City cards of one color at any research station to cure that color
+    # pass in the color being discovered, and the list of cards being discarded
     # If no cubes of that color are on board at this time, make disease eradicated also
     # If all diseases are cured, trigger game end (victory)
     # Takes into account special role 7
-    def discover_cure(self):
-        pass
+    def discover_cure(self, color, discard_list):
+        player = self._player_list[self._player_turn - 1]
 
+        if (self._city_list[player.current_city].has_station == False):
+            return False
 
+        for x in discard_list:
+            if (discard_list[x].color != color or discard_list[x] not in player.hand):
+                return False
+
+        if (len(discard_list) == 5 or (player.role == 7 and len(discard_list) == 4)):
+            if (color == "red"):
+                if (self._red_cured):
+                    return False
+                self._red_cured = True
+                if (self._red_remaining == 24):
+                    self._red_eradicated = True
+            
+            elif (color == "blue"):
+                if (self._blue_cured):
+                    return False
+                self._blue_cured = True
+                if (self._blue_remaining == 24):
+                    self._blue_eradicated = True
+
+            elif (color == "black"):
+                if (self._black_cured):
+                    return False
+                self._black_cured = True
+                if (self._black_remaining == 24):
+                    self._black_eradicated = True
+
+            elif (color == "yellow"):
+                if (self._yellow_cured):
+                    return False
+                self._yellow_cured = True
+                if (self._yellow_remaining == 24):
+                    self._yellow_eradicated = True
+
+            else:
+                return False
+
+        #discard the cards
+        for x in discard_list:
+            self._player_discard_pile.append(discard_list[x])
+            player.discard(discard_list[x])
+        
+        self.actions_remaining -= 1
+        if (self._red_cured and self._blue_cured and self._black_cured and self._yellow_cured):
+            self.game_end(True)
+
+        return True
 
     # - - - (2) DRAW CARDS - - -
 
@@ -296,8 +440,13 @@ class GameBoard(object):
 
     # contingency_planner_take()
     # Takes an Event card from the discard pile, according to Role rules
-    def contingency_planner_take(self):
-        pass 
+    def contingency_planner_take(self, card):
+        pass
+        #player = self._player_list[self._player_turn - 1]
+
+        #if (player.role == 5 and card is EventCard and card in self._player_discard_pile):
+            
+
 
     # dispatcher_move_other()
     # Move another player's pawn as if it were your own
@@ -316,10 +465,17 @@ class GameBoard(object):
 
     # operations_expert_move()
     # Move from research station to any city by discarding any Card
-    def operations_expert_move(self):
-        pass 
+    def operations_expert_move(self, card, city_name):
+        player = self._player_list[self._player_turn - 1]
 
-
+        if (player.role == 2 and card in player.hand and city_name in self._city_list):
+            self._player_discard_pile.append(card)
+            player.discard(card)
+            player.current_city = city_name
+            self._actions_remaining -= 1
+            return True
+        else:
+            return False
 
     # - - - EVENT CARDS - - -
 
@@ -335,16 +491,35 @@ class GameBoard(object):
 
     # government_grant()
     # Does Event card #3 -- Government Grant
-    def government_grant(self):
-        pass
+    # pass in the player using the card and where they are building the station
+    def government_grant(self, player, city_name):
+
+        if (self._research_stations_remaining == 0 or "Government Grant" not in player.hand):
+            return False
+        if (self._city_list.add_station() == False):
+            return False
+        else:
+            player.discard("Government Grant")
+            #Check!
+            #if player is using their contingency planner event card, don't put it in the discard pile
+            self._player_discard_pile.append("Government Grant")
+            return True
 
     # airlift()
     # Does Event card #4 -- Airlift
-    def airlift(self):
-        pass
+    def airlift(self, card_player, moving_player, city_name):
+        if ("Airlift" not in card_player.hand or city_name not in self._city_list):
+            return False
+        else:
+            card_player.discard("Airlift")
+            moving_player.current_city = city_name
+            #Check!
+            #if player is using their contingency planner event card, don't put it in the discard pile
+            self._player_discard_pile.append("Airlift")
+            return True
 
     # resilient_population()
-    # Does Event card #5 -- One Quiet Night
+    # Does Event card #5 -- Resilient Population
     def resilient_population(self):
         pass
 
@@ -356,24 +531,48 @@ class GameBoard(object):
     # Advances the turn counter and resets number of actions remaining
     # Captures the current state of the board as member data for use with reset()
     def next_turn(self):
+        self._actions_remaining = 4
+        
+        if (self._player_turn == len(self._player_list)):
+            self._player_turn = 1
+        else:
+            self._player_turn += 1
+
         self.temp_board = self
 
     # reset()
     # Resets the state of the board to the way it was before a player took actions that turn
     # Only allowed during action phase of turn
     def reset(self):
-        self = self.temp_board
+        if (self._actions_remaining > 0):
+            self = self.temp_board
+            return True
+        else:
+            return False
 
     # discard()
     # Allows the player to discard when they have gone over the hand limit
-    def discard(self):
-        pass
+    def discard(self, card):
+        player = self._player_list[self._player_turn - 1].discard(card)
+        if (player.over_hand_limit()):
+            player.discard(card)
+            return True
+        else:
+            return False
 
     # remove_station()
     # removes station if the remaining stations is 0
     def remove_station(self, city_name):
         if (self.research_stations_remaining == 0 and self.city_list[city_name].remove_station()):
             self._research_stations_remaining += 1
+
+    # game_end()
+    # ends the game based on if it was a victory or a defeat
+    def game_end(self, victory):
+        if (victory == True):
+            self._victory = True
+        else:
+            self._defeat = True
 
     # initialize_cities()
     # Helper function to initilialize cities
@@ -514,3 +713,19 @@ class GameBoard(object):
     @property
     def player_turn(self):
         return self._player_turn
+    
+    @property
+    def player_discard_pile(self):
+        return self._player_discard_pile
+
+    @property
+    def infection_discard_pile(self):
+        return self._infection_discard_pile
+    
+    @property
+    def victory(self):
+        return self._victory
+    
+    @property
+    def defeat(self):
+        return self._defeat
