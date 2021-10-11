@@ -82,13 +82,14 @@ class Player(object):
 
     # acquire_card()
     # Adds a card to the player's hand
-    def acquire_card(self):
-        pass
+    # How should this interact with over_hand_limit, if at all?
+    def acquire_card(self, card):
+        self._playerhand.append(card)
 
     # over_hand_limit()
     # Returns True if the player has more than 7 cards in hand; False otherwise
     def over_hand_limit(self):
-        if playerhand.len() > 7:
+        if self._playerhand.len() > 7:
             return True
         else:
             return False
@@ -107,7 +108,7 @@ class Player(object):
             goal = 5
 
             # Increments the counters as the hand is checked.
-            for x in playerhand:
+            for x in self._playerhand:
                 if x.color == "yellow":
                     yellowCounter += 1
                 elif x.color == "black":
