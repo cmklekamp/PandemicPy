@@ -38,12 +38,12 @@ class Deck(object):
 
     # get_size()
     # Returns the size of the deck
-    def get_size():
+    def get_size(self):
         return self._cardlist.len()
 
     # is_empty()
     # Returns True if the deck is empty, False otherwise
-    def is_empty():
+    def is_empty(self):
         if self._cardlist.get_size() == 0:
             return True
         else:
