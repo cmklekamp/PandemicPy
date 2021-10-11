@@ -32,10 +32,12 @@ class InfectionCard(Card):
         self._color = color
 
     # Getter functions
-    def get_city(self):
+    @property
+    def city(self):
         return self._city
 
-    def get_color(self):
+    @property
+    def color(self):
         return self._color
 
 
@@ -58,16 +60,20 @@ class CityCard(PlayerCard):
         self._density = density
 
     # Getter functions
-    def get_city(self):
+    @property
+    def city(self):
         return self._city
 
-    def get_color(self):
+    @property
+    def color(self):
         return self._color
 
-    def get_population(self):
+    @property
+    def population(self):
         return self._population
 
-    def get_density(self):
+    @property
+    def density(self):
         return self._density
 
 
@@ -92,5 +98,6 @@ class EventCard(PlayerCard):
         self._value = event_num
 
     # Getter functions
-    def get_value(self):
+    @property
+    def value(self):
         return self._value
