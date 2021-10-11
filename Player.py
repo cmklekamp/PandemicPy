@@ -65,6 +65,14 @@ class Player(object):
     def playerhand(self):
         return self._playerhand
 
+    @property
+    def role(self):
+        return self._role
+
+    @property
+    def current_city(self):
+        return self._current_city
+
     # - - - SETTER FUNCTIONS - - -
     # set_username()
     # Sets the player's username to the given parameter
@@ -89,4 +97,34 @@ class Player(object):
     # Returns True if the player can turn in a set; False otherwise
     # Takes special case of Role #7 (Scientist) into consideration
     def can_turn_in(self):
-        pass
+        if current_city.has_station():
+            # Counters that will be used to count the number of cards of each color the player holds.
+            yellowCounter = 0
+            blackCounter = 0
+            blueCounter = 0
+            redCounter = 0
+            # Counter that holds the number a player needs to successfully turn in the set.
+            goal = 5
+
+            # Increments the counters as the hand is checked.
+            for x in playerhand:
+                if x.color == "yellow":
+                    yellowCounter += 1
+                elif x.color == "black":
+                    blackCounter += 1
+                elif x.color == "blue":
+                    blueCounter += 1
+                else:
+                    redCounter += 1
+            
+            # Goal decreases by one if the player is the Scientist.
+            if role == 7:
+                goal -= 1
+
+            # Final check.
+            if yellowCounter >= goal or blackCounter >= goal or blueCounter >= goal or redCounter >= goal:
+                return True
+            else:
+                return False
+        else:
+            return False
