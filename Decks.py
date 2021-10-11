@@ -14,6 +14,7 @@
 
 # Relevant import statements
 from Cards import *
+import random
 
 
 # Deck class
@@ -25,9 +26,10 @@ class Deck(object):
         self._cardlist = list()
 
     # shuffle()
-    # Shuffle cards in the deck
+    # Shuffle cards in the deck using the random library's prebuilt list shuffling method
+    # NOTE: Is this method necessary with the pre-existing shuffle method already usable?
     def shuffle(self):
-        pass
+        random.shuffle(self._cardlist)
 
     # top_card()
     # Returns the top card from the deck, removing it from the deck in the process
@@ -123,7 +125,9 @@ class InfectionDeck(Deck):
     # Reshuffles cards from Infection discard, adds them back to TOP of Infection deck
     # Occurs during 3 - INTENSIFY phase of Epidemics
     def intensify(self, discard_pile):
-        pass
+        discard_pile.shuffle()
+        while discard_pile.len() > 0:
+            self._cardlist.append(discard_pile.pop())
 
 
 # PlayerDeck class
@@ -131,7 +135,7 @@ class InfectionDeck(Deck):
 class PlayerDeck(Deck):
 
     # Default constructor
-    # Initializes 48 City cards (w/ population data), 5 Event cards (NO Epidemic cards yet)
+    # Initializes 48 City cards (w/ population data), 5 Event cards (NO Epidemic cards yet) 
     def __init__(self):
         # First, call parent constructor
         super().__init__()
@@ -204,4 +208,48 @@ class PlayerDeck(Deck):
     # Adds 4, 5, or 6 Epidemic cards to the deck (based on parameter)
     # Shuffles deck according to Step 5 of game setup
     def prepare(self, num_epidemics):
-        pass
+        # Slicing the list into smaller lists.
+        if num_epidemics == 4:
+            cardlist1 = self._cardlist[0::13]
+            cardlist2 = self._cardlist[13::26]
+            cardlist3 = self._cardlist[26::39]
+            cardlist4 = self._cardlist[39::54]
+        elif num_epidemics == 5:
+            cardlist1 = self._cardlist[0::11]
+            cardlist2 = self._cardlist[11::22]
+            cardlist3 = self._cardlist[22::33]
+            cardlist4 = self._cardlist[33::44]
+            cardlist5 = self._cardlist[44::54]
+        elif num_epidemics == 6:
+            cardlist1 = self._cardlist[0::9]
+            cardlist2 = self._cardlist[9::18]
+            cardlist3 = self._cardlist[18::27]
+            cardlist4 = self._cardlist[27::36]
+            cardlist5 = self._cardlist[36::45]
+            cardlist6 = self._cardlist[45::54]
+
+        # Adding in the epidemic cards and shuffling.
+        cardlist1.append(EpidemicCard())
+        random.shuffle(cardlist1)
+        cardlist2.append(EpidemicCard())
+        random.shuffle(cardlist2)
+        cardlist3.append(EpidemicCard())
+        random.shuffle(cardlist3)
+        cardlist4.append(EpidemicCard())
+        random.shuffle(cardlist4)
+        if num_epidemics >= 5:
+            cardlist5.append(EpidemicCard())
+            random.shuffle(cardlist5)
+        if num_epidemics == 6:
+            cardlist6.append(EpidemicCard())
+            random.shuffle(cardlist6)
+
+        # Adding everything back into the original deck.
+        self._cardlist = cardlist1
+        self._cardlist.extend(cardlist2)
+        self._cardlist.extend(cardlist3)
+        self._cardlist.extend(cardlist4)
+        if num_epidemics >= 5:
+            self._cardlist.extend(cardlist5)
+        if num_epidemics == 6:
+            self._cardlist.extend(cardlist6)
