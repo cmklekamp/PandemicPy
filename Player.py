@@ -36,6 +36,7 @@ class Player(object):
         self._role = role_num
         self._current_city = starting_city
         self._username = ""
+        self._contingency_planner_card = EventCard(0)
 
         # Setting player color based on role number.
         # This should make later GUI syntax a little more readable.
@@ -73,12 +74,20 @@ class Player(object):
     def current_city(self):
         return self._current_city
 
+    @property
+    def contingency_planner_card(self):
+        return self._contingency_planner_card
+
     # - - - SETTER FUNCTIONS - - -
     # set_username()
     # Sets the player's username to the given parameter
     @username.setter
     def set_username(self, username):
         self._username = username
+
+    @contingency_planner_card.setter
+    def contingency_planner_card(self, card):
+        self._contingency_planner_card = card
 
     # acquire_card()
     # Adds a card to the player's hand
