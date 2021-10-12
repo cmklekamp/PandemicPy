@@ -27,7 +27,6 @@ class Deck(object):
 
     # shuffle()
     # Shuffle cards in the deck using the random library's prebuilt list shuffling method
-    # NOTE: Is this method necessary with the pre-existing shuffle method already usable?
     def shuffle(self):
         random.shuffle(self._cardlist)
 

@@ -24,6 +24,7 @@ class City(object):
         self._red = 0
         self._yellow = 0
         self._has_station = False
+        self._had_outbreak = False
         self._connected_cities = connected_list
 
     # add_cube()
@@ -94,6 +95,10 @@ class City(object):
     @property
     def has_station(self):
         return self._has_station
+
+    @property
+    def had_outbreak(self):
+        return self._had_outbreak
 
     @property
     def name(self):
