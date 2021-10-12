@@ -514,12 +514,13 @@ class GameBoard(object):
                 quarantine_list = self._city_list[x.current_city].connected_cities
 
         # skips the outbreak if the city already had one or the quarentine specialist is connected
-        if (self._city_list[city_name].had_outbreak == False or city_name in quarantine_list):
+        if (self._city_list[city_name].had_outbreak == False and city_name not in quarantine_list):
             self._outbreak_counter += 1
             if (self._outbreak_counter >= 8):
                 self.game_end(False)
                 return
 
+            # prevent future outbreaks from happening to this city in the same turn
             self._city_list[city_name].had_outbreak = True
             
             # recursively go through all the connected cities, if infect_city calls
