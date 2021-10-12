@@ -131,6 +131,10 @@ class City(object):
     def has_station(self, a):
         self.has_station = a
 
+    @had_outbreak.setter
+    def had_outbreak(self, a):
+        self._had_outbreak = a
+
     @black.setter
     def black(self, a):
         self._black = a
