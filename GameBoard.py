@@ -1,12 +1,5 @@
 #Check!
-# Should we pass in the names of the cards or the cards themselves?
-# special attribute for contingency planner so they can have an extra card? just set to a EventCard
-#    of value 0, make a setter for this variable and it can be set in contingency_planner_take()
 # change order of who goes first based on city population
-# should the current city be a string of the name or a city object
-# are we doing difficulty levels?
-# add attribute to city class: had_outbreak, either true or false, set back to false in draw_infection method
-# separate function for each type of dispatcher move?
 
 # - - - - - - - - - - - - - - - - - - - -
 # COP 4521 -- Term Project
@@ -33,7 +26,7 @@ class GameBoard(object):
     # - - - SETUP FUNCTIONS - - -
     
     # Constructor -- initializes components of game board based on number of players
-    def __init__(self, num_players):
+    def __init__(self, num_players, difficulty = 4):
 
         #Initialize Member Data
         self._outbreak_counter = 0
@@ -104,7 +97,7 @@ class GameBoard(object):
                 self._player_list[x].acquire_card(card)
         
         #Prepare Deck
-        self._player_deck.prepare(4)
+        self._player_deck.prepare(difficulty)
 
         # make a list of the cities that the quarantine specialist is connected to so they won't be infected
         self._quarantine_list = list()
@@ -410,7 +403,7 @@ class GameBoard(object):
         for x in range(2):
             card = self._player_deck.top_card()
             if (card is CityCard or card is EventCard):
-                player.playerhand.append(card)
+                player.acquire_card(card)
             else:
                 self.epidemic()
                 if (self._defeat == True):
