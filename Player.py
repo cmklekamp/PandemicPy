@@ -98,7 +98,7 @@ class Player(object):
     # Returns True if the player can turn in a set; False otherwise
     # Takes special case of Role #7 (Scientist) into consideration
     def can_turn_in(self):
-        if current_city.has_station():
+        if self._current_city.has_station():
             # Counters that will be used to count the number of cards of each color the player holds.
             yellowCounter = 0
             blackCounter = 0
@@ -119,7 +119,7 @@ class Player(object):
                     redCounter += 1
             
             # Goal decreases by one if the player is the Scientist.
-            if role == 7:
+            if self._role == 7:
                 goal -= 1
 
             # Final check.
