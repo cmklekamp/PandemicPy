@@ -102,8 +102,7 @@ class Player(object):
             if x == card:
                 self._playerhand.remove(card)
                 return True
-            else:
-                return False
+        return False
 
     # over_hand_limit()
     # Returns True if the player has more than 7 cards in hand; False otherwise
