@@ -1,5 +1,9 @@
 #Check!
 # change order of who goes first based on city population
+# simplify event cards by putting more in the helper function
+# split epidemic function into 2 parts for resilient population
+# deal with skip_infect_cities, handle it in main with a setter or deal with it in infect_cities()?
+# break up draw cards function to only draw 1 card? allow event cards before epidemic starts
 
 # - - - - - - - - - - - - - - - - - - - -
 # COP 4521 -- Term Project
@@ -64,6 +68,9 @@ class GameBoard(object):
         #flags for victory or defeat
         self._victory = False
         self._defeat = False
+
+        #flag for use by One Quiet Night event card
+        self._skip_infect_cities = False
 
         #Initilize Cities
         self._city_list = dict()
@@ -447,8 +454,8 @@ class GameBoard(object):
         self._infection_discard_pile.append(card)
         self.infect_city(card.city, card.color)
 
-        #Check!
-        #set had_outbreak to false for all cities
+        for x in self._city_list:
+            x.had_outbreak = False
 
     # infect_city()
     # Infects a city with the specified number of disease cubes; handles outbreaks appropriately
@@ -456,6 +463,10 @@ class GameBoard(object):
     # Take into account cured/eradicated diseases, along with special roles (like 3 and 6)
     # If there aren't enough cubes to infect a city, trigger game end (defeat)
     def infect_city(self, city_name, color, num_cubes = 1):
+        
+        #if there is an epidemic it won't skip the placement of the 3 cubes on the bottom card
+        if (self._skip_infect_cities == True and num_cubes == 1):
+            return
         
         # skip this function if a game over condition has already been met, saves a little time
         if (self._defeat == True):
@@ -622,8 +633,23 @@ class GameBoard(object):
 
     # one_quiet_night()
     # Does Event card #1 -- One Quiet Night
-    def one_quiet_night(self):
-        pass
+    def one_quiet_night(self, player):
+
+        has_card, using_contingency_card, card = self.event_card_check(player, 1)
+
+        if (has_card == False):
+            return False
+
+        self._skip_infect_cities == True
+
+        # only discard if the card is not the contingency_planner_card           
+        if (using_contingency_card == False):
+            player.discard(card)
+            self._player_discard_pile.append(card)
+        else:
+            player.contingency_planner_card.value = 0
+        
+        return True
 
     # forecast()
     # Does Event card #2 -- Forecast
@@ -635,39 +661,55 @@ class GameBoard(object):
     # pass in the player using the card and where they are building the station
     def government_grant(self, player, city_name):
 
-        # Check!
-        # Use the correct syntax, also check for the contingency planner card
-        if (self._research_stations_remaining == 0 or "Government Grant" not in player.playerhand):
+        if (self._research_stations_remaining == 0):
             return False
-        if (self._city_list.add_station() == False):
+
+        has_card, using_contingency_card, card = self.event_card_check(player, 3)
+
+        if (has_card == False):
+            return False
+
+        if (self._city_list[city_name].add_station() == False):
             return False
         else:
-            player.discard("Government Grant")
-            #Check!
-            #if player is using their contingency planner event card, don't put it in the discard pile
-            self._player_discard_pile.append("Government Grant")
-            return True
+            self._research_stations_remaining -= 1
+            
+        # only discard if the card is not the contingency_planner_card           
+        if (using_contingency_card == False):
+            player.discard(card)
+            self._player_discard_pile.append(card)
+        else:
+            player.contingency_planner_card.value = 0
+        
+        return True
 
     # airlift()
     # Does Event card #4 -- Airlift
     def airlift(self, card_player, moving_player, city_name):
 
-        # Check!
-        # Use the correct syntax, also check for the contingency planner card
-        if ("Airlift" not in card_player.playerhand or city_name not in self._city_list):
+        if (city_name not in self._city_list):
             return False
+
+        has_card, using_contingency_card, card = self.event_card_check(card_player, 4)
+
+        if (has_card == False):
+            return False
+
+        # update the current city of the player that moved
+        moving_player.current_city = city_name
+
+        # medic passive check
+        if (moving_player.role == 3):
+            self.medic_passive(city_name)
+
+        # only discard if the card is not the contingency_planner_card           
+        if (using_contingency_card == False):
+            card_player.discard(card)
+            self._player_discard_pile.append(card)
         else:
-            card_player.discard("Airlift")
-            moving_player.current_city = city_name
-            #Check!
-            #if player is using their contingency planner event card, don't put it in the discard pile
-
-            # medic passive check
-            if (moving_player.role == 3):
-                self.medic_passive(city_name)
-
-            self._player_discard_pile.append("Airlift")
-            return True
+            card_player.contingency_planner_card.value = 0
+        
+        return True
 
     # resilient_population()
     # Does Event card #5 -- Resilient Population
@@ -683,7 +725,7 @@ class GameBoard(object):
     # Captures the current state of the board as member data for use with reset()
     def next_turn(self):
         self._actions_remaining = 4
-        
+
         if (self._player_turn == len(self._player_list)):
             self._player_turn = 1
         else:
@@ -704,7 +746,7 @@ class GameBoard(object):
     # discard()
     # Allows the player to discard when they have gone over the hand limit
     def discard(self, card):
-        player = self._player_list[self._player_turn - 1].discard(card)
+        player = self._player_list[self._player_turn - 1]
         if (player.over_hand_limit()):
             player.discard(card)
             return True
@@ -716,6 +758,9 @@ class GameBoard(object):
     def remove_station(self, city_name):
         if (self.research_stations_remaining == 0 and self.city_list[city_name].remove_station()):
             self._research_stations_remaining += 1
+            return True
+        else:
+            return False
 
     # game_end()
     # ends the game based on if it was a victory or a defeat
@@ -741,6 +786,26 @@ class GameBoard(object):
         if (self._yellow_cured):
             while (city.remove_cube("yellow") == True):
                 self._yellow_remaining += 1
+    
+    # event_card_check()
+    # helper function, checks if the player has an event card and whether or not it is the contingency_planner_card
+    def event_card_check(self, player, number):
+        has_card = False
+        using_contingency_card = False
+        card = EventCard(0)
+
+        if (player.contingency_planner_card.value == number):
+            has_card = True
+            using_contingency_card = True
+
+        else:
+            for x in player.playerhand:
+                if (x is EventCard and x.value == number):
+                    has_card = True
+                    card = x
+
+        return has_card, using_contingency_card, card
+
 
     # initialize_cities()
     # Helper function to initilialize cities
@@ -901,3 +966,7 @@ class GameBoard(object):
     @property
     def quarantine_list(self):
         return self._quarantine_list
+    
+    @property
+    def skip_infect_cities(self):
+        return self._skip_infect_cities
