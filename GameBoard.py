@@ -4,6 +4,7 @@
 # split epidemic function into 2 parts for resilient population
 # deal with skip_infect_cities, handle it in main with a setter or deal with it in infect_cities()?
 # break up draw cards function to only draw 1 card? allow event cards before epidemic starts
+# player discard function might not work
 
 # - - - - - - - - - - - - - - - - - - - -
 # COP 4521 -- Term Project
@@ -128,11 +129,7 @@ class GameBoard(object):
     # simple_move()
     # Moves a player to a connected city (Drive / Ferry action)
     # Used by the dispatcher to move other players
-    def simple_move(self, city_name, player = Player(0,"")):
-
-        #sets the moving player to the current player's turn if not specified in parameters
-        if (player.current_city == ""):
-            player = self._player_list[self._player_turn - 1]
+    def simple_move(self, player, city_name):
 
         #moves the current player if the city requested is connected to the current city
         if (city_name in self._city_list[player.current_city].connected_cities):
@@ -150,15 +147,17 @@ class GameBoard(object):
 
     # direct_flight()
     # Player must discard a City card to move to the city named on the card
-    def direct_flight(self, city_name, player = Player(0,"")):
+    def direct_flight(self, player, city_name):
 
-        #sets the moving player to the current player's turn if not specified in parameters
-        if (player.current_city == ""):
-            player = self._player_list[self._player_turn - 1]
+        #check if the card is in the players hand
+        card = CityCard("", "", 0, 0)
+        for x in player.playerhand:
+            if (x is CityCard and x.city == city_name):
+                card = x
 
-        if (city_name in player.playerhand):
-            self._player_discard_pile.append(self._city_list[city_name])
-            player.discard(self._city_list[city_name])
+        if (card.city != ""):
+            self._player_discard_pile.append(card)
+            player.discard(card)
             player.current_city = city_name
             self._actions_remaining -= 1
 
@@ -172,14 +171,17 @@ class GameBoard(object):
 
     # charter_flight()
     # Player must discard the City that matches where they are to move anywhere
-    def charter_flight(self, city_name, player = Player(0,"")):
-        
-        #sets the moving player to the current player's turn if not specified in parameters
-        if (player.current_city == ""):
-            player = self._player_list[self._player_turn - 1]
+    def charter_flight(self, player, city_name):
 
-        if (player.current_city in player.playerhand):
-            player.discard(self._city_list[player.current_city])
+        #check if the card is in the players hand
+        card = CityCard("", "", 0, 0)
+        for x in player.playerhand:
+            if (x is CityCard and x.city == player.current_city):
+                card = x
+
+        if (card.city != ""):
+            self._player_discard_pile.append(card)
+            player.discard(card)
             player.current_city = city_name
             self._actions_remaining -= 1
 
@@ -193,11 +195,7 @@ class GameBoard(object):
 
     # shuttle_flight()
     # Moves a player from a city with a research station to another city with a research station
-    def shuttle_flight(self, city_name, player = Player(0,"")):
-
-        #sets the moving player to the current player's turn if not specified in parameters
-        if (player.current_city == ""):
-            player = self._player_list[self._player_turn - 1]
+    def shuttle_flight(self, player, city_name):
 
         if (self._city_list[player.current_city].has_station and self._citylist[city_name].has_station):
             player.current_city = city_name
@@ -220,7 +218,7 @@ class GameBoard(object):
         if (self._research_stations_remaining == 0):
                 return False
 
-        player = self._player_list[self._player_turn - 1]
+        player = self.get_current_player()
 
         #check if player is operations expert      
         if (player.role == 2):
@@ -244,7 +242,7 @@ class GameBoard(object):
     # Updates cube pools (and possibly, eradicated flags) accordingly
     # Takes into account special role 3
     def treat_disease(self, color):
-        player = self._player_list[self._player_turn - 1]
+        player = self.get_current_player()
 
         if (color == "red"):
             #return if the selected color can't be treated
@@ -341,7 +339,7 @@ class GameBoard(object):
     # If all diseases are cured, trigger game end (victory)
     # Takes into account special role 7
     def discover_cure(self, color, discard_list):
-        player = self._player_list[self._player_turn - 1]
+        player = self.get_current_player()
 
         if (self._city_list[player.current_city].has_station == False):
             return False
@@ -405,7 +403,7 @@ class GameBoard(object):
             self.game_end(False)
             return
 
-        player = self._player_list[self._player_turn - 1]
+        player = self.get_current_player()
 
         for x in range(2):
             card = self._player_deck.top_card()
@@ -569,29 +567,88 @@ class GameBoard(object):
     # contingency_planner_take()
     # Takes an Event card from the discard pile, according to Role rules
     def contingency_planner_take(self, card):
-        pass
-        #player = self._player_list[self._player_turn - 1]
+        
+        player = self.get_current_player()
 
-        #if (player.role == 5 and card is EventCard and card in self._player_discard_pile):
-        #reduce action by 1
-            
+        if (player.role == 5 and card is EventCard and card in self._player_discard_pile):
+            player.contingency_planner_card.value = card.value
+            self._player_discard_pile.remove(card)
+            self._actions_remaining -= 1
+            return True
+        else:
+            return False     
 
+    # dispatcher_simple_move()
+    # Move another player's pawn to city_name as if it were your own
+    def dispatcher_simple_move(self, moving_player, city_name):  
+        if (self._player_list[self.player_turn - 1].role == 1):
+            return self.simple_move(moving_player, city_name)
+        else:
+            return False
 
-    # dispatcher_move_other()
+    # dispatcher_direct_flight()
+    # Move another player's pawn to city_name as if it were your own
+    def dispatcher_direct_flight(self, moving_player, city_name):
+        
+        dispatcher = self._player_list[self.player_turn - 1]
+        if (dispatcher.role != 1):
+            return False
+
+        #check if the card is in the players hand
+        card = CityCard("", "", 0, 0)
+        for x in dispatcher.playerhand:
+            if (x is CityCard and x.city == city_name):
+                card = x
+
+        if (card.city != ""):
+            self._player_discard_pile.append(card)
+            dispatcher.discard(card)
+            moving_player.current_city = city_name
+            self._actions_remaining -= 1
+
+            # medic passive check
+            if (moving_player.role == 3):
+                self.medic_passive(city_name)
+
+            return True
+        else:
+            return False
+
+    # dispatcher_charter_flight()
     # Move another player's pawn as if it were your own
-    # CHECK!
-    # separate function for each type of move?
-    def dispatcher_move_other(self, city_name, player):
-        pass
-        #if (self._player_list[self.player_turn - 1].role == 1):
-        #   return self.simple_move(city_name, player)
+    def dispatcher_charter_flight(self, moving_player, city_name,):
 
-        # reduce actions
+        dispatcher = self.get_current_player()
+        if (dispatcher.role != 1):
+            return False
 
-        # medic passive check
-        #if (player.role == 3):
-            #self.medic_passive(city_name)
+        #check if the card is in the players hand
+        card = CityCard("", "", 0, 0)
+        for x in dispatcher.playerhand:
+            if (x is CityCard and x.city == moving_player.current_city):
+                card = x
 
+        if (card.city != ""):
+            self._player_discard_pile.append(card)
+            dispatcher.discard(card)
+            moving_player.current_city = city_name
+            self._actions_remaining -= 1
+
+            # medic passive check
+            if (moving_player.role == 3):
+                self.medic_passive(city_name)
+
+            return True
+        else:
+            return False
+
+    # dispatcher_shuttle_flight()
+    # Move another player's pawn as if it were your own
+    def dispatcher_shuttle_flight(self, moving_player, city_name):
+        if (self._player_list[self.player_turn - 1].role == 1):
+            return self.shuttle_flight(moving_player, city_name)
+        else:
+            return False
 
     # dispatcher_move_p2p()
     # Move one player to another player ("player 2 player")
@@ -618,7 +675,7 @@ class GameBoard(object):
     # operations_expert_move()
     # Move from research station to any city by discarding any Card
     def operations_expert_move(self, card, city_name):
-        player = self._player_list[self._player_turn - 1]
+        player = self.get_current_player()
 
         if (player.role == 2 and card in player.playerhand and city_name in self._city_list):
             self._player_discard_pile.append(card)
@@ -653,8 +710,24 @@ class GameBoard(object):
 
     # forecast()
     # Does Event card #2 -- Forecast
-    def forecast(self):
-        pass
+    # the last card in the top_six array will be on the top of the deck
+    def forecast(self, player, top_six):
+        
+        has_card, using_contingency_card, card = self.event_card_check(player, 2)
+
+        if (has_card == False):
+            return False
+
+        self._infection_deck.append(top_six)
+
+        # only discard if the card is not the contingency_planner_card           
+        if (using_contingency_card == False):
+            player.discard(card)
+            self._player_discard_pile.append(card)
+        else:
+            player.contingency_planner_card.value = 0
+        
+        return True
 
     # government_grant()
     # Does Event card #3 -- Government Grant
@@ -713,8 +786,26 @@ class GameBoard(object):
 
     # resilient_population()
     # Does Event card #5 -- Resilient Population
-    def resilient_population(self):
-        pass
+    def resilient_population(self, player, card_to_discard):
+        
+        if (card_to_discard not in self._infection_discard_pile):
+            return False
+        
+        has_card, using_contingency_card, card = self.event_card_check(player, 5)
+
+        if (has_card == False):
+            return False
+
+        self._infection_discard_pile.remove(card_to_discard)
+
+        # only discard if the card is not the contingency_planner_card           
+        if (using_contingency_card == False):
+            player.discard(card)
+            self._player_discard_pile.append(card)
+        else:
+            player.contingency_planner_card.value = 0
+        
+        return True
 
 
 
@@ -746,7 +837,7 @@ class GameBoard(object):
     # discard()
     # Allows the player to discard when they have gone over the hand limit
     def discard(self, card):
-        player = self._player_list[self._player_turn - 1]
+        player = self.get_current_player()
         if (player.over_hand_limit()):
             player.discard(card)
             return True
@@ -769,6 +860,11 @@ class GameBoard(object):
             self._victory = True
         else:
             self._defeat = True
+        
+    # get_current_player()
+    # returns the player that is currently taking their turn
+    def get_current_player(self):
+        return self._player_list[self._player_turn - 1] 
 
     # medic_passive()
     # Checks for the medics passive, removes cubes if a disease is cured
@@ -863,6 +959,12 @@ class GameBoard(object):
         self._city_list["Hong Kong"] = City("Hong Kong", "red",["Kolkata", "Shanghai", "Taipei", "Manila", "Ho Chi Minh City", "Bangkok"])
 
     # - - - GETTER FUNCTIONS - - -
+
+    # get_current_player()
+    # returns the player that is currently taking their turn
+    def get_current_player(self):
+        return self._player_list[self._player_turn - 1] 
+
     @property
     def city_list(self):
         return self._city_list
