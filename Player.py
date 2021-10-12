@@ -91,9 +91,19 @@ class Player(object):
 
     # acquire_card()
     # Adds a card to the player's hand
-    # How should this interact with over_hand_limit, if at all?
     def acquire_card(self, card):
         self._playerhand.append(card)
+
+    # discard()
+    # Takes in a card and discards it from the player's hand
+    # Returns true if the card was able to be found and discarded, otherwise false
+    def discard(self, card):
+        for x in self._playerhand:
+            if x == card:
+                self._playerhand.remove(card)
+                return True
+            else:
+                return False
 
     # over_hand_limit()
     # Returns True if the player has more than 7 cards in hand; False otherwise
