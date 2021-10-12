@@ -1,12 +1,11 @@
 #Check!
-# How to handle medic passive abilitiy (call a helper function from within the move functions?)
 # Should we pass in the names of the cards or the cards themselves?
 # special attribute for contingency planner so they can have an extra card? just set to a EventCard
 #    of value 0, make a setter for this variable and it can be set in contingency_planner_take()
 # change order of who goes first based on city population
 # should the current city be a string of the name or a city object
 # are we doing difficulty levels?
-# add attribute to city class: had_outbreak, either true or false, set back to false in next_turn method
+# add attribute to city class: had_outbreak, either true or false, set back to false in draw_infection method
 # separate function for each type of dispatcher move?
 
 # - - - - - - - - - - - - - - - - - - - -
@@ -106,6 +105,12 @@ class GameBoard(object):
         
         #Prepare Deck
         self._player_deck.prepare(4)
+
+        # make a list of the cities that the quarantine specialist is connected to so they won't be infected
+        self._quarantine_list = list()
+        for x in self._player_list:
+            if (x.role == 6):
+                self._quarantine_list = self._city_list[x.current_city].connected_cities
         
         #set up temp_board in case there needs to be a reset
         self.temp_board = self
@@ -134,8 +139,10 @@ class GameBoard(object):
             player.current_city = city_name
             self._actions_remaining -= 1
 
-            #Check!
             # medic passive check
+            if (player.role == 3):
+                self.medic_passive(city_name)
+
             return True                    
         else:
             return False
@@ -155,8 +162,10 @@ class GameBoard(object):
             player.current_city = city_name
             self._actions_remaining -= 1
 
-            #Check!
             # medic passive check
+            if (player.role == 3):
+                self.medic_passive(city_name)
+
             return True
         else:
             return False
@@ -174,8 +183,10 @@ class GameBoard(object):
             player.current_city = city_name
             self._actions_remaining -= 1
 
-            #Check!
             # medic passive check
+            if (player.role == 3):
+                self.medic_passive(city_name)
+
             return True
         else:
             return False
@@ -191,10 +202,12 @@ class GameBoard(object):
         if (self._city_list[player.current_city].has_station and self._citylist[city_name].has_station):
             player.current_city = city_name
             self._actions_remaining -= 1
-            #Check!
+
             # medic passive check
+            if (player.role == 3):
+                self.medic_passive(city_name)
+
             return True
-            
         else:
             return False
             
@@ -414,10 +427,6 @@ class GameBoard(object):
         self._infection_rate_counter += 1
         
         #infect
-        if (self._infection_deck.is_empty()):
-            self.game_end(False)
-            return
-
         card = self._infection_deck.bottom_card()
         self._infection_discard_pile.append(card)
 
@@ -435,9 +444,18 @@ class GameBoard(object):
     # Draws an infection card from the top of the deck, putting in discard pile
     # Should then call infect_city() on the city specified by the card
     def draw_infection_card(self):
+
+        # updates the list of the cities that the quarantine specialist is connected to so they won't be infected
+        for x in self._player_list:
+            if (x.role == 6):
+                self._quarantine_list = self._city_list[x.current_city].connected_cities
+
         card = self._infection_deck.top_card()
         self._infection_discard_pile.append(card)
         self.infect_city(card.city, card.color)
+
+        #Check!
+        #set had_outbreak to false for all cities
 
     # infect_city()
     # Infects a city with the specified number of disease cubes; handles outbreaks appropriately
@@ -446,9 +464,29 @@ class GameBoard(object):
     # If there aren't enough cubes to infect a city, trigger game end (defeat)
     def infect_city(self, city_name, color, num_cubes = 1):
         
+        # skip this function if a game over condition has already been met, saves a little time
+        if (self._defeat == True):
+            return
+        
         for x in self.player_list:
-            if ((x.role == 3 or x.role == 6) and x.city == city_name):
+            # don't infect if quarantine specialist is in the city
+            if (x.role == 6 and x.city == city_name):
                 return
+
+            # don't infect if the medic is in the city and the disease has been cured
+            if (x.role == 3 and x.city == city_name):
+                if (color == "red" and self._red_cured == True):
+                    return
+                if (color == "blue" and self._blue_cured == True):
+                    return
+                if (color == "black" and self._black_cured == True):
+                    return
+                if (color == "yellow" and self._yellow_cured == True):
+                    return
+
+        # don't infect if quarantine specialist is in a connected city
+        if (city_name in self._quarantine_list):
+            return
 
         if (color == "red" and self._red_eradicated == False):
             for x in range(num_cubes):               
@@ -501,26 +539,17 @@ class GameBoard(object):
     # Triggers an outbreak in a given city
     # If additional outbreaks occur, this outbreak should finish first
     # If the outbreak tracker reaches 8, trigger game end (defeat)
-    # take into account role 6
-    #Check!
-    #add attribute to city class: had_outbreak, either true or false, set back to false in next_turn method
     def outbreak_in_city(self, city_name, color):
-        
-        # make a list of the cities that the quarentine specialist is connected to so they won't be infected
-        # Check!
-        # make this member data to increase efficiency? update in draw phase?
-        for x in self._player_list:
-            if (x.role == 6):
-                quarantine_list = self._city_list[x.current_city].connected_cities
 
-        # skips the outbreak if the city already had one or the quarentine specialist is connected
-        if (self._city_list[city_name].had_outbreak == False and city_name not in quarantine_list):
+        # skips the outbreak if the city already had one
+        if (self._city_list[city_name].had_outbreak == False):
             self._outbreak_counter += 1
             if (self._outbreak_counter >= 8):
                 self.game_end(False)
                 return
 
-            # prevent future outbreaks from happening to this city in the same turn
+            # prevent future outbreaks from happening to this city
+            # resets after each infection card is drawn
             self._city_list[city_name].had_outbreak = True
             
             # recursively go through all the connected cities, if infect_city calls
@@ -547,15 +576,17 @@ class GameBoard(object):
     # dispatcher_move_other()
     # Move another player's pawn as if it were your own
     # CHECK!
-    # seperate function for each type of move?
+    # separate function for each type of move?
     def dispatcher_move_other(self, city_name, player):
         pass
         #if (self._player_list[self.player_turn - 1].role == 1):
         #   return self.simple_move(city_name, player)
 
-        #Check!
-        # medic passive check
         # reduce actions
+
+        # medic passive check
+        #if (player.role == 3):
+            #self.medic_passive(city_name)
 
 
     # dispatcher_move_p2p()
@@ -571,12 +602,14 @@ class GameBoard(object):
         if (contains_player == False):
             return False
 
-        #Check!
-        # medic passive check
         player.current_city = city_name
         self._actions_remaining -= 1
+
+        # medic passive check
+        if (player.role == 3):
+            self.medic_passive(city_name)
+
         return True
-            
 
     # operations_expert_move()
     # Move from research station to any city by discarding any Card
@@ -636,8 +669,10 @@ class GameBoard(object):
             #Check!
             #if player is using their contingency planner event card, don't put it in the discard pile
 
-            #Check!
             # medic passive check
+            if (moving_player.role == 3):
+                self.medic_passive(city_name)
+
             self._player_discard_pile.append("Airlift")
             return True
 
@@ -655,9 +690,6 @@ class GameBoard(object):
     # Captures the current state of the board as member data for use with reset()
     def next_turn(self):
         self._actions_remaining = 4
-
-        #Check!
-        # set had_outbreak to false for all cities
         
         if (self._player_turn == len(self._player_list)):
             self._player_turn = 1
@@ -699,6 +731,23 @@ class GameBoard(object):
             self._victory = True
         else:
             self._defeat = True
+
+    # medic_passive()
+    # Checks for the medics passive, removes cubes if a disease is cured
+    def medic_passive(self, city_name):
+        city = self._city_list[city_name]
+        if (self._red_cured):
+            while (city.remove_cube("red") == True):
+                self._red_remaining += 1
+        if (self._blue_cured):
+            while (city.remove_cube("blue") == True):
+                self._blue_remaining += 1
+        if (self._black_cured):
+            while (city.remove_cube("black") == True):
+                self._black_remaining += 1
+        if (self._yellow_cured):
+            while (city.remove_cube("yellow") == True):
+                self._yellow_remaining += 1
 
     # initialize_cities()
     # Helper function to initilialize cities
@@ -855,3 +904,7 @@ class GameBoard(object):
     @property
     def defeat(self):
         return self._defeat
+
+    @property
+    def quarantine_list(self):
+        return self._quarantine_list
