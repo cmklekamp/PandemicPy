@@ -3,6 +3,11 @@
 # check if a player passes hand limit in main so that they can choose cards to discard or use
 # epidemics_occuring counter
 # for draw phase and infect phase, should I return the cards that were drawn?
+# do functions like dispatcher move need to pass the data by reference?
+# in main, check if the player has the forecast card before letting them look at the top 6 cards
+# in main, don't let players use event cards after the last infection card is drawn, just move to next turn
+#   the reason is because one quiet night is reset in the next turn function, also from the players perspective
+#   it doesn't make a difference
 
 # - - - - - - - - - - - - - - - - - - - -
 # COP 4521 -- Term Project
@@ -19,14 +24,13 @@ from Cards import *
 from Decks import *
 from City import *
 from Player import *
-import random
 
 # GameBoard class
 class GameBoard(object):
 
     # - - - SETUP FUNCTIONS - - -
     
-    # Constructor -- initializes components of game board based on number of players
+    # Constructor -- initializes components of game board based on number of players, list of usernames, and difficulty level
     def __init__(self, num_players, names_list, difficulty = 4):
 
         #Initialize Member Data
@@ -83,11 +87,15 @@ class GameBoard(object):
         self._city_list["Atlanta"].add_station()
 
         #Initialize Players, gives them a random role, no duplicates
-        self._player_list = []
+        self._player_list = list()
         self._num_players = num_players
         role_list = random.sample(range(1,8), num_players)
         for x in range(num_players):
             self._player_list.append(Player(role_list[x], "Atlanta"))
+
+        # list of the cities that the quarantine specialist is connected to so they won't be infected
+        # initializes as empty so it won't take effect in the setup phase
+        self._quarantine_list = list()
 
         #Infect Cities  
         for x in range(9):
@@ -95,6 +103,12 @@ class GameBoard(object):
             card = self._infection_deck.top_card()
             self.infect_city(card.city, card.color, infect_amount)
             self._infection_discard_pile.append(card)
+
+        # updates the list of the cities that the quarantine specialist is connected to so they won't be infected
+        # if there is no quarantine specialist, the quarantine list will be empty for the rest of the game
+        for x in self._player_list:
+            if (x.role == 6):
+                self._quarantine_list = self._city_list[x.current_city].connected_cities
 
         # Sets player usernames to names contained in list of strings 
         for x in names_list:
@@ -110,8 +124,8 @@ class GameBoard(object):
                 self._player_list[x].acquire_card(card)
 
                 #determines who has the card with the highest population
-                if card.population > highest_population:
-                    highest_population = 0
+                if (card.population > highest_population):
+                    highest_population = card.population
                     first_player = x
 
         # Re-order players based on who has the card with the highest population
@@ -122,12 +136,6 @@ class GameBoard(object):
         #Prepare Deck
         self._player_deck.prepare(difficulty)
 
-        # make a list of the cities that the quarantine specialist is connected to so they won't be infected
-        self._quarantine_list = list()
-        for x in self._player_list:
-            if (x.role == 6):
-                self._quarantine_list = self._city_list[x.current_city].connected_cities
-        
         #set up temp_board in case there needs to be a turn reset
         self.temp_board = self
 
@@ -136,7 +144,6 @@ class GameBoard(object):
 
     # simple_move()
     # Moves a player to a connected city (Drive / Ferry action)
-    # Used by the dispatcher to move other players
     def simple_move(self, player, city_name):
 
         #moves the current player if the city requested is connected to the current city
@@ -157,6 +164,8 @@ class GameBoard(object):
     # Player must discard a City card to move to the city named on the card
     def direct_flight(self, player, city_name):
 
+        #Check!
+        #Do I need to use type coercion here?
         #check if the card is in the players hand
         card = CityCard("", "", 0, 0)
         for x in player.playerhand:
@@ -205,7 +214,8 @@ class GameBoard(object):
     # Moves a player from a city with a research station to another city with a research station
     def shuttle_flight(self, player, city_name):
 
-        if (self._city_list[player.current_city].has_station and self._citylist[city_name].has_station):
+        if (city_name in self._city_list and self._city_list[player.current_city].has_station
+                and self._citylist[city_name].has_station):
             player.current_city = city_name
             self._actions_remaining -= 1
 
@@ -232,6 +242,9 @@ class GameBoard(object):
         if (player.role == 2):
             if (self._city_list.add_station() == False):
                 return False
+            else:
+                self._actions_remaining -= 1
+                return True
 
         #check if the player has the current city card
         else:
@@ -245,28 +258,30 @@ class GameBoard(object):
                 if (self._city_list[card.city].add_station() == False):
                     return False
                 else:
-                    player.discard(self._city_list[player.current_city])
-
-        self._actions_remaining -= 1
-        return True  
-
+                    self._player_discard_pile.append(card)
+                    player.discard(card)
+                    self._actions_remaining -= 1
+                    return True
+            else:
+                return False
 
     # treat_disease()
     # Removes 1 disease cube of specified color in current city; all cubes if disease is cured
     # Updates cube pools (and possibly, eradicated flags) accordingly
     # Takes into account special role 3
     def treat_disease(self, color):
+
         player = self.get_current_player()
+        city = self._city_list[player.current_city]
 
         if (color == "red"):
             #return if the selected color can't be treated
-            if (player.current_city.red == 0):
+            if (city.red == 0):
                 return False
 
             #remove all cubes if the disease is cured or if the player is the medic
             if (self._red_cured or player.role == 3):
-                for x in range (player.current_city.red):
-                    player.current_city.removecube("red")
+                while (city.remove_cube("red") == True):
                     self._red_remaining += 1
 
                 #eradicate if necessary
@@ -275,46 +290,50 @@ class GameBoard(object):
 
             #remove one cube            
             else:
-                player.current_city.removecube("red")
+                city.remove_cube("red")
                 self._red_remaining += 1
 
         elif (color == "blue"):
-            if (player.current_city.blue == 0):
+            if (city.blue == 0):
                 return False
+
             if (self._blue_cured or player.role == 3):
-                for x in range (player.current_city.blue):
-                    player.current_city.removecube("blue")
+                while (city.remove_cube("blue") == True):
                     self._blue_remaining += 1
+
                 if (self._blue_cured and self._blue_remaining == 24):
                     self._blue_eradicated = True
+
             else:
-                player.current_city.removecube("blue")
+                city.remove_cube("blue")
                 self._blue_remaining += 1
 
         elif (color == "black"):
-            if (player.current_city.black == 0):
+            if (city.black == 0):
                 return False
+
             if (self._black_cured or player.role == 3):
-                for x in range (player.current_city.black):
-                    player.current_city.removecube("black")
+                while (city.remove_cube("black") == True):
                     self._black_remaining += 1
+
                 if (self._black_cured and self._black_remaining == 24):
                     self._black_eradicated = True
             else:
-                player.current_city.removecube("black")
+                city.remove_cube("black")
                 self._black_remaining += 1
 
         elif (color == "yellow"):
-            if (player.current_city.yellow == 0):
+            if (city.yellow == 0):
                 return False
+
             if (self._yellow_cured or player.role == 3):
-                for x in range (player.current_city.yellow):
-                    player.current_city.removecube("yellow")
+                while (city.remove_cube("yellow") == True):
                     self._yellow_remaining += 1
+
                 if (self._yellow_cured and self._yellow_remaining == 24):
                     self._yellow_eradicated = True
             else:
-                player.current_city.removecube("yellow")
+                city.remove_cube("yellow")
                 self._yellow_remaining += 1
 
         else:
@@ -357,6 +376,7 @@ class GameBoard(object):
     # If all diseases are cured, trigger game end (victory)
     # Takes into account special role 7
     def discover_cure(self, color, discard_list):
+
         player = self.get_current_player()
 
         if (self._city_list[player.current_city].has_station == False):
@@ -397,6 +417,8 @@ class GameBoard(object):
 
             else:
                 return False
+        else:
+            return False
 
         #discard the cards
         for x in discard_list:
@@ -404,6 +426,8 @@ class GameBoard(object):
             player.discard(discard_list[x])
         
         self.actions_remaining -= 1
+
+        #Check win condition
         if (self._red_cured and self._blue_cured and self._black_cured and self._yellow_cured):
             self.game_end(True)
 
@@ -444,9 +468,11 @@ class GameBoard(object):
         
         # (2) infect
         # updates the list of the cities that the quarantine specialist is connected to so they won't be infected
-        for x in self._player_list:
-            if (x.role == 6):
-                self._quarantine_list = self._city_list[x.current_city].connected_cities
+        # skips if there is no quarantine specialist
+        if not self._quarantine_list:
+            for x in self._player_list:
+                if (x.role == 6):
+                    self._quarantine_list = self._city_list[x.current_city].connected_cities
 
         card = self._infection_deck.bottom_card()
         self._infection_discard_pile.append(card)
@@ -471,9 +497,11 @@ class GameBoard(object):
             return
         
         # updates the list of the cities that the quarantine specialist is connected to so they won't be infected
-        for x in self._player_list:
-            if (x.role == 6):
-                self._quarantine_list = self._city_list[x.current_city].connected_cities
+        # skips if there is no quarantine specialist in the game
+        if not self._quarantine_list:
+            for x in self._player_list:
+                if (x.role == 6):
+                    self._quarantine_list = self._city_list[x.current_city].connected_cities
 
         card = self._infection_deck.top_card()
         self._infection_discard_pile.append(card)
@@ -510,51 +538,59 @@ class GameBoard(object):
                     return
 
         if (color == "red" and self._red_eradicated == False):
-            for x in range(num_cubes):               
+            for x in range(num_cubes):
+
+                # only increment red_remaining if a cube was successfully added (i.e. no outbreak happened)               
                 flag = self._city_list[city_name].add_cube("red")
                 if (flag == True):
                     self._red_remaining -= 1
 
-                #cause outbreak of the disease color that is being increased
+                # cause outbreak of the disease color that is being increased
                 else:
                     self.outbreak_in_city(city_name, color)   
 
+                # check lose condition
                 if (self._red_remaining < 0):
                     self.game_end(False)
-                    return
 
         elif (color == "blue" and self._blue_eradicated == False):
-            for x in range(num_cubes):                
+            for x in range(num_cubes): 
+
                 flag = self._city_list[city_name].add_cube("blue")
                 if (flag == True):
                     self._blue_remaining -= 1
+
                 else:
-                    self.outbreak_in_city(city_name, color)                   
+                    self.outbreak_in_city(city_name, color)    
+
                 if (self._blue_remaining < 0):
                    self.game_end(False)
-                   return 
 
         elif (color == "black" and self._black_eradicated == False):
-            for x in range(num_cubes):                   
+            for x in range(num_cubes): 
+
                 flag = self._city_list[city_name].add_cube("black")
                 if (flag == True):
                     self._black_remaining -= 1
+
                 else:
-                    self.outbreak_in_city(city_name, color)                   
+                    self.outbreak_in_city(city_name, color)  
+
                 if (self._black_remaining < 0):
                    self.game_end(False)
-                   return 
 
         elif (color == "yellow" and self._yellow_eradicated == False):
-            for x in range(num_cubes):                    
+            for x in range(num_cubes):   
+
                 flag = self._city_list[city_name].add_cube("yellow")
                 if (flag == True):
                     self._yellow_remaining -= 1
+
                 else:
-                    self.outbreak_in_city(city_name, color)                   
+                    self.outbreak_in_city(city_name, color)     
+
                 if (self._yellow_remaining < 0):
                    self.game_end(False)
-                   return 
 
     # outbreak_in_city()
     # Triggers an outbreak in a given city
@@ -562,8 +598,8 @@ class GameBoard(object):
     # If the outbreak tracker reaches 8, trigger game end (defeat)
     def outbreak_in_city(self, city_name, color):
 
-        # skips the outbreak if the city already had one
-        if (self._city_list[city_name].had_outbreak == False):
+        # skips the outbreak if the city already had one, or if the game has been lost
+        if (self._city_list[city_name].had_outbreak == False and self._defeat == False):
             self._outbreak_counter += 1
             if (self._outbreak_counter >= 8):
                 self.game_end(False)
@@ -600,7 +636,7 @@ class GameBoard(object):
     # dispatcher_simple_move()
     # Move another player's pawn to city_name as if it were your own
     def dispatcher_simple_move(self, moving_player, city_name):  
-        if (self._player_list[self.player_turn - 1].role == 1):
+        if (self.get_current_player().role == 1):
             return self.simple_move(moving_player, city_name)
         else:
             return False
@@ -609,7 +645,7 @@ class GameBoard(object):
     # Move another player's pawn to city_name as if it were your own
     def dispatcher_direct_flight(self, moving_player, city_name):
         
-        dispatcher = self._player_list[self.player_turn - 1]
+        dispatcher = self.get_current_player()
         if (dispatcher.role != 1):
             return False
 
@@ -664,36 +700,33 @@ class GameBoard(object):
     # dispatcher_shuttle_flight()
     # Move another player's pawn as if it were your own
     def dispatcher_shuttle_flight(self, moving_player, city_name):
-        if (self._player_list[self.player_turn - 1].role == 1):
+        if (self.get_current_player().role == 1):
             return self.shuttle_flight(moving_player, city_name)
         else:
             return False
 
     # dispatcher_move_p2p()
     # Move one player to another player ("player 2 player")
-    def dispatcher_move_p2p(self, player, city_name):
+    # player1 is always the player that is moving
+    def dispatcher_move_p2p(self, player1, player2):
 
-        #check if there is a player at the city being moved to
-        contains_player = False
-        for x in self._player_list:
-            if (x.current_city == city_name):
-                contains_player = True
-
-        if (contains_player == False):
+        # make sure we are dealing with real people and not frauds
+        if (player1 not in self._player_list or player2 in self._player_list):
             return False
 
-        player.current_city = city_name
+        player1.current_city = player2.current_city
         self._actions_remaining -= 1
 
         # medic passive check
-        if (player.role == 3):
-            self.medic_passive(city_name)
+        if (player1.role == 3):
+            self.medic_passive(player1.current_city)
 
         return True
 
     # operations_expert_move()
     # Move from research station to any city by discarding any Card
     def operations_expert_move(self, card, city_name):
+
         player = self.get_current_player()
 
         if (player.role == 2 and card in player.playerhand and city_name in self._city_list 
@@ -726,7 +759,7 @@ class GameBoard(object):
         if (self.event_card_check(player, 2) == False):
             return False
 
-        self._infection_deck.append(top_six)   
+        self._infection_deck.extend(top_six)   
         return True
 
     # government_grant()
@@ -796,6 +829,9 @@ class GameBoard(object):
     # reset()
     # Resets the state of the board to the way it was before a player took actions that turn
     # Only allowed during action phase of turn
+    # Check!
+    # Should we allow this to work with 0 actions in case they didn't want to make their last move?
+    #  we could add a boolean that is updated in the draw card function called in_action_phase
     def reset(self):
         if (self._actions_remaining > 0):
             self = self.temp_board
@@ -808,6 +844,7 @@ class GameBoard(object):
     def discard(self, card):
         player = self.get_current_player()
         if (player.over_hand_limit()):
+            self._player_discard_pile.append(card)
             player.discard(card)
             return True
         else:
@@ -829,11 +866,6 @@ class GameBoard(object):
             self._victory = True
         else:
             self._defeat = True
-        
-    # get_current_player()
-    # returns the player that is currently taking their turn
-    def get_current_player(self):
-        return self._player_list[self._player_turn - 1] 
 
     # medic_passive()
     # Checks for the medics passive, removes cubes if a disease is cured
@@ -1051,3 +1083,11 @@ class GameBoard(object):
     @property
     def epidemics_occuring(self):
         return self._epidemics_occuring
+
+    @property
+    def player_deck(self):
+        return self._player_deck
+
+    @property
+    def infection_deck(self):
+        return self._infection_deck
