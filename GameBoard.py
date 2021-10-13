@@ -1,10 +1,8 @@
 #Check!
-# change order of who goes first based on city population
-# simplify event cards by putting more in the helper function
-# split epidemic function into 2 parts for resilient population
-# deal with skip_infect_cities, handle it in main with a setter or deal with it in infect_cities()?
-# break up draw cards function to only draw 1 card? allow event cards before epidemic starts
-# player discard function might not work
+# only allow resilient population to be played in between infect and intensify step
+# check if a player passes hand limit in main so that they can choose cards to discard or use
+# epidemics_occuring counter
+# for draw phase and infect phase, should I return the cards that were drawn?
 
 # - - - - - - - - - - - - - - - - - - - -
 # COP 4521 -- Term Project
@@ -12,11 +10,9 @@
 # PANDEMIC board game implementation
 # - - - - - - - - - - - - - - - - - - - -
 
-
 # * * * GameBoard.py * * *
 # GameBoard class
 # Encapsulates all data and behavior of the gameplay and board
-
 
 # Relevant import statements
 from Cards import *
@@ -31,7 +27,7 @@ class GameBoard(object):
     # - - - SETUP FUNCTIONS - - -
     
     # Constructor -- initializes components of game board based on number of players
-    def __init__(self, num_players, difficulty = 4):
+    def __init__(self, num_players, names_list, difficulty = 4):
 
         #Initialize Member Data
         self._outbreak_counter = 0
@@ -73,6 +69,12 @@ class GameBoard(object):
         #flag for use by One Quiet Night event card
         self._skip_infect_cities = False
 
+        # counter for whether or not an epidemic is currently happening
+        # used in main to signal whether or not epidemic should be called after drawing cards
+        # counter instead of flag for the case that 2 epidemic cards are drawn during a single draw phase
+        # reduced by 1 after the intensify step of the epidemic
+        self._epidemics_occuring = 0
+
         #Initilize Cities
         self._city_list = dict()
         self.initialize_cities()
@@ -93,16 +95,29 @@ class GameBoard(object):
             card = self._infection_deck.top_card()
             self.infect_city(card.city, card.color, infect_amount)
             self._infection_discard_pile.append(card)
-        
-        #CHECK!
-        #Make sure this works once Player class has been made (acquire_card())     
+
+        # Sets player usernames to names contained in list of strings 
+        for x in names_list:
+            self._player_list[x].username = names_list[x]
+            
         # Give Out Cards
-        # 2-players = 4, 3-players = 3, 4-players = 2
+        # 2-players = 4, 3-players = 3, 4-players = 2  
         num_cards = -(num_players - 2) + 4
+        highest_population = 0
         for x in self._player_list:
             for y in range(num_cards):
                 card = self._player_deck.top_card()
                 self._player_list[x].acquire_card(card)
+
+                #determines who has the card with the highest population
+                if card.population > highest_population:
+                    highest_population = 0
+                    first_player = x
+
+        # Re-order players based on who has the card with the highest population
+        #   moves the last player to the front until the front player is the one with the highest population
+        while (self._player_list[0] != first_player):
+            self._player_list.insert(0, self._player_list.pop())
         
         #Prepare Deck
         self._player_deck.prepare(difficulty)
@@ -113,15 +128,8 @@ class GameBoard(object):
             if (x.role == 6):
                 self._quarantine_list = self._city_list[x.current_city].connected_cities
         
-        #set up temp_board in case there needs to be a reset
+        #set up temp_board in case there needs to be a turn reset
         self.temp_board = self
-
-    # set_usernames()
-    # Sets player usernames to names contained in list of strings
-    def set_usernames(self, names_list):
-        for x in names_list:
-            self._player_list[x].username = names_list[x]
-
 
     # - - - (1) ACTION PHASE: EIGHT MAIN ACTIONS - - -
     # All actions, when taken, should decrement the actions counter
@@ -227,8 +235,14 @@ class GameBoard(object):
 
         #check if the player has the current city card
         else:
-            if (player.current_city in player.playerhand):
-                if (self._city_list.add_station() == False):
+            #check if the card is in the players hand
+            card = CityCard("", "", 0, 0)
+            for x in player.playerhand:
+                if (x is CityCard and x.city == player.current_city):
+                    card = x
+
+            if (card.city != ""):
+                if (self._city_list[card.city].add_station() == False):
                     return False
                 else:
                     player.discard(self._city_list[player.current_city])
@@ -312,20 +326,24 @@ class GameBoard(object):
     # share_knowledge()
     # Give or take City card that matches current city
     # The first player in the parameter list is always the one giving the card
-    # Checks for hand limit and responds appropriately, when necessary
+    # In main, check to see if hand limit reached so you can discard city cards or use event cards
     # Takes into account special role 4
     def share_knowledge(self, giving_player, taking_player, card_name):
 
-        #return false if the giving player doesn't have the card, card limit reached,
-        #  or players aren't in the same city
-        if (card_name not in giving_player.playerhand or taking_player.over_hand_limit()
-                or giving_player.current_city != taking_player.current_city):
+        #check if the card is in the players hand
+        card = CityCard("", "", 0, 0)
+        for x in giving_player.playerhand:
+            if (x is CityCard and x.city == card_name):
+                card = x
+        
+        #return false if the giving player doesn't have the card or players aren't in the same city
+        if (card.city == "" or giving_player.current_city != taking_player.current_city):
             return False
         
         #exchange cards if the giving player is the researcher or the card matches current city
         if (giving_player.role == 4 or giving_player.current_city == card_name):
-            taking_player.acquire_card(self._city_list[card_name])
-            giving_player.discard(self._city_list[card_name])
+            taking_player.acquire_card(card)
+            giving_player.discard(card)
             self._actions_remaining -= 1
             return True
 
@@ -401,7 +419,7 @@ class GameBoard(object):
 
         if (self._player_deck.get_size() < 2):
             self.game_end(False)
-            return
+            return False
 
         player = self.get_current_player()
 
@@ -410,31 +428,36 @@ class GameBoard(object):
             if (card is CityCard or card is EventCard):
                 player.acquire_card(card)
             else:
-                self.epidemic()
-                if (self._defeat == True):
-                    return
-
+                self._epidemics_occuring += 1
+        return True
 
     # epidemic()
     # Causes an epidemic to take place
-    # Does all three steps: (1) Increase, (2) Infect, (3) Intensify
+    # Does the first two steps: (1) Increase, (2) Infect
+    # After calling this function, allow players to play the resilient population card if they have it,
+    #  then call intensify()
     def epidemic(self):
         
-        #increase
+        # (1) increase
         self._infection_rate = (self._infection_rate_counter / 2) + 2
         self._infection_rate_counter += 1
         
-        #infect
+        # (2) infect
+        # updates the list of the cities that the quarantine specialist is connected to so they won't be infected
+        for x in self._player_list:
+            if (x.role == 6):
+                self._quarantine_list = self._city_list[x.current_city].connected_cities
+
         card = self._infection_deck.bottom_card()
         self._infection_discard_pile.append(card)
-
         self.infect_city(card.city, card.color, 3)
-        if (self._defeat == True):
-            return
-
-        #intensify
+    
+    # intensify()
+    # Does the third step of an epidemic
+    def intensify(self):
         self._infection_deck.intensify(self._infection_discard_pile)
         self._infection_discard_pile.clear()
+        self._epidemics_occuring -= 1
 
     # - - - (3) INFECT CITIES - - -
 
@@ -443,6 +466,10 @@ class GameBoard(object):
     # Should then call infect_city() on the city specified by the card
     def draw_infection_card(self):
 
+        #if one quiet night is active, don't draw any cards
+        if (self._skip_infect_cities == True):
+            return
+        
         # updates the list of the cities that the quarantine specialist is connected to so they won't be infected
         for x in self._player_list:
             if (x.role == 6):
@@ -462,17 +489,13 @@ class GameBoard(object):
     # If there aren't enough cubes to infect a city, trigger game end (defeat)
     def infect_city(self, city_name, color, num_cubes = 1):
         
-        #if there is an epidemic it won't skip the placement of the 3 cubes on the bottom card
-        if (self._skip_infect_cities == True and num_cubes == 1):
-            return
-        
         # skip this function if a game over condition has already been met, saves a little time
         if (self._defeat == True):
             return
         
         for x in self.player_list:
-            # don't infect if quarantine specialist is in the city
-            if (x.role == 6 and x.city == city_name):
+            # don't infect if quarantine specialist is in the city or a connected city
+            if (x.role == 6 and (x.city == city_name or city_name in self._quarantine_list)):
                 return
 
             # don't infect if the medic is in the city and the disease has been cured
@@ -485,10 +508,6 @@ class GameBoard(object):
                     return
                 if (color == "yellow" and self._yellow_cured == True):
                     return
-
-        # don't infect if quarantine specialist is in a connected city
-        if (city_name in self._quarantine_list):
-            return
 
         if (color == "red" and self._red_eradicated == False):
             for x in range(num_cubes):               
@@ -677,7 +696,8 @@ class GameBoard(object):
     def operations_expert_move(self, card, city_name):
         player = self.get_current_player()
 
-        if (player.role == 2 and card in player.playerhand and city_name in self._city_list):
+        if (player.role == 2 and card in player.playerhand and city_name in self._city_list 
+                and self.city_list[player.current_city].has_station):
             self._player_discard_pile.append(card)
             player.discard(card)
             player.current_city = city_name
@@ -692,41 +712,21 @@ class GameBoard(object):
     # Does Event card #1 -- One Quiet Night
     def one_quiet_night(self, player):
 
-        has_card, using_contingency_card, card = self.event_card_check(player, 1)
-
-        if (has_card == False):
+        if (self.event_card_check(player, 1) == False):
             return False
 
-        self._skip_infect_cities == True
-
-        # only discard if the card is not the contingency_planner_card           
-        if (using_contingency_card == False):
-            player.discard(card)
-            self._player_discard_pile.append(card)
-        else:
-            player.contingency_planner_card.value = 0
-        
+        self._skip_infect_cities == True   
         return True
 
     # forecast()
     # Does Event card #2 -- Forecast
-    # the last card in the top_six array will be on the top of the deck
+    # the last card in the top_six array will be on the top of the deck after the event is done
     def forecast(self, player, top_six):
         
-        has_card, using_contingency_card, card = self.event_card_check(player, 2)
-
-        if (has_card == False):
+        if (self.event_card_check(player, 2) == False):
             return False
 
-        self._infection_deck.append(top_six)
-
-        # only discard if the card is not the contingency_planner_card           
-        if (using_contingency_card == False):
-            player.discard(card)
-            self._player_discard_pile.append(card)
-        else:
-            player.contingency_planner_card.value = 0
-        
+        self._infection_deck.append(top_six)   
         return True
 
     # government_grant()
@@ -734,26 +734,14 @@ class GameBoard(object):
     # pass in the player using the card and where they are building the station
     def government_grant(self, player, city_name):
 
-        if (self._research_stations_remaining == 0):
+        if (city_name not in self._city_list or self._research_stations_remaining == 0 or self._city_list[city_name].has_station):
             return False
 
-        has_card, using_contingency_card, card = self.event_card_check(player, 3)
-
-        if (has_card == False):
+        if (self.event_card_check(player, 3) == False):
             return False
 
-        if (self._city_list[city_name].add_station() == False):
-            return False
-        else:
-            self._research_stations_remaining -= 1
-            
-        # only discard if the card is not the contingency_planner_card           
-        if (using_contingency_card == False):
-            player.discard(card)
-            self._player_discard_pile.append(card)
-        else:
-            player.contingency_planner_card.value = 0
-        
+        self._city_list[city_name].add_station()
+        self._research_stations_remaining -= 1         
         return True
 
     # airlift()
@@ -763,9 +751,7 @@ class GameBoard(object):
         if (city_name not in self._city_list):
             return False
 
-        has_card, using_contingency_card, card = self.event_card_check(card_player, 4)
-
-        if (has_card == False):
+        if (self.event_card_check(card_player, 4) == False):
             return False
 
         # update the current city of the player that moved
@@ -774,14 +760,7 @@ class GameBoard(object):
         # medic passive check
         if (moving_player.role == 3):
             self.medic_passive(city_name)
-
-        # only discard if the card is not the contingency_planner_card           
-        if (using_contingency_card == False):
-            card_player.discard(card)
-            self._player_discard_pile.append(card)
-        else:
-            card_player.contingency_planner_card.value = 0
-        
+     
         return True
 
     # resilient_population()
@@ -791,23 +770,11 @@ class GameBoard(object):
         if (card_to_discard not in self._infection_discard_pile):
             return False
         
-        has_card, using_contingency_card, card = self.event_card_check(player, 5)
-
-        if (has_card == False):
+        if (self.event_card_check(player, 5) == False):
             return False
 
         self._infection_discard_pile.remove(card_to_discard)
-
-        # only discard if the card is not the contingency_planner_card           
-        if (using_contingency_card == False):
-            player.discard(card)
-            self._player_discard_pile.append(card)
-        else:
-            player.contingency_planner_card.value = 0
-        
         return True
-
-
 
     # - - - MISCELLANEOUS GAMEPLAY FUNCTIONS - - -
 
@@ -816,6 +783,8 @@ class GameBoard(object):
     # Captures the current state of the board as member data for use with reset()
     def next_turn(self):
         self._actions_remaining = 4
+
+        self._skip_infect_cities == False
 
         if (self._player_turn == len(self._player_list)):
             self._player_turn = 1
@@ -888,7 +857,6 @@ class GameBoard(object):
     def event_card_check(self, player, number):
         has_card = False
         using_contingency_card = False
-        card = EventCard(0)
 
         if (player.contingency_planner_card.value == number):
             has_card = True
@@ -900,8 +868,15 @@ class GameBoard(object):
                     has_card = True
                     card = x
 
-        return has_card, using_contingency_card, card
+        # only discard if the card is not the contingency_planner_card           
+        if (has_card == True): 
+            if (using_contingency_card == False):
+                player.discard(card)
+                self._player_discard_pile.append(card)
+            else:
+                player.contingency_planner_card.value = 0
 
+        return has_card
 
     # initialize_cities()
     # Helper function to initilialize cities
@@ -1072,3 +1047,7 @@ class GameBoard(object):
     @property
     def skip_infect_cities(self):
         return self._skip_infect_cities
+
+    @property
+    def epidemics_occuring(self):
+        return self._epidemics_occuring
