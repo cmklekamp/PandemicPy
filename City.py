@@ -129,7 +129,7 @@ class City(object):
 
     @has_station.setter
     def has_station(self, a):
-        self.has_station = a
+        self._has_station = a
 
     @had_outbreak.setter
     def had_outbreak(self, a):

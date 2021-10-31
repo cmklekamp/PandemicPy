@@ -99,7 +99,7 @@ class GameBoard(object):
 
         #Infect Cities  
         for x in range(9):
-            infect_amount = 3 - (x / 3)
+            infect_amount = 3 - (x // 3)
             card = self._infection_deck.top_card()
             self.infect_city(card.city, card.color, infect_amount)
             self._infection_discard_pile.append(card)
@@ -111,7 +111,7 @@ class GameBoard(object):
                 self._quarantine_list = self._city_list[x.current_city].connected_cities
 
         # Sets player usernames to names contained in list of strings 
-        for x in names_list:
+        for x in range(len(names_list)):
             self._player_list[x].username = names_list[x]
             
         # Give Out Cards
@@ -121,10 +121,10 @@ class GameBoard(object):
         for x in self._player_list:
             for y in range(num_cards):
                 card = self._player_deck.top_card()
-                self._player_list[x].acquire_card(card)
+                x.acquire_card(card)
 
                 #determines who has the card with the highest population
-                if (card.population > highest_population):
+                if (isinstance(card, CityCard) and card.population > highest_population):
                     highest_population = card.population
                     first_player = x
 
@@ -463,7 +463,7 @@ class GameBoard(object):
     def epidemic(self):
         
         # (1) increase
-        self._infection_rate = (self._infection_rate_counter / 2) + 2
+        self._infection_rate = (self._infection_rate_counter // 2) + 2
         self._infection_rate_counter += 1
         
         # (2) infect
@@ -523,11 +523,11 @@ class GameBoard(object):
         
         for x in self.player_list:
             # don't infect if quarantine specialist is in the city or a connected city
-            if (x.role == 6 and (x.city == city_name or city_name in self._quarantine_list)):
+            if (x.role == 6 and (x.current_city == city_name or city_name in self._quarantine_list)):
                 return
 
             # don't infect if the medic is in the city and the disease has been cured
-            if (x.role == 3 and x.city == city_name):
+            if (x.role == 3 and x.current_city == city_name):
                 if (color == "red" and self._red_cured == True):
                     return
                 if (color == "blue" and self._blue_cured == True):
@@ -538,7 +538,7 @@ class GameBoard(object):
                     return
 
         if (color == "red" and self._red_eradicated == False):
-            for x in range(num_cubes):
+            for x in range(int(num_cubes)):
 
                 # only increment red_remaining if a cube was successfully added (i.e. no outbreak happened)               
                 flag = self._city_list[city_name].add_cube("red")
@@ -554,7 +554,7 @@ class GameBoard(object):
                     self.game_end(False)
 
         elif (color == "blue" and self._blue_eradicated == False):
-            for x in range(num_cubes): 
+            for x in range(int(num_cubes)): 
 
                 flag = self._city_list[city_name].add_cube("blue")
                 if (flag == True):
@@ -567,7 +567,7 @@ class GameBoard(object):
                    self.game_end(False)
 
         elif (color == "black" and self._black_eradicated == False):
-            for x in range(num_cubes): 
+            for x in range(int(num_cubes)): 
 
                 flag = self._city_list[city_name].add_cube("black")
                 if (flag == True):
@@ -580,7 +580,7 @@ class GameBoard(object):
                    self.game_end(False)
 
         elif (color == "yellow" and self._yellow_eradicated == False):
-            for x in range(num_cubes):   
+            for x in range(int(num_cubes)):   
 
                 flag = self._city_list[city_name].add_cube("yellow")
                 if (flag == True):

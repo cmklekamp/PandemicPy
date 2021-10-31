@@ -38,7 +38,7 @@ class Deck(object):
     # get_size()
     # Returns the size of the deck
     def get_size(self):
-        return self._cardlist.len()
+        return len(self._cardlist)
 
     # is_empty()
     # Returns True if the deck is empty, False otherwise
@@ -125,7 +125,7 @@ class InfectionDeck(Deck):
     # Occurs during 3 - INTENSIFY phase of Epidemics
     def intensify(self, discard_pile):
         discard_pile.shuffle()
-        while discard_pile.len() > 0:
+        while len(discard_pile) > 0:
             self._cardlist.append(discard_pile.pop())
 
 

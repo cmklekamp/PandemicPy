@@ -82,7 +82,7 @@ class Player(object):
     # set_username()
     # Sets the player's username to the given parameter
     @username.setter
-    def set_username(self, username):
+    def username(self, username):
         self._username = username
 
     @contingency_planner_card.setter
