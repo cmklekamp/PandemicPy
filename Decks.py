@@ -33,7 +33,7 @@ class Deck(object):
     # top_card()
     # Returns the top card from the deck, removing it from the deck in the process
     def top_card(self):
-        return self._cardlist.pop(0)
+        return self._cardlist.pop()
 
     # get_size()
     # Returns the size of the deck
