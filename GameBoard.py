@@ -1,13 +1,10 @@
 #Check!
-# only allow resilient population to be played in between infect and intensify step
+# Allow resilient population to be played in between infect and intensify step
 # check if a player passes hand limit in main so that they can choose cards to discard or use
-# epidemics_occuring counter
-# for draw phase and infect phase, should I return the cards that were drawn?
-# do functions like dispatcher move need to pass the data by reference?
-# in main, check if the player has the forecast card before letting them look at the top 6 cards
 # in main, don't let players use event cards after the last infection card is drawn, just move to next turn
 #   the reason is because one quiet night is reset in the next turn function, also from the players perspective
 #   it doesn't make a difference
+
 
 # - - - - - - - - - - - - - - - - - - - -
 # COP 4521 -- Term Project
@@ -169,7 +166,7 @@ class GameBoard(object):
         #check if the card is in the players hand
         card = CityCard("", "", 0, 0)
         for x in player.playerhand:
-            if (x is CityCard and x.city == city_name):
+            if (isinstance(x, CityCard) and x.city == city_name):
                 card = x
 
         if (card.city != ""):
@@ -193,7 +190,7 @@ class GameBoard(object):
         #check if the card is in the players hand
         card = CityCard("", "", 0, 0)
         for x in player.playerhand:
-            if (x is CityCard and x.city == player.current_city):
+            if (isinstance(x, CityCard) and x.city == player.current_city):
                 card = x
 
         if (card.city != ""):
@@ -251,7 +248,7 @@ class GameBoard(object):
             #check if the card is in the players hand
             card = CityCard("", "", 0, 0)
             for x in player.playerhand:
-                if (x is CityCard and x.city == player.current_city):
+                if (isinstance(x, CityCard) and x.city == player.current_city):
                     card = x
 
             if (card.city != ""):
@@ -352,7 +349,7 @@ class GameBoard(object):
         #check if the card is in the players hand
         card = CityCard("", "", 0, 0)
         for x in giving_player.playerhand:
-            if (x is CityCard and x.city == card_name):
+            if (isinstance(x, CityCard) and x.city == card_name):
                 card = x
         
         #return false if the giving player doesn't have the card or players aren't in the same city
@@ -449,7 +446,7 @@ class GameBoard(object):
 
         for x in range(2):
             card = self._player_deck.top_card()
-            if (card is CityCard or card is EventCard):
+            if (isinstance(card, CityCard) or isinstance(card, EventCard)):
                 player.acquire_card(card)
             else:
                 self._epidemics_occuring += 1
@@ -625,7 +622,7 @@ class GameBoard(object):
         
         player = self.get_current_player()
 
-        if (player.role == 5 and card is EventCard and card in self._player_discard_pile):
+        if (player.role == 5 and isinstance(card, EventCard) and card in self._player_discard_pile):
             player.contingency_planner_card.value = card.value
             self._player_discard_pile.remove(card)
             self._actions_remaining -= 1
@@ -652,7 +649,7 @@ class GameBoard(object):
         #check if the card is in the players hand
         card = CityCard("", "", 0, 0)
         for x in dispatcher.playerhand:
-            if (x is CityCard and x.city == city_name):
+            if (isinstance(x, CityCard) and x.city == city_name):
                 card = x
 
         if (card.city != ""):
@@ -680,7 +677,7 @@ class GameBoard(object):
         #check if the card is in the players hand
         card = CityCard("", "", 0, 0)
         for x in dispatcher.playerhand:
-            if (x is CityCard and x.city == moving_player.current_city):
+            if (isinstance(x, CityCard) and x.city == moving_player.current_city):
                 card = x
 
         if (card.city != ""):
@@ -896,7 +893,7 @@ class GameBoard(object):
 
         else:
             for x in player.playerhand:
-                if (x is EventCard and x.value == number):
+                if (isinstance(x, EventCard) and x.value == number):
                     has_card = True
                     card = x
 
