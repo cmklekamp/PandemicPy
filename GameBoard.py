@@ -756,7 +756,7 @@ class GameBoard(object):
         if (self.event_card_check(player, 2) == False):
             return False
 
-        self._infection_deck.extend(top_six)   
+        self._infection_deck.cardlist.extend(top_six)   
         return True
 
     # government_grant()
