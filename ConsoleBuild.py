@@ -145,16 +145,16 @@ def parse_input(choice, board):
         for x in (board.city_list[board.get_current_player().current_city].connected_cities):
             show_city_details(board.city_list[x])
         print()
-        city_name = input("Move to which city?")
+        city_name = input("Move to which city? ")
         if board.simple_move(board.get_current_player(), city_name):
-            print("Success! " + board.get_current_player().username + "moved to " + city_name + ".")
+            print("Success! " + board.get_current_player().username + " moved to " + city_name + ".")
         else:
             print(city_name + " is not connected to your current city. Please try again.")
 
     elif(choice == "2"):
         # Direct flight
         show_player_hand(board.get_current_player())
-        city_name = input("Please choose one of your currently held cities to move to...")
+        city_name = input("Please choose one of your currently held cities to move to: ")
         if board.direct_flight(board.get_current_player(), city_name):
             print("Success! " + board.get_current_player().username + "took a direct flight to " + city_name + ".")
         else:
@@ -163,7 +163,7 @@ def parse_input(choice, board):
     elif(choice == "3"):
         # Charter flight
         show_all_cities(board)
-        city_name = input("Please choose a city to move to...")
+        city_name = input("Please choose a city to move to: ")
         city_is_valid = False
         for x in board.city_list:
             if x[city_name] == city_name:
@@ -183,7 +183,7 @@ def parse_input(choice, board):
             if x.has_station:
                 show_city_details(board.city_list[x])
             print()
-        city_name = input("Move to which city?")
+        city_name = input("Move to which city? ")
         if board.shuttle_flight(board.get_current_player(), city_name):
             print("Success! " + board.get_current_player().username + "was shuttled to " + city_name + ".")
         else:
@@ -196,7 +196,7 @@ def parse_input(choice, board):
             print("Success! A research station has been built in this city, and its card discarded from your hand.")
         elif board.research_stations_remaining == 0:
             print("You are out of research stations to build. Remove an old one to build a new one here, or select a new action?")
-            choice = input("To remove an old one, enter \"R\", to skip and select a new action, enter \"S\".")
+            choice = input("To remove an old one, enter \"R\", to skip and select a new action, enter \"S\": ")
             while choice != 'r' and choice != 'R' and choice != 's' and choice != 'S':
                 choice = input("Please enter a valid choice.")
             if choice == 'r' or choice == 'R':
@@ -205,7 +205,7 @@ def parse_input(choice, board):
                     if x.has_station:
                         show_city_details(board.city_list[x])
                     print()
-                city_name = input("Choose city to remove a research station from, or type \"cancel\" to cancel action.")
+                city_name = input("Choose city to remove a research station from, or type \"cancel\" to cancel action: ")
                 if board.remove_station(city_name):
                     print("Station removed. You can now build a station.")
                 else:
@@ -217,8 +217,8 @@ def parse_input(choice, board):
 
     elif(choice == "6"):
         # Treat disease
-        print("Please enter color disease to treat:")
-        color = input("red, blue, black, or yellow.")
+        print("Please enter color disease to treat...")
+        color = input("red, blue, black, or yellow: ")
         if board.treat_disease(color):
             print("Success! Disease cube(s) removed from your current city!")
         else:
@@ -226,9 +226,9 @@ def parse_input(choice, board):
 
     elif(choice == "7"):
         # Share knowledge
-        giving_player_name = input("Which player is giving the card?")
-        taking_player_name = input("Which player is taking the card?")
-        print("Note that if the taking player goes over the hand limit, they must discard a card.")
+        print("Note that if the taking player goes over the hand limit, they must discard a card...")
+        giving_player_name = input("Which player is giving the card? ")
+        taking_player_name = input("Which player is taking the card? ")
         giving_player_valid = False
         taking_player_valid = False
         if giving_player_name != taking_player_name:
@@ -263,7 +263,7 @@ def parse_input(choice, board):
     elif(choice == "8"):
         # Discover a cure
         if board.get_current_player.can_turn_in():
-            print("Please input all five cards of one color to turn in, or type \"cancel\":")
+            print("Please input all five cards of one color to turn in, or type \"cancel\": ")
             card_num = 0
             card_name = ""
             discard_list = []
@@ -274,7 +274,7 @@ def parse_input(choice, board):
                     if x.city == card_name:
                         card_num = card_num + 1
                         discard_list.append(x)
-            color = input("What disease color would you like to cure (red, blue, black, or yellow)?")
+            color = input("What disease color would you like to cure (red, blue, black, or yellow)? ")
             if card_num == 5 and (color == "red" or color == "blue" or color == "black" or color == "yellow"):
                 if board.discover_cure(color, discard_list):
                     print("Success! This desease has been eradicated!")
