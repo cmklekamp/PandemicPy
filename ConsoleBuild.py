@@ -141,35 +141,149 @@ def parse_input(choice, board):
 
     elif(choice == "1"):
         # Drive / ferry
-        pass
+        print("Showing cities surrounding your current city...")
+        for x in (board.city_list[board.get_current_player().current_city].connected_cities):
+            show_city_details(board.city_list[x])
+        print()
+        city_name = input("Move to which city?")
+        if board.simple_move(board.get_current_player().username, city_name):
+            print("Success! " + board.get_current_player().username + "moved to " + city_name + ".")
+        else:
+            print(city_name + " is not connected to your current city. Please try again.")
 
     elif(choice == "2"):
         # Direct flight
-        pass
+        show_player_hand(board.get_current_player())
+        city_name = input("Please choose one of your currently held cities to move to...")
+        if board.direct_flight(board.get_current_player().username, city_name):
+            print("Success! " + board.get_current_player().username + "took a direct flight to " + city_name + ".")
+        else:
+            print(board.get_current_player().username + "did not have the required card to take a direct flight to the input city. Please select a new action.")
 
     elif(choice == "3"):
         # Charter flight
-        pass
+        show_all_cities(board)
+        city_name = input("Please choose a city to move to...")
+        city_is_valid = False
+        for x in board.city_list:
+            if x[city_name] == city_name:
+                city_is_valid = True
+                if board.charter_flight(board.get_current_player().username, city_name):
+                    print("Success! " + board.get_current_player().username + "chartered a flight to " + city_name + ".")
+                else:
+                    print(board.get_current_player().username + "did not have the required card to charter a flight. Please select a new action.")
+                break
+        if city_is_valid == False:
+            print("City not found. Action could not be taken.")
 
     elif(choice == "4"):
         # Shuttle flight
-        pass
+        print("Printing cities with research stations...")
+        for x in (board.city_list):
+            if x.has_station:
+                show_city_details(board.city_list[x])
+            print()
+        city_name = input("Move to which city?")
+        if board.shuttle_flight(board.get_current_player().username, city_name):
+            print("Success! " + board.get_current_player().username + "was shuttled to " + city_name + ".")
+        else:
+            print(city_name + " or the current city does not have the required research station. Please try again.")
 
     elif(choice == "5"):
         # Build a research station
-        pass
+        print("Building a research station in current city...")
+        if board.build_station():
+            print("Success! A research station has been built in this city, and its card discarded from your hand.")
+        elif board.research_stations_remaining == 0:
+            print("You are out of research stations to build. Remove an old one to build a new one here, or select a new action?")
+            choice = input("To remove an old one, enter \"R\", to skip and select a new action, enter \"S\".")
+            while choice != 'r' and choice != 'R' and choice != 's' and choice != 'S':
+                choice = input("Please enter a valid choice.")
+            if choice == 'r' or choice == 'R':
+                print("Printing cities with research stations...")
+                for x in (board.city_list):
+                    if x.has_station:
+                        show_city_details(board.city_list[x])
+                    print()
+                city_name = input("Choose city to remove a research station from, or type \"cancel\" to cancel action.")
+                if board.remove_station(city_name):
+                    print("Station removed. You can now build a station.")
+                else:
+                    print("You chose \"cancel\" or typed an invalid city. Cancelling action...")
+            else:
+                print("Skipping this action. Please choose a new action.")
+        else:
+            print("You do not have the required city card to build a station here! Please select another action!")
 
     elif(choice == "6"):
         # Treat disease
-        pass
+        print("Please enter color disease to treat:")
+        color = input("red, blue, black, or yellow.")
+        if board.treat_disease(color):
+            print("Success! Disease cube(s) removed from your current city!")
+        else:
+            print("There were no disease cubes of color " + color + " to remove from this city. Please select a new action.")
 
     elif(choice == "7"):
         # Share knowledge
-        pass
+        giving_player_name = input("Which player is giving the card?")
+        taking_player_name = input("Which player is taking the card?")
+        print("Note that if the taking player goes over the hand limit, they must discard a card.")
+        giving_player_valid = False
+        taking_player_valid = False
+        if giving_player_name != taking_player_name:
+            for x in board.player_list:
+                if x.username == giving_player_name:
+                    giving_player_valid = True
+                    giving_player = x
+                elif x.username == taking_player_name:
+                    taking_player_valid = True
+                    taking_player = x
+            if giving_player_valid and taking_player_valid:
+                show_player_hand(giving_player)
+                card_name = input("Which card to give?")
+                if board.share_knowledge(giving_player, taking_player, card_name):
+                    print("Success! Knowledge shared!")
+                    if taking_player.over_hand_limit():
+                        print("Taking player is now over the hand limit. Please discard a card.")
+                        show_player_hand(taking_player)
+                        discarded = False
+                        while discarded == False:
+                            discard_card = input("Discard which card?")
+                            if taking_player.discard(discard_card):
+                                print("Discard successful.")
+                                discarded = True
+                else:
+                    print("Invalid card. Knowledge could not be shared.")
+            else:
+                print("One or both players could not be found. Please try again.")
+        else:
+            print("Player can not share knowledge to themselves. Please try again.")
 
     elif(choice == "8"):
         # Discover a cure
-        pass
+        if board.get_current_player.can_turn_in():
+            print("Please input all five cards of one color to turn in, or type \"cancel\":")
+            card_num = 0
+            card_name = ""
+            discard_list = []
+            while card_num > 5 and card_name != "cancel":
+                show_player_hand(board.get_current_player())
+                card_name = input("Card name (or \"cancel\"): ")
+                for x in board.get_current_player().playerhand:
+                    if x.city == card_name:
+                        card_num = card_num + 1
+                        discard_list.append(x)
+            color = input("What disease color would you like to cure (red, blue, black, or yellow)?")
+            if card_num == 5 and (color == "red" or color == "blue" or color == "black" or color == "yellow"):
+                if board.discover_cure(color, discard_list):
+                    print("Success! This desease has been eradicated!")
+                else:
+                    print("This disease was unable to be eradicated. This could be because you did not have the proper cards, or are not positioned on a research station.")
+            else:
+                print("Invalid color. Please try again, or select a new action.")
+        else:
+            print(board.get_current_player().username + " does not have enough cards to turn in. Please try another action.")
 
     elif(choice == "role"):
         # Special role action
