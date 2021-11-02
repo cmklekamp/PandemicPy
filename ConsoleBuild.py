@@ -1,3 +1,5 @@
+# invariant culture case
+
 # - - - - - - - - - - - - - - - - - - - -
 # COP 4521 -- Term Project
 # Daniel Fletcher, Connor Klekamp, Jacob Gregie
@@ -174,9 +176,9 @@ def parse_input(choice, board):
         pass
 
     elif(choice == "event"):
-        # Play event card
-        pass
+        play_event_card(board)
 
+            
     elif(choice == "reset"):
         # Reset this turn
         pass
@@ -348,6 +350,11 @@ def show_misc_data(board):
 def show_player_hand(player):
     print("\nShowing " + player.username + "'s hand...\n")
     counter = 1
+    
+    # Show the contingency planner's card if they have one
+    if (player.role == 5 and player.contingency_planner_card.value != 0):
+        print("CONTIGENCY PLANNER CARD: EVENT -- " + event_card_string(player.contingency_planner_card.value))
+
     for x in player.playerhand:
         if(isinstance(x, CityCard)):
             print("CARD " + str(counter) + ": " + x.city + " / " + x.color)
@@ -371,6 +378,178 @@ def event_card_string(value):
     else:
         return "Resilient Population"
 
+# play_event_card()
+# Function for playing an event card
+def play_event_card(board):
+    counter = 1
+    print()
+    for x in board.player_list:
+        print ("Player " + str(counter) + ": " + x.username)
+        counter += 1
+
+    choice = input("\nWho is using an event card? (Enter Player Number): ")
+    choice = int(choice) - 1
+    player = board.player_list[choice]
+
+    print("\nShowing event cards in " + player.username + "'s hand...")
+    counter = 1
+    has_event_card = False
+    event_card_list = list()
+
+    # Show the contingency planner's card if they have one
+    if (player.role == 5 and player.contingency_planner_card.value != 0):
+        print("CONTIGENCY PLANNER CARD: EVENT -- " + event_card_string(player.contingency_planner_card.value))
+
+    for x in player.playerhand:
+        if(isinstance(x, EventCard)):
+            print("CARD " + str(counter) + ": EVENT -- " + event_card_string(x.value))
+            has_event_card = True
+            event_card_list.append(x)
+            counter += 1
+    print()
+
+    if (has_event_card == False):
+        print("There are no event cards in " + player.username + "'s hand\n")
+        return
+    
+    choice = input("Select the card that you want to use (\"0\" to cancel): ")
+    choice = int(choice) - 1
+
+    if choice == -1:
+        print("\nNo event card was used.\n")
+        return
+
+    card = event_card_list[choice]
+
+    if (card.value == 1):
+        play_one_quiet_night(board, player)
+    elif (card.value == 2):    
+        play_forecast(board, player)     
+    elif (card.value == 3):
+        play_government_grant(board, player)
+    elif (card.value == 4):
+        play_airlift(board, player)
+    elif (card.value == 5):
+        play_resilient_population(board, player)
+    else:
+        print("Card does not exist.\n")
+
+
+# play_one_quiet_night()
+# plays the One Quiet Night Event Card
+def play_one_quiet_night(board, player):
+    board.one_quiet_night(player)
+    print ("\nThe next Infect Cities step will be skipped.\n")
+
+
+# play_forcast()
+# plays the Forcast Event Card
+def play_forecast(board,player):
+    infection_list = []
+    print ("\nShowing the top 6 cards of the Infection Deck...\n")
+    for x in range(6):
+        y = board.infection_deck.top_card()
+        print("CARD " + str(x+1) + ": " + y.city + " / " + y.color)
+        infection_list.append(y)
+
+    print ("\nSelect each card in the order that you want them placed on the deck. The last card you choose will be on the top of the deck.\n")
+
+    rearranged_list = []
+    for x in range(6):  
+        choice = input("Enter card number " + str(x+1) + ": ")
+        choice = int(choice) - 1
+
+        while infection_list[choice] in rearranged_list:
+            choice = input("Card already chosen. Try Again: ")
+            choice = int(choice) - 1
+
+        rearranged_list.append(infection_list[choice])
+
+    board.forecast(player, rearranged_list)
+    print("\nThe top 6 cards of the infection deck have been rearranged.\n")
+
+
+# play_government_grant()
+# plays the Government Grant Event Card
+def play_government_grant(board, player):
+
+    if (board.research_stations_remaining == 0):
+        choice = input("\nYou have reached the research station limit. Would you like to remove a research station? (Y or N): ")
+
+        if (choice.upper() != "Y"):
+            return
+
+        else:
+            station_list = []
+            counter = 1
+            for x in board.city_list:
+                if (board.city_list[x].has_station == True):
+                    print("City " + str(counter) + ": " + board.city_list[x].name)
+                    counter += 1
+                    station_list.append(x)
+
+            choice = input("\nSelect the city that you want to remove a research station from (\"0\" to cancel): ")
+            choice = int(choice) - 1
+
+            board.remove_station(station_list[choice])
+            print("\nThe research station in " + station_list[choice] + " has been removed.")
+
+    city = input("\nWhat city would you like to build a research station in? (Enter the name): ")
+    city = city.capitalize()
+
+    success = board.government_grant(player, city)
+    if success == True:
+        print("\nA research station was built in " + city + ".\n")
+    else:
+        print("\nA research station was unable to be built in " + city + ".\n")
+
+
+# play_airlift()
+# plays the Airlift Event Card
+def play_airlift(board, player):
+    counter = 1
+    print()
+    for x in board.player_list:
+        print ("Player " + str(counter) + ": " + x.username)
+        counter += 1
+
+    choice = input("\nWho is being moved? (Enter Player Number): ")
+    choice = int(choice) - 1
+    moving_player = board.player_list[choice]
+
+    city = input("\nWhat city would you like " + moving_player.username + " to move to? ")
+    city = city.capitalize()
+
+    success = board.airlift(player, moving_player, city)
+    if success == True:
+        print(moving_player.username + " is now in " + city + "\n")
+    else:
+        print(moving_player.username + " was unable to move to " + city + "\n")
+
+
+# play_resilient_population()
+# plays the Resilient Population Event Card
+def play_resilient_population(board, player):
+    if (len(board.infection_discard_pile) == 0):
+        print ("The infection discard pile is empty.\n")
+        return
+
+    counter = 1
+    discard_list = []
+    print()
+    for x in board.infection_discard_pile:
+        print("CARD " + str(counter) + ": " + x.city + " / " + x.color)
+        counter += 1  
+        discard_list.append(x)  
+
+    choice = input("\nWhat infection card would you like to remove from the game? (Enter the number of the card): ")
+    choice = int(choice) - 1
+
+    success = board.resilient_population(player, discard_list[choice])
+    if success == True:
+        print("\nThe " + discard_list[choice].city + " infection card has been removed from the game.\n")
+    else:
+        print("\nThe " + discard_list[choice].city + " infection card was unable to be removed from the game.\n")
 
 
 
