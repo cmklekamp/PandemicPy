@@ -146,7 +146,7 @@ def parse_input(choice, board):
             show_city_details(board.city_list[x])
         print()
         city_name = input("Move to which city?")
-        if board.simple_move(board.get_current_player().username, city_name):
+        if board.simple_move(board.get_current_player(), city_name):
             print("Success! " + board.get_current_player().username + "moved to " + city_name + ".")
         else:
             print(city_name + " is not connected to your current city. Please try again.")
@@ -155,7 +155,7 @@ def parse_input(choice, board):
         # Direct flight
         show_player_hand(board.get_current_player())
         city_name = input("Please choose one of your currently held cities to move to...")
-        if board.direct_flight(board.get_current_player().username, city_name):
+        if board.direct_flight(board.get_current_player(), city_name):
             print("Success! " + board.get_current_player().username + "took a direct flight to " + city_name + ".")
         else:
             print(board.get_current_player().username + "did not have the required card to take a direct flight to the input city. Please select a new action.")
@@ -168,7 +168,7 @@ def parse_input(choice, board):
         for x in board.city_list:
             if x[city_name] == city_name:
                 city_is_valid = True
-                if board.charter_flight(board.get_current_player().username, city_name):
+                if board.charter_flight(board.get_current_player(), city_name):
                     print("Success! " + board.get_current_player().username + "chartered a flight to " + city_name + ".")
                 else:
                     print(board.get_current_player().username + "did not have the required card to charter a flight. Please select a new action.")
@@ -184,7 +184,7 @@ def parse_input(choice, board):
                 show_city_details(board.city_list[x])
             print()
         city_name = input("Move to which city?")
-        if board.shuttle_flight(board.get_current_player().username, city_name):
+        if board.shuttle_flight(board.get_current_player(), city_name):
             print("Success! " + board.get_current_player().username + "was shuttled to " + city_name + ".")
         else:
             print(city_name + " or the current city does not have the required research station. Please try again.")
