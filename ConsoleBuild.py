@@ -149,7 +149,7 @@ def parse_input(choice, board):
         if board.simple_move(board.get_current_player(), city_name):
             print("Success! " + board.get_current_player().username + " moved to " + city_name + ".")
         else:
-            print(city_name + " is not connected to your current city. Please try again.")
+            print(city_name + " is not connected to your current city. Please try again, or select a new action.")
 
     elif(choice == "2"):
         # Direct flight
@@ -158,7 +158,7 @@ def parse_input(choice, board):
         if board.direct_flight(board.get_current_player(), city_name):
             print("Success! " + board.get_current_player().username + " took a direct flight to " + city_name + ".")
         else:
-            print(board.get_current_player().username + " did not have the required card to take a direct flight to the input city. Please select a new action.")
+            print(board.get_current_player().username + " did not have the required card to take a flight here. Please try again, or select a new action.")
 
     elif(choice == "3"):
         # Charter flight
@@ -171,7 +171,7 @@ def parse_input(choice, board):
                 if board.charter_flight(board.get_current_player(), city_name):
                     print("Success! " + board.get_current_player().username + " chartered a flight to " + city_name + ".")
                 else:
-                    print(board.get_current_player().username + " did not have the required card to charter a flight. Please select a new action.")
+                    print(board.get_current_player().username + " did not have the required card to charter a flight. Please try again, or select a new action.")
                 break
         if city_is_valid == False:
             print("City not found. Action could not be taken.")
@@ -187,7 +187,7 @@ def parse_input(choice, board):
         if board.shuttle_flight(board.get_current_player(), city_name):
             print("Success! " + board.get_current_player().username + " was shuttled to " + city_name + ".")
         else:
-            print(city_name + " or the current city does not have the required research station. Please try again.")
+            print(city_name + " or the current city does not have the required research station. Please try again, or select a new action.")
 
     elif(choice == "5"):
         # Build a research station
@@ -213,7 +213,7 @@ def parse_input(choice, board):
             else:
                 print("Skipping this action. Please choose a new action.")
         else:
-            print("You do not have the required city card to build a station here! Please select another action!")
+            print("You do not have the required city card to build a station here! Please try again, or select a new action.")
 
     elif(choice == "6"):
         # Treat disease
@@ -222,7 +222,7 @@ def parse_input(choice, board):
         if board.treat_disease(color):
             print("Success! Disease cube(s) removed from your current city!")
         else:
-            print("There were no disease cubes of color " + color + " to remove from this city. Please select a new action.")
+            print("There were no disease cubes of color \"" + color + "\" to remove from this city. Please try again, or select a new action.")
 
     elif(choice == "7"):
         # Share knowledge
@@ -256,9 +256,9 @@ def parse_input(choice, board):
                 else:
                     print("Invalid card. Knowledge could not be shared.")
             else:
-                print("One or both players could not be found. Please try again.")
+                print("One or both players could not be found. Please try again, or select a new action.")
         else:
-            print("Player can not share knowledge to themselves. Please try again.")
+            print("Player can not share knowledge to themselves. Please try again, or select a new action.")
 
     elif(choice == "8"):
         # Discover a cure
@@ -283,7 +283,7 @@ def parse_input(choice, board):
             else:
                 print("Invalid color. Please try again, or select a new action.")
         else:
-            print(board.get_current_player().username + " does not have enough cards to turn in. Please try another action.")
+            print(board.get_current_player().username + " does not have enough cards to turn in. Please try again, or select a new action.")
 
     elif(choice == "role"):
         # Special role action
