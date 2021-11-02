@@ -24,7 +24,7 @@ class Deck(object):
     # Default constructor (should only be called by derived class constructors)
     def __init__(self):
         self._cardlist = list()
-
+        
     # shuffle()
     # Shuffle cards in the deck using the random library's prebuilt list shuffling method
     def shuffle(self):
@@ -47,6 +47,10 @@ class Deck(object):
             return True
         else:
             return False
+    
+    # @property
+    # def cardlist(self):
+    #     return super().self._cardlist
 
 # InfectionDeck class
 # Contains Infection cards and behavior unique to Infection deck
@@ -118,7 +122,7 @@ class InfectionDeck(Deck):
     # Returns the bottom card from the deck, removing it from the deck in the process
     # Occurs during 2 - INFECT phase of Epidemics
     def bottom_card(self):
-        return self._cardlist.pop()
+        return self._cardlist.pop(0)
 
     # intensify()
     # Reshuffles cards from Infection discard, adds them back to TOP of Infection deck
@@ -127,6 +131,10 @@ class InfectionDeck(Deck):
         discard_pile.shuffle()
         while len(discard_pile) > 0:
             self._cardlist.append(discard_pile.pop())
+
+    @property
+    def cardlist(self):
+        return self._cardlist
 
 
 # PlayerDeck class
