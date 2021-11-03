@@ -352,7 +352,7 @@ class GameBoard(object):
         else:
             return False
 
-        self.actions_remaining -= 1
+        self._actions_remaining -= 1
         return True
 
     # share_knowledge()

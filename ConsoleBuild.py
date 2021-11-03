@@ -20,6 +20,7 @@ from Decks import *
 from City import *
 from Player import *
 from GameBoard import *
+from unidecode import unidecode
 
 
 # - - - HELPER FUNCTIONS - - -
@@ -174,7 +175,7 @@ def parse_input(choice, board):
         city_name = input("Please choose a city to move to: ")
         city_is_valid = False
         for x in board.city_list:
-            if x[city_name] == city_name:
+            if unidecode(x) == city_name:
                 city_is_valid = True
                 if board.charter_flight(board.get_current_player(), city_name):
                     print("Success! " + board.get_current_player().username + " chartered a flight to " + city_name + ".")
