@@ -188,10 +188,7 @@ def parse_input(choice, board):
     elif(choice == "4"):
         # Shuttle flight
         print("Printing cities with research stations...")
-        for x in (board.city_list):
-            if x.has_station:
-                show_city_details(board.city_list[x])
-            print()
+        show_research_cities(board)
         city_name = input("Move to which city? ")
         if board.shuttle_flight(board.get_current_player(), city_name):
             print("Success! " + board.get_current_player().username + " was shuttled to " + city_name + ".")
