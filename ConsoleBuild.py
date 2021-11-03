@@ -1,4 +1,7 @@
-# invariant culture case
+# playing event cards before epidemic starts
+# printing out cities where an outbreak occurs
+# printing out what cards were drawn
+# allow event cards to be played after each card is drawn
 
 # - - - - - - - - - - - - - - - - - - - -
 # COP 4521 -- Term Project
@@ -172,15 +175,22 @@ def parse_input(choice, board):
         pass
 
     elif(choice == "role"):
-        # Special role action
-        pass
+        if (board.get_current_player().role == 1):
+            pass
+        elif (board.get_current_player().role == 2):
+            pass   
+        elif (board.get_current_player().role == 5):
+            pass
+        else:
+            print("The current player's role does not have an special action they can take.\n")
+
 
     elif(choice == "event"):
         play_event_card(board)
 
             
     elif(choice == "reset"):
-        # Reset this turn
+        #print("The turn has been reset.\n")
         pass
 
     else:
@@ -568,7 +578,7 @@ if __name__ == "__main__":
         while(True):
 
             # Confirm action selection, then break out of loop
-            if(board.actions_remaining == 0):
+            if(board.actions_remaining == 0 or board.victory == True):
                 break 
 
             # Prompt user input for action
@@ -580,5 +590,89 @@ if __name__ == "__main__":
             else:
                 parse_input(choice, board)
 
+        # allow use of event cards before draw phase
+        choice = "Y"
+        while (choice.upper() == "Y"):
+            choice = input("\nWould anybody like to use an event card before the draw phase begins? (Y or N): ")
+            if choice == "Y":
+                play_event_card(board)
+        
+        # draw cards
+        player = board.get_current_player()
+        print("Drawing the cards from the Player Deck")
+        board.draw_cards()
+        if (board.defeat == True):
+            continue
+
+        # show acquired cards
+        temp = 2 - board.epidemics_occuring
+        for x in range(temp):
+            card = player.playerhand[-(x+1)]
+            if(isinstance(player.playerhand[-1], CityCard)):
+                print(player.username + " acquired:" + card.city + " / " + card.color)
+            else:
+                print(player.username + " acquired:" + event_card_string(card.value))
+
+        # epidemic time
+        while (board.epidemics_occuring != 0):
+            print ("OH NO! AN EPIDEMIC IS OCCURRING!!!\n")
+
+            board.epidemic()
+            infected_city = board.infection_discard_pile[-1]
+            print(infected_city.city + " was infected.\n")
+            if (board.defeat == True):
+                continue
+
+            has_resilient_population = False
+            for x in board.player_list:
+                if (isinstance(x, EventCard) and x.value == 5):
+                    resilient_population_player = x
+                    has_resilient_population = True
+
+            if (has_resilient_population == True):
+                print(resilient_population_player.username + " has the resilient population card.")
+                choice = input("Would " + resilient_population_player.username + " like to play this card? (Y or N): ")
+                if (choice.upper() == "Y"):
+                    play_resilient_population(board, resilient_population_player)
+
+            board.intensify()
+
+        if (board.skip_infect_cities == False):
+            for x in range(board.infection_rate):
+                board.draw_infection_card()
+                print("Card drawn from the infection pile: " + board.infection_discard_pile[-1].city)
+                
+        else:
+            print ("Thankfully, the infect phase has been skipped.\n")
+
+        while player.over_hand_limit() == True:
+            print("\nYou got too many cards in your pockets, either use 'em or throw 'em away.\n")
+            show_player_hand(player)
+
+            choice = input("\nPick a card that you want to use or lose. (Enter the number): ")
+            choice = int(choice) - 1
+
+            card = player.playerhand[choice]
+            if (isinstance(card, CityCard)):
+                board.discard(card)
+                print("Bye Bye Mr. Card, A.K.A: " + card.city)
+
+            if (isinstance(card, EventCard)):
+                if (card.value == 1):
+                    play_one_quiet_night()
+                elif (card.value == 2):
+                    play_forecast()
+                elif (card.value == 3):
+                    play_government_grant()
+                elif (card.value == 4):
+                    play_airlift()
+                elif (card.value == 5):
+                    play_resilient_population()
+
+        board.next_turn()
 
     # End-of-game stuff
+    if (board.victory == True):
+        print("Mission Complete! You saved the world from impending doom!\n")
+    else:
+        print("Mission Failed. The world is going to perish and it is all your fault.\n")
