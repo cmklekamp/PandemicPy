@@ -21,6 +21,7 @@ from Cards import *
 from Decks import *
 from City import *
 from Player import *
+import copy
 
 # GameBoard class
 class GameBoard(object):
@@ -134,7 +135,7 @@ class GameBoard(object):
         self._player_deck.prepare(difficulty)
 
         #set up temp_board in case there needs to be a turn reset
-        self.temp_board = self
+        self._temp_board = self
 
     # - - - (1) ACTION PHASE: EIGHT MAIN ACTIONS - - -
     # All actions, when taken, should decrement the actions counter
@@ -436,7 +437,7 @@ class GameBoard(object):
     # Draws two cards from the Player deck
     # If City/Event card, add to hand (if over the hand limit, handle in main after drawing 2 cards); if Epidemic, conduct Epidemic
     # If there aren't two cards to draw, trigger game end (defeat)
-    def draw_card(self):
+    def draw_cards(self):
 
         if (self._player_deck.get_size() < 2):
             self.game_end(False)
@@ -831,7 +832,7 @@ class GameBoard(object):
     #  we could add a boolean that is updated in the draw card function called in_action_phase
     def reset(self):
         if (self._actions_remaining > 0):
-            self = self.temp_board
+            self = self._temp_board
             return True
         else:
             return False
@@ -1088,3 +1089,7 @@ class GameBoard(object):
     @property
     def infection_deck(self):
         return self._infection_deck
+
+    @property
+    def temp_board(self):
+        return self._temp_board
