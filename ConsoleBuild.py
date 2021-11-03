@@ -713,7 +713,7 @@ if __name__ == "__main__":
         
         # draw cards
         player = board.get_current_player()
-        print("Drawing the cards from the Player Deck")
+        print("Drawing the cards from the Player Deck...\n")
         board.draw_cards()
         if (board.defeat == True):
             continue
@@ -723,17 +723,17 @@ if __name__ == "__main__":
         for x in range(temp):
             card = player.playerhand[-(x+1)]
             if(isinstance(player.playerhand[-1], CityCard)):
-                print(player.username + " acquired:" + card.city + " / " + card.color)
+                print(player.username + " acquired: " + card.city + " / " + card.color)
             else:
-                print(player.username + " acquired:" + event_card_string(card.value))
+                print(player.username + " acquired: " + event_card_string(card.value))
 
         # epidemic time
         while (board.epidemics_occuring != 0):
-            print ("OH NO! AN EPIDEMIC IS OCCURRING!!!\n")
+            print ("\nOH NO! AN EPIDEMIC IS OCCURRING!!!\n")
 
             board.epidemic()
             infected_city = board.infection_discard_pile[-1]
-            print(infected_city.city + " was infected.\n")
+            print(infected_city.city + " was infected!\n")
             if (board.defeat == True):
                 continue
 
@@ -755,6 +755,7 @@ if __name__ == "__main__":
             for x in range(board.infection_rate):
                 board.draw_infection_card()
                 print("Card drawn from the infection pile: " + board.infection_discard_pile[-1].city)
+            print()
                 
         else:
             print ("Thankfully, the infect phase has been skipped.\n")
@@ -787,6 +788,6 @@ if __name__ == "__main__":
 
     # End-of-game stuff
     if (board.victory == True):
-        print("Mission Complete! You saved the world from impending doom!\n")
+        print("\nMission Complete! You saved the world from impending doom!\n")
     else:
-        print("Mission Failed. The world is going to perish and it is all your fault.\n")
+        print("\nMission Failed. The world is going to perish and it is all your fault.\n")

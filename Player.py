@@ -111,7 +111,7 @@ class Player(object):
     # over_hand_limit()
     # Returns True if the player has more than 7 cards in hand; False otherwise
     def over_hand_limit(self):
-        if self._playerhand.len() > 7:
+        if len(self._playerhand) > 7:
             return True
         else:
             return False

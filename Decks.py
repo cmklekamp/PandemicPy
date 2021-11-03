@@ -47,10 +47,6 @@ class Deck(object):
             return True
         else:
             return False
-    
-    # @property
-    # def cardlist(self):
-    #     return super().self._cardlist
 
 # InfectionDeck class
 # Contains Infection cards and behavior unique to Infection deck
@@ -116,7 +112,7 @@ class InfectionDeck(Deck):
         self._cardlist.append(InfectionCard("Hong Kong", "red"))
 
         # Shuffle the deck
-        super().shuffle()
+        random.shuffle(self._cardlist)
 
     # bottom_card()
     # Returns the bottom card from the deck, removing it from the deck in the process
@@ -128,7 +124,7 @@ class InfectionDeck(Deck):
     # Reshuffles cards from Infection discard, adds them back to TOP of Infection deck
     # Occurs during 3 - INTENSIFY phase of Epidemics
     def intensify(self, discard_pile):
-        discard_pile.shuffle()
+        random.shuffle(discard_pile)
         while len(discard_pile) > 0:
             self._cardlist.append(discard_pile.pop())
 
@@ -209,7 +205,7 @@ class PlayerDeck(Deck):
 
 
         # Shuffle the deck
-        super().shuffle()
+        random.shuffle(self._cardlist)
 
     # prepare()
     # Adds 4, 5, or 6 Epidemic cards to the deck (based on parameter)

@@ -448,8 +448,11 @@ class GameBoard(object):
         for x in range(2):
             card = self._player_deck.top_card()
             if (isinstance(card, CityCard) or isinstance(card, EventCard)):
+                print("ohhhh, that card is a ", type(card))
                 player.acquire_card(card)
+                self._player_discard_pile.append(card)
             else:
+                print("uh oh, that card is a ", type(card))
                 self._epidemics_occuring += 1
         return True
 
@@ -506,7 +509,7 @@ class GameBoard(object):
         self.infect_city(card.city, card.color)
 
         for x in self._city_list:
-            x.had_outbreak = False
+            self._city_list[x].had_outbreak = False
 
     # infect_city()
     # Infects a city with the specified number of disease cubes; handles outbreaks appropriately
@@ -822,7 +825,7 @@ class GameBoard(object):
         else:
             self._player_turn += 1
 
-        self.temp_board = self
+        self._temp_board = self
 
     # reset()
     # Resets the state of the board to the way it was before a player took actions that turn
