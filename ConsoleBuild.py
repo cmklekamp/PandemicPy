@@ -150,7 +150,7 @@ def parse_input(choice, board):
 
     elif(choice == "1"):
         # Drive / ferry
-        take_drive_ferry(board)
+        drive_ferry(board)
 
     elif(choice == "2"):
         # Direct flight
