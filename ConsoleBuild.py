@@ -150,10 +150,7 @@ def parse_input(choice, board):
 
     elif(choice == "1"):
         # Drive / ferry
-        print("Showing cities surrounding your current city...")
-        for x in (board.city_list[board.get_current_player().current_city].connected_cities):
-            show_city_details(board.city_list[x])
-        print()
+        show_current_city(board)
         city_name = input("Move to which city? ")
         if board.simple_move(board.get_current_player(), city_name):
             print("Success! " + board.get_current_player().username + " moved to " + city_name + ".")
@@ -187,7 +184,6 @@ def parse_input(choice, board):
 
     elif(choice == "4"):
         # Shuttle flight
-        print("Printing cities with research stations...")
         show_research_cities(board)
         city_name = input("Move to which city? ")
         if board.shuttle_flight(board.get_current_player(), city_name):
