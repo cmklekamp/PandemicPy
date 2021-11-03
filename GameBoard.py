@@ -136,7 +136,7 @@ class GameBoard(object):
         self._player_deck.prepare(difficulty)
 
         #set up temp_board in case there needs to be a turn reset
-        self._temp_board = self
+        #self._temp_board = self
 
     # - - - (1) ACTION PHASE: EIGHT MAIN ACTIONS - - -
     # All actions, when taken, should decrement the actions counter
@@ -158,7 +158,6 @@ class GameBoard(object):
                 return True
 
         return False
-
 
     # direct_flight()
     # Player must discard a City card to move to the city named on the card
@@ -638,7 +637,7 @@ class GameBoard(object):
         
         player = self.get_current_player()
 
-        if (player.role == 5 and isinstance(card, EventCard) and card in self._player_discard_pile):
+        if (player.role == 5 and isinstance(card, EventCard) and card in self._player_discard_pile and player.contingency_planner_card.value == 0):
             player.contingency_planner_card.value = card.value
             self._player_discard_pile.remove(card)
             self._actions_remaining -= 1
@@ -684,7 +683,7 @@ class GameBoard(object):
 
     # dispatcher_charter_flight()
     # Move another player's pawn as if it were your own
-    def dispatcher_charter_flight(self, moving_player, city_name,):
+    def dispatcher_charter_flight(self, moving_player, city_name):
 
         dispatcher = self.get_current_player()
         if (dispatcher.role != 1):
@@ -724,7 +723,7 @@ class GameBoard(object):
     def dispatcher_move_p2p(self, player1, player2):
 
         # make sure we are dealing with real people and not frauds
-        if (player1 not in self._player_list or player2 in self._player_list):
+        if (player1 not in self._player_list or player2 not in self._player_list):
             return False
 
         player1.current_city = player2.current_city
@@ -837,7 +836,7 @@ class GameBoard(object):
         else:
             self._player_turn += 1
 
-        self._temp_board = self
+        #self._temp_board = self
 
     # reset()
     # Resets the state of the board to the way it was before a player took actions that turn
@@ -847,7 +846,7 @@ class GameBoard(object):
     #  we could add a boolean that is updated in the draw card function called in_action_phase
     def reset(self):
         if (self._actions_remaining > 0):
-            self = self._temp_board
+            #self = self._temp_board
             return True
         else:
             return False
@@ -1105,6 +1104,6 @@ class GameBoard(object):
     def infection_deck(self):
         return self._infection_deck
 
-    @property
-    def temp_board(self):
-        return self._temp_board
+    #@property
+    #def temp_board(self):
+    #    return self._temp_board
