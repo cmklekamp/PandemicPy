@@ -203,7 +203,6 @@ class PlayerDeck(Deck):
         self._cardlist.append(EventCard(4))
         self._cardlist.append(EventCard(5))
 
-
         # Shuffle the deck
         random.shuffle(self._cardlist)
 
@@ -213,23 +212,25 @@ class PlayerDeck(Deck):
     def prepare(self, num_epidemics):
         # Slicing the list into smaller lists.
         if num_epidemics == 4:
-            cardlist1 = self._cardlist[0::13]
-            cardlist2 = self._cardlist[13::26]
-            cardlist3 = self._cardlist[26::39]
-            cardlist4 = self._cardlist[39::54]
+            cardlist1 = self._cardlist[0:11]
+            cardlist2 = self._cardlist[11:22]
+            cardlist3 = self._cardlist[22:33]
+            cardlist4 = self._cardlist[33:45]
+
         elif num_epidemics == 5:
-            cardlist1 = self._cardlist[0::11]
-            cardlist2 = self._cardlist[11::22]
-            cardlist3 = self._cardlist[22::33]
-            cardlist4 = self._cardlist[33::44]
-            cardlist5 = self._cardlist[44::54]
+            cardlist1 = self._cardlist[0:9]
+            cardlist2 = self._cardlist[9:18]
+            cardlist3 = self._cardlist[18:27]
+            cardlist4 = self._cardlist[27:36]
+            cardlist5 = self._cardlist[36:45]
+
         elif num_epidemics == 6:
-            cardlist1 = self._cardlist[0::9]
-            cardlist2 = self._cardlist[9::18]
-            cardlist3 = self._cardlist[18::27]
-            cardlist4 = self._cardlist[27::36]
-            cardlist5 = self._cardlist[36::45]
-            cardlist6 = self._cardlist[45::54]
+            cardlist1 = self._cardlist[0:7]
+            cardlist2 = self._cardlist[7:14]
+            cardlist3 = self._cardlist[14:21]
+            cardlist4 = self._cardlist[21:29]
+            cardlist5 = self._cardlist[29:37]
+            cardlist6 = self._cardlist[37:45]
 
         # Adding in the epidemic cards and shuffling.
         cardlist1.append(EpidemicCard())

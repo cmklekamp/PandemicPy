@@ -722,10 +722,11 @@ if __name__ == "__main__":
         temp = 2 - board.epidemics_occuring
         for x in range(temp):
             card = player.playerhand[-(x+1)]
-            if(isinstance(player.playerhand[-1], CityCard)):
+            if(isinstance(card, CityCard)):
                 print(player.username + " acquired: " + card.city + " / " + card.color)
             else:
                 print(player.username + " acquired: " + event_card_string(card.value))
+        print()
 
         # epidemic time
         while (board.epidemics_occuring != 0):
@@ -764,25 +765,25 @@ if __name__ == "__main__":
             print("\nYou got too many cards in your pockets, either use 'em or throw 'em away.\n")
             show_player_hand(player)
 
-            choice = input("\nPick a card that you want to use or lose. (Enter the number): ")
+            choice = input("Pick a card that you want to use or lose. (Enter the number): ")
             choice = int(choice) - 1
 
             card = player.playerhand[choice]
             if (isinstance(card, CityCard)):
                 board.discard(card)
-                print("Bye Bye Mr. Card, A.K.A: " + card.city)
+                print("\nBye Bye Mr. Card, A.K.A: " + card.city + "\n")
 
             if (isinstance(card, EventCard)):
                 if (card.value == 1):
-                    play_one_quiet_night()
+                    play_one_quiet_night(board,player)
                 elif (card.value == 2):
-                    play_forecast()
+                    play_forecast(board,player)
                 elif (card.value == 3):
-                    play_government_grant()
+                    play_government_grant(board,player)
                 elif (card.value == 4):
-                    play_airlift()
+                    play_airlift(board,player)
                 elif (card.value == 5):
-                    play_resilient_population()
+                    play_resilient_population(board,player)
 
         board.next_turn()
 

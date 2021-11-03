@@ -448,11 +448,8 @@ class GameBoard(object):
         for x in range(2):
             card = self._player_deck.top_card()
             if (isinstance(card, CityCard) or isinstance(card, EventCard)):
-                print("ohhhh, that card is a ", type(card))
                 player.acquire_card(card)
-                self._player_discard_pile.append(card)
             else:
-                print("uh oh, that card is a ", type(card))
                 self._epidemics_occuring += 1
         return True
 
