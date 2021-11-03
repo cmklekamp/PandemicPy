@@ -78,11 +78,12 @@ def print_menu(board):
     print("- - - VIEWING ACTIONS - - -")
     print("(A) Show All Gameplay Elements")
     print("(B) Show Current City and Surrounding City")
-    print("(C) Show Infected Cities")
-    print("(D) Show All Cities")
-    print("(E) Show Misc Board Data")
-    print("(F) View Hand")
-    print("(G) View All Player Hands")
+    print("(C) Show Cities with Research Stations")
+    print("(D) Show Infected Cities")
+    print("(E) Show All Cities")
+    print("(F) Show Misc Board Data")
+    print("(G) View Hand")
+    print("(H) View All Player Hands")
     print("(M) Re-print Menu")
     print()
 
@@ -122,22 +123,26 @@ def parse_input(choice, board):
         show_current_city(board)
 
     elif(choice == "C" or choice == "c"):
+        # Show cities with research stations
+        show_research_cities(board)
+
+    elif(choice == "D" or choice == "d"):
         # Show infected cities
         show_infected_cities(board)
 
-    elif(choice == "D" or choice == "d"):
+    elif(choice == "E" or choice == "e"):
         # Show all cities
         show_all_cities(board)
 
-    elif(choice == "E" or choice == "e"):
+    elif(choice == "F" or choice == "f"):
         # Show misc board data
         show_misc_data(board)
 
-    elif(choice == "F" or choice == "f"):
+    elif(choice == "G" or choice == "g"):
         # View hand
         show_player_hand(board.get_current_player())
 
-    elif(choice == "G" or choice == "g"):
+    elif(choice == "H" or choice == "h"):
         # View all player hands
         for x in board.player_list:
             show_player_hand(x)
@@ -203,11 +208,7 @@ def parse_input(choice, board):
             while choice != 'r' and choice != 'R' and choice != 's' and choice != 'S':
                 choice = input("Please enter a valid choice.")
             if choice == 'r' or choice == 'R':
-                print("Printing cities with research stations...")
-                for x in (board.city_list):
-                    if x.has_station:
-                        show_city_details(board.city_list[x])
-                    print()
+                show_research_cities(board)
                 city_name = input("Choose city to remove a research station from, or type \"cancel\" to cancel action: ")
                 if board.remove_station(city_name):
                     print("Station removed. You can now build a station.")
@@ -322,6 +323,20 @@ def show_current_city(board):
     # Surrounding cities
     for x in (board.city_list[board.get_current_player().current_city].connected_cities):
         show_city_details(board.city_list[x])
+    print()
+
+
+# show_research_cities()
+# Shows the details of all cities with research stations
+def show_research_cities(board):
+    # Heading and message
+    print("\nShowing all cities with research stations...")
+    show_city_heading()
+
+    # Show details for all cities with research stations
+    for x in (board.city_list):
+        if board.city_list[x].has_station:
+            show_city_details(board.city_list[x])
     print()
 
 
