@@ -1,3 +1,6 @@
+# Check!
+# printing outbreaks
+
 # - - - - - - - - - - - - - - - - - - - -
 # COP 4521 -- Term Project
 # Daniel Fletcher, Connor Klekamp, Jacob Gregie

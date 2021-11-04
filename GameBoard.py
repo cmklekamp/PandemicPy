@@ -1,11 +1,3 @@
-#Check!
-# Allow resilient population to be played in between infect and intensify step
-# check if a player passes hand limit in main so that they can choose cards to discard or use
-# in main, don't let players use event cards after the last infection card is drawn, just move to next turn
-#   the reason is because one quiet night is reset in the next turn function, also from the players perspective
-#   it doesn't make a difference
-
-
 # - - - - - - - - - - - - - - - - - - - -
 # COP 4521 -- Term Project
 # Daniel Fletcher, Connor Klekamp, Jacob Gregie
@@ -135,8 +127,6 @@ class GameBoard(object):
         #Prepare Deck
         self._player_deck.prepare(difficulty)
 
-        #set up temp_board in case there needs to be a turn reset
-        #self._temp_board = self
 
     # - - - (1) ACTION PHASE: EIGHT MAIN ACTIONS - - -
     # All actions, when taken, should decrement the actions counter
@@ -833,21 +823,6 @@ class GameBoard(object):
         else:
             self._player_turn += 1
 
-        #self._temp_board = self
-
-    # reset()
-    # Resets the state of the board to the way it was before a player took actions that turn
-    # Only allowed during action phase of turn
-    # Check!
-    # Should we allow this to work with 0 actions in case they didn't want to make their last move?
-    #  we could add a boolean that is updated in the draw card function called in_action_phase
-    def reset(self):
-        if (self._actions_remaining > 0):
-            #self = self._temp_board
-            return True
-        else:
-            return False
-
     # discard()
     # Allows the player to discard when they have gone over the hand limit
     def discard(self, card):
@@ -1100,7 +1075,3 @@ class GameBoard(object):
     @property
     def infection_deck(self):
         return self._infection_deck
-
-    #@property
-    #def temp_board(self):
-    #    return self._temp_board
