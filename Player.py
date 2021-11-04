@@ -93,6 +93,10 @@ class Player(object):
     def current_city(self, city):
         self._current_city = city
 
+    @contingency_planner_card.setter
+    def contingency_planner_card(self, a):
+        self._contingency_planner_card = a
+
     # acquire_card()
     # Adds a card to the player's hand
     def acquire_card(self, card):
