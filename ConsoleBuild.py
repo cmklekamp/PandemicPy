@@ -60,12 +60,40 @@ def start_game_data():
     return data_package
 
 
+# role_title()
+# Returns role title as a string based on numeric identifier
+def role_title(value):
+    if(value == 1):
+        return "DISPATCHER"
+    elif(value == 2):
+        return "OPERATIONS EXPERT"
+    elif(value == 3):
+        return "MEDIC"
+    elif(value == 4):
+        return "RESEARCHER"
+    elif(value == 5):
+        return "CONTINGENCY PLANNER"
+    elif(value == 6):
+        return "QUARANTINE SPECIALIST"
+    else:
+        return "SCIENTIST"
+
+
+# show_roles()
+# Shows roles of all players in the game
+def show_roles(board):
+    print("\nShowing all player roles...\n")
+    for player in board.player_list:
+        print(player.username.upper() + " -- " + role_title(player.role))
+    print()
+
+
 # print_menu()
 # Prints menu of options to the screen and prompts user input
 def print_menu(board):
     # Heading for current player's turn
     print("==========================")
-    print("PLAYER " + str(board.player_turn))
+    print("PLAYER " + str(board.player_turn) + " -- " + role_title(board.get_current_player().role))
     print(board.get_current_player().username + "'s turn")
     print("==========================")
     print()
@@ -533,7 +561,8 @@ def show_misc_data(board):
 # show_player_hand()
 # Show all cards in a player's hand
 def show_player_hand(player):
-    print("\nShowing " + player.username + "'s hand...\n")
+    print("\nShowing " + player.username + "'s hand...")
+    print("(" + player.username + " is the " + role_title(player.role) + ".)\n")
     counter = 1
     
     # Show the contingency planner's card if they have one
@@ -882,6 +911,7 @@ if __name__ == "__main__":
     print_title()
     player_count, usernames, difficulty = start_game_data()
     board = GameBoard(player_count, usernames, difficulty)
+    show_roles(board)
 
     # Main loop: playing the game
     while(board.victory == False and board.defeat == False):
