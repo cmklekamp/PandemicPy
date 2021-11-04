@@ -650,7 +650,9 @@ def build_research_station(board):
 
 # 6: Treat disease
 def treat_disease_action(board):
-    print("Please enter color disease to treat...")
+    show_city_heading()
+    show_city_details(board.city_list[board.get_current_player().current_city])
+    print("\nPlease enter color disease to treat...")
     color = input("red, blue, black, or yellow: ")
     if board.treat_disease(color):
         print("Success! Disease cube(s) removed from your current city!")
