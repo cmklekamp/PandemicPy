@@ -609,8 +609,8 @@ def take_charter_flight(board):
     for x in board.city_list:
         if unidecode(x) == city_name:
             city_is_valid = True
-            if board.charter_flight(board.get_current_player(), city_name):
-                print("Success! " + board.get_current_player().username + " chartered a flight to " + city_name + ".")
+            if board.charter_flight(board.get_current_player(), x):
+                print("Success! " + board.get_current_player().username + " chartered a flight to " + x + ".")
             else:
                 print(board.get_current_player().username + " did not have the required card to charter a flight. Please try again, or select a new action.")
             break
