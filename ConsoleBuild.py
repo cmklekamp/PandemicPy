@@ -211,175 +211,22 @@ def parse_input(choice, board):
 
         # Dispatcher Action
         if (player.role == 1):
-            print("- - - VIEWING ACTIONS - - -")
-            print("(1) Drive / Ferry")
-            print("(2) Direct Flight")
-            print("(3) Charter Flight")
-            print("(4) Shuttle Flight")
-            print("(5) Player to Player")
-            choice = input("\nWhat kind of move would you like to make? (Enter the number): ")
-
-            if (isinstance(choice, int) == False or choice < 1 or choice > 5):
-                print("Why did you try to pick an action that wasn't listed. Don't do that.\n")
-                return
-
-            print("\nShowing Player List...\n")
-            counter = 1
-            for x in board.player_list:
-                print("Player " + str(counter) + ": " + x.username + ", " + x.current_city)
-                counter += 1       
-            
-            # Dispatcher Simple Move
-            if (choice == 1):              
-                choice = input("\nWho is gonna move? (Enter the number): ")
-                choice = int(choice) - 1
-                player = board.player_list[choice]
-
-                print("Showing cities surrounding " + player.username + "'s current city...")
-                for x in (board.city_list[player.current_city].connected_cities):
-                    show_city_details(board.city_list[x])
-
-                city_name = input("\nMove to which city? (Enter the name) ")
-                if board.dispatcher_simple_move(player, city_name):
-                    print("Success! " + player.username + " moved to " + city_name + ".\n")
-                else:
-                    print(city_name + " is not connected to " + player.username + "'s  current city.\n")
-
-            # Dispatcher Direct Flight
-            elif (choice == 2):
-                choice = input("\nWho is gonna move? (Enter the number): ")
-                choice = int(choice) - 1
-                player = board.player_list[choice]
-
-                show_player_hand(player)
-                city_name = input("Please choose one of your currently held cities to move to (Enter the name): ")
-                if board.dispatcher_direct_flight(player, city_name):
-                    print("\nSuccess! " + player.username + " took a direct flight to " + city_name + ".\n")
-                else:
-                    print("\n" + player.username + " could not take a flight to " + city_name + ".\n")
-
-            # Dispatcher Charter Flight
-            elif (choice == 3):
-                choice = input("\nWho is gonna move? (Enter the number): ")
-                choice = int(choice) - 1
-                player = board.player_list[choice]
-
-                show_all_cities(board)
-                city_name = input("\nPlease choose a city to move to. (Enter the name): ")
-                city_is_valid = False
-                for x in board.city_list:
-                    if unidecode(x) == city_name:
-                        city_is_valid = True
-                        if board.dispatcher_charter_flight(player, city_name):
-                            print("\nSuccess! " + player.username + " chartered a flight to " + city_name + ".\n")
-                        else:
-                            print("\n" + player.username + " could not take a flight to " + city_name + ".\n")
-                        break
-                if city_is_valid == False:
-                    print("\nCity not found. Action could not be taken.\n")
-
-            # Dispatcher Shuttle Flight
-            elif (choice == 4):
-                choice = input("\nWho is gonna move? (Enter the number): ")
-                choice = int(choice) - 1
-                player = board.player_list[choice]
-
-                print("Printing cities with research stations...")
-                show_research_cities(board)
-
-                city_name = input("Move to which city? (Enter the name): ")
-                if board.dispatcher_shuttle_flight(player, city_name):
-                    print("\nSuccess! " + player.username + " was shuttled to " + city_name + ".\n")
-                else:
-                    print("\n" + player.username + " could not take a flight to " + city_name + ".\n")
-
-            # Dispatcher Move Player to Player
-            elif (choice == 5):
-                choice = input("\nWho is gonna move? (Enter the number): ")
-                choice = int(choice) - 1
-                moving_player = board.player_list[choice]
-
-                choice2 = input("\nWho are they moving to? (Enter the number): ")
-                choice2 = int(choice2) - 1
-                destination_player = board.player_list[choice2]
-
-                if (moving_player == destination_player):
-                    print("\nCongratulations, you just tried to move a player to themselves. Next time, don't do that.\n")
-                
-                else:
-                    if (board.p2p(moving_player, destination_player == True)):
-                        print("\n" + moving_player.username + " successfully moved to " + destination_player.username + ". Now kiss.\n")
-                    else:
-                        print("\nSomebody involved in this equation is not a real person, find the imposter.\n")
+           dispatcher_action(board, player)
 
         # Operations Expert Action
         elif (player.role == 2):
-            if (board.city_list[player.current_city].has_station == False):
-                print("Bro, you aren't even in a city with a research station.\n")
-                return
-
-            has_city_card = False
-            for x in player.playerhand:
-                if isinstance (x, CityCard):
-                    has_city_card = True
-
-            if (has_city_card == False):
-                print ("You seem to be lacking a critical piece of cardboard to complete this action, a city card.\n")
-                return
-
-            print ("Now showing " + player.username + "'s hand...\n")
-            show_player_hand(player)
-
-            choice = input("What card would you like to discard? (Enter the number): ")
-            choice = int(choice) - 1
-
-            card = player.playerhand[choice]
-            if (isinstance(card, CityCard) == False):
-                print("\nYou just picked an invalid card, shame on you.\n")
-                return
-
-            city = input("Where would you like to go? (Enter the name of the city): ")
-            city = city.capitalize()
-
-            success = board.operations_expert_move(card, city)
-            if (success == True):
-                print("\nPack your bags, " + player.username + ". You are going to " + city + "\n")
-            else:
-                print("\n" + player.username + " , I hate to tell you this, but you aren't going anywhere.\n")    
-
+            operations_expert_action(board, player)
+            
         # Contingency Planner Action
         elif (player.role == 5):
-            if (player.contingency_planner_card.value != 0):
-                print("You already have an event card, silly.\n")
-
-            empty = True
-            counter = 1
-            event_list = []          
-            print ("Showing event cards in discard pile...\n")
-            for x in board.player_discard_pile:
-                if (isinstance(x, EventCard)):
-                    print("CARD " + str(counter) + ": " + event_card_string(x.value))
-                    counter+= 1
-                    empty = False
-                    event_list.append(x)
-
-            if (empty == True):
-                print ("There are no event cards in the discard pile.\n")
-
-            else:
-                choice = input("\nWhat card would you like to take? (Enter the number): ")
-                choice = int(choice) - 1
-                card = event_list[choice]
-                board.contingency_planner_take(card)
-                print(player + " has acquired: " + event_card_string(card.value) + "\n")
+            contingency_planner_action(board, player)
+        
         else:
             print("The current player's role does not have an special action they can take.\n")
-
-
+            
     elif(choice == "event"):
         play_event_card(board)
 
-            
     elif(choice == "reset"):
         resetting = True
         print("The turn has been reset.\n")
@@ -718,6 +565,172 @@ def discover_cure_action(board):
     else:
         print(board.get_current_player().username + " does not have enough cards to turn in. Please try again, or select a new action.")
 
+# Dispatcher Special Action
+def dispatcher_action(board, dispatcher):
+    print("- - - VIEWING ACTIONS - - -")
+    print("(1) Drive / Ferry")
+    print("(2) Direct Flight")
+    print("(3) Charter Flight")
+    print("(4) Shuttle Flight")
+    print("(5) Player to Player")
+    choice = input("\nWhat kind of move would you like to make? (Enter the number): ")
+    choice = int(choice)
+
+    if (choice < 1 or choice > 5):
+        print("Why did you try to pick an action that wasn't listed. Don't do that.\n")
+        return
+
+    print("\nShowing Player List...\n")
+    counter = 1
+    for x in board.player_list:
+        print("Player " + str(counter) + ": " + x.username + ", " + x.current_city)
+        counter += 1       
+    
+    # Dispatcher Simple Move
+    if (choice == 1):              
+        choice = input("\nWho is gonna move? (Enter the number): ")
+        choice = int(choice) - 1
+        player = board.player_list[choice]
+
+        print("Showing cities surrounding " + player.username + "'s current city...")
+        for x in (board.city_list[player.current_city].connected_cities):
+            show_city_details(board.city_list[x])
+
+        city_name = input("\nMove to which city? (Enter the name) ")
+        if board.dispatcher_simple_move(player, city_name):
+            print("Success! " + player.username + " moved to " + city_name + ".\n")
+        else:
+            print(city_name + " is not connected to " + player.username + "'s  current city.\n")
+
+    # Dispatcher Direct Flight
+    elif (choice == 2):
+        choice = input("\nWho is gonna move? (Enter the number): ")
+        choice = int(choice) - 1
+        moving_player = board.player_list[choice]
+
+        show_player_hand(dispatcher)
+        city_name = input("Please choose one of your currently held cities to move to (Enter the name): ")
+        if board.dispatcher_direct_flight(moving_player, city_name):
+            print("\nSuccess! " + moving_player.username + " took a direct flight to " + city_name + ".\n")
+        else:
+            print("\n" + moving_player.username + " could not take a flight to " + city_name + ".\n")
+
+    # Dispatcher Charter Flight
+    elif (choice == 3):
+        choice = input("\nWho is gonna move? (Enter the number): ")
+        choice = int(choice) - 1
+        moving_player = board.player_list[choice]
+
+        city_name = input("\nPlease choose a city to move to. (Enter the name): ")
+        city_is_valid = False
+        for x in board.city_list:
+            if unidecode(x) == city_name:
+                city_is_valid = True
+                if board.dispatcher_charter_flight(moving_player, city_name):
+                    print("\nSuccess! " + moving_player.username + " chartered a flight to " + city_name + ".\n")
+                else:
+                    print("\n" + moving_player.username + " could not take a flight to " + city_name + ".\n")
+                break
+        if city_is_valid == False:
+            print("\nCity not found. Action could not be taken.\n")
+
+    # Dispatcher Shuttle Flight
+    elif (choice == 4):
+        choice = input("\nWho is gonna move? (Enter the number): ")
+        choice = int(choice) - 1
+        moving_player = board.player_list[choice]
+
+        print("Printing cities with research stations...")
+        show_research_cities(board)
+
+        city_name = input("Move to which city? (Enter the name): ")
+        if board.dispatcher_shuttle_flight(moving_player, city_name):
+            print("\nSuccess! " + moving_player.username + " was shuttled to " + city_name + ".\n")
+        else:
+            print("\n" + moving_player.username + " could not take a flight to " + city_name + ".\n")
+
+    # Dispatcher Move Player to Player
+    elif (choice == 5):
+        choice = input("\nWho is gonna move? (Enter the number): ")
+        choice = int(choice) - 1
+        moving_player = board.player_list[choice]
+
+        choice2 = input("\nWho are they moving to? (Enter the number): ")
+        choice2 = int(choice2) - 1
+        destination_player = board.player_list[choice2]
+
+        if (moving_player == destination_player):
+            print("\nCongratulations, you just tried to move a player to themselves. Next time, don't do that.\n")
+        
+        else:
+            if (board.dispatcher_move_p2p(moving_player, destination_player) == True):
+                print("\n" + moving_player.username + " successfully moved to " + destination_player.username + ". Now kiss.\n")
+            else:
+                print("\nSomebody involved in this equation is not a real person, find the imposter.\n")
+
+# Operations Expert Action
+def operations_expert_action(board,player):
+    if (board.operations_expert_action_complete == True):
+        print ("\nYou tried to pull a fast one on me huh. You already did that this turn. If you could do that more than once in a turn, that would be BROKEN.\n")
+        return
+    
+    if (board.city_list[player.current_city].has_station == False):
+        print("\nBro, you aren't even in a city with a research station.\n")
+        return
+
+    has_city_card = False
+    for x in player.playerhand:
+        if isinstance (x, CityCard):
+            has_city_card = True
+
+    if (has_city_card == False):
+        print ("You seem to be lacking a critical piece of cardboard to complete this action, a city card.\n")
+        return
+
+    print ("Now showing " + player.username + "'s hand...\n")
+    show_player_hand(player)
+
+    choice = input("What card would you like to discard? (Enter the number): ")
+    choice = int(choice) - 1
+
+    card = player.playerhand[choice]
+    if (isinstance(card, CityCard) == False):
+        print("\nYou just picked an invalid card, shame on you.\n")
+        return
+
+    city = input("\nWhere would you like to go? (Enter the name of the city): ")
+
+    success = board.operations_expert_move(card, city)
+    if (success == True):
+        print("\nPack your bags, " + player.username + ". You are going to " + city + ".\n")
+    else:
+        print("\n" + player.username + " ,I hate to tell you this, but you aren't going anywhere.\n")    
+
+# Contingency Planner Action   
+def contingency_planner_action(board,player):
+    if (player.contingency_planner_card.value != 0):
+        print("You already have an event card, silly.\n")
+
+    empty = True
+    counter = 1
+    event_list = []          
+    print ("Showing event cards in discard pile...\n")
+    for x in board.player_discard_pile:
+        if (isinstance(x, EventCard)):
+            print("CARD " + str(counter) + ": " + event_card_string(x.value))
+            counter+= 1
+            empty = False
+            event_list.append(x)
+
+    if (empty == True):
+        print ("There are no event cards in the discard pile.\n")
+
+    else:
+        choice = input("\nWhat card would you like to take? (Enter the number): ")
+        choice = int(choice) - 1
+        card = event_list[choice]
+        board.contingency_planner_take(card)
+        print(player.username + " has acquired: " + event_card_string(card.value) + "\n")
 
 # event_card_string()
 # Returns the title of the event card based on the numeric value
@@ -751,16 +764,18 @@ def play_event_card(board):
     has_event_card = False
     event_card_list = list()
 
-    # Show the contingency planner's card if they have one
-    if (player.role == 5 and player.contingency_planner_card.value != 0):
-        print("CONTIGENCY PLANNER CARD: EVENT -- " + event_card_string(player.contingency_planner_card.value))
-
     for x in player.playerhand:
         if(isinstance(x, EventCard)):
             print("CARD " + str(counter) + ": EVENT -- " + event_card_string(x.value))
             has_event_card = True
             event_card_list.append(x)
             counter += 1
+
+    # Show the contingency planner's card if they have one
+    if (player.role == 5 and player.contingency_planner_card.value != 0):
+        print("CARD " + str(counter) + ": CONTIGENCY PLANNER CARD: EVENT -- " + event_card_string(player.contingency_planner_card.value))
+        has_event_card = True
+        event_card_list.append(player.contingency_planner_card)
     print()
 
     if (has_event_card == False):
@@ -850,7 +865,6 @@ def play_government_grant(board, player):
             print("\nThe research station in " + station_list[choice] + " has been removed.")
 
     city = input("\nWhat city would you like to build a research station in? (Enter the name): ")
-    city = city.capitalize()
 
     success = board.government_grant(player, city)
     if success == True:
@@ -873,7 +887,6 @@ def play_airlift(board, player):
     moving_player = board.player_list[choice]
 
     city = input("\nWhat city would you like " + moving_player.username + " to move to? ")
-    city = city.capitalize()
 
     success = board.airlift(player, moving_player, city)
     if success == True:
@@ -945,13 +958,13 @@ if __name__ == "__main__":
         # allow use of event cards before draw phase
         choice = "Y"
         while (choice.upper() == "Y"):
-            choice = input("\nWould anybody like to use an event card before the draw phase begins? (Y or N): ")
-            if choice == "Y":
+            choice = input("\nWould anybody like to use an event card before the player draw phase begins? (Y or N): ")
+            if choice.upper() == "Y":
                 play_event_card(board)
         
         # draw cards
         player = board.get_current_player()
-        print("Drawing the cards from the Player Deck...\n")
+        print("\nDrawing the cards from the Player Deck...\n")
         board.draw_cards()
         if (board.defeat == True):
             continue
@@ -973,32 +986,49 @@ if __name__ == "__main__":
             board.epidemic()
             infected_city = board.infection_discard_pile[-1]
             print(infected_city.city + " was infected!\n")
+
+            for x in board.city_list:
+                if board.city_list[x].had_outbreak == True:
+                    print("Ruh Roh Raggy! " + x + " had an outbreak!")
+
             if (board.defeat == True):
                 continue
 
             has_resilient_population = False
             for x in board.player_list:
-                if (isinstance(x, EventCard) and x.value == 5):
-                    resilient_population_player = x
-                    has_resilient_population = True
+                for y in x.playerhand:
+                    if (isinstance(y, EventCard) and y.value == 5):
+                        resilient_population_player = x
+                        has_resilient_population = True
 
             if (has_resilient_population == True):
-                print(resilient_population_player.username + " has the resilient population card.")
+                print(resilient_population_player.username + " has the Resilient Population card.")
                 choice = input("Would " + resilient_population_player.username + " like to play this card? (Y or N): ")
                 if (choice.upper() == "Y"):
                     play_resilient_population(board, resilient_population_player)
 
             board.intensify()
 
-        if (board.skip_infect_cities == False):
+        # allow use of event cards before draw phase
+        choice = "Y"
+        while (choice.upper() == "Y"):
+            choice = input("\nWould anybody like to use an event card before the infection draw phase begins? (Y or N): ")
+            if choice.upper() == "Y":
+                play_event_card(board)
+
+        if (board.skip_infect_cities == False):   
             for x in range(board.infection_rate):
                 board.draw_infection_card()
-                print("Card drawn from the infection pile: " + board.infection_discard_pile[-1].city)
+                print("\nCard drawn from the infection pile: " + board.infection_discard_pile[-1].city)
+
+                for x in board.city_list:
+                    if board.city_list[x].had_outbreak == True:
+                        print("Ruh Roh Raggy! " + x + " had an outbreak!")
             print()
                 
         else:
             board.skip_infect_cities = False
-            print ("Thankfully, the infect phase has been skipped.\n")
+            print ("\nThankfully, the infect phase has been skipped.\n")
 
         while player.over_hand_limit() == True:
             print("\nYou got too many cards in your pockets, either use 'em or throw 'em away.\n")
