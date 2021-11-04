@@ -688,6 +688,7 @@ def share_knowledge_action(board):
                             discarded = True
             else:
                 print("Invalid card. Knowledge could not be shared.")
+                print("This may be because the card is not in the player's hand, or the card does not match the current city of both players.")
         else:
             print("One or both players could not be found. Please try again, or select a new action.")
     else:
