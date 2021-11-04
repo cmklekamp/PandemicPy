@@ -828,9 +828,6 @@ class GameBoard(object):
     # Captures the current state of the board as member data for use with reset()
     def next_turn(self):
         self._actions_remaining = 4
-
-        self._skip_infect_cities == False
-
         if (self._player_turn == len(self._player_list)):
             self._player_turn = 1
         else:

@@ -1,8 +1,3 @@
-# playing event cards before epidemic starts
-# printing out cities where an outbreak occurs
-# printing out what cards were drawn
-# allow event cards to be played after each card is drawn
-
 # - - - - - - - - - - - - - - - - - - - -
 # COP 4521 -- Term Project
 # Daniel Fletcher, Connor Klekamp, Jacob Gregie
@@ -969,6 +964,7 @@ if __name__ == "__main__":
             print()
                 
         else:
+            board.skip_infect_cities = False
             print ("Thankfully, the infect phase has been skipped.\n")
 
         while player.over_hand_limit() == True:
