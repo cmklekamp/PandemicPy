@@ -673,10 +673,8 @@ def share_knowledge_action(board):
                 taking_player_valid = True
                 taking_player = x
         if giving_player_valid and taking_player_valid:
-            show_player_hand(giving_player)
-            card_name = input("Which card to give?")
-            if board.share_knowledge(giving_player, taking_player, card_name):
-                print("Success! Knowledge shared!")
+            if board.share_knowledge(giving_player, taking_player, board.get_current_player().current_city):
+                print("Success! The " + board.get_current_player().current_city + " card was given to " + taking_player_name + ".")
                 if taking_player.over_hand_limit():
                     print("Taking player is now over the hand limit. Please discard a card.")
                     show_player_hand(taking_player)
