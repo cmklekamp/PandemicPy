@@ -186,20 +186,16 @@ class GameBoard(object):
     # Player must discard the City that matches where they are to move anywhere
     def charter_flight(self, player, city_name):
 
-        # Saves the accented city name for later use.
-        uni_city = ""
-
         #check if the card is in the players hand
         card = CityCard("", "", 0, 0)
         for x in player.playerhand:
             if (isinstance(x, CityCard) and x.city == player.current_city):
                 card = x
-                uni_city = x.city
 
         if (card.city != ""):
             self._player_discard_pile.append(card)
             player.discard(card)
-            player.current_city = uni_city
+            player.current_city = city_name
             self._actions_remaining -= 1
 
             # medic passive check

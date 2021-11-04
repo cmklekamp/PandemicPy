@@ -456,8 +456,8 @@ def take_charter_flight(board):
     for x in board.city_list:
         if unidecode(x) == city_name:
             city_is_valid = True
-            if board.charter_flight(board.get_current_player(), city_name):
-                print("Success! " + board.get_current_player().username + " chartered a flight to " + city_name + ".")
+            if board.charter_flight(board.get_current_player(), x):
+                print("Success! " + board.get_current_player().username + " chartered a flight to " + x + ".")
             else:
                 print(board.get_current_player().username + " did not have the required card to charter a flight. Please try again, or select a new action.")
             break
@@ -520,10 +520,8 @@ def share_knowledge_action(board):
                 taking_player_valid = True
                 taking_player = x
         if giving_player_valid and taking_player_valid:
-            show_player_hand(giving_player)
-            card_name = input("Which card to give?")
-            if board.share_knowledge(giving_player, taking_player, card_name):
-                print("Success! Knowledge shared!")
+            if board.share_knowledge(giving_player, taking_player, board.get_current_player().current_city):
+                print("Success! The " + board.get_current_player().current_city + " card was given to " + taking_player_name + ".")
                 if taking_player.over_hand_limit():
                     print("Taking player is now over the hand limit. Please discard a card.")
                     show_player_hand(taking_player)
@@ -535,6 +533,7 @@ def share_knowledge_action(board):
                             discarded = True
             else:
                 print("Invalid card. Knowledge could not be shared.")
+                print("This may be because the card is not in the player's hand, or the card does not match the current city of both players.")
         else:
             print("One or both players could not be found. Please try again, or select a new action.")
     else:
