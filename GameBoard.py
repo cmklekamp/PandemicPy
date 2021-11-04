@@ -64,6 +64,9 @@ class GameBoard(object):
         #flag for use by One Quiet Night event card
         self._skip_infect_cities = False
 
+        #flag for operations expert special action
+        self._operations_expert_action_complete = False
+
         # counter for whether or not an epidemic is currently happening
         # used in main to signal whether or not epidemic should be called after drawing cards
         # counter instead of flag for the case that 2 epidemic cards are drawn during a single draw phase
@@ -216,7 +219,7 @@ class GameBoard(object):
 
         for x in self._city_list:
             if (city_name == unidecode(x) and self._city_list[player.current_city].has_station 
-                and self._citylist[x].has_station):
+                and self._citylist[x].has_station and city_name != player.current_city):
                 uni_city = x
                 player.current_city = uni_city
                 self._actions_remaining -= 1
@@ -498,6 +501,10 @@ class GameBoard(object):
         if (self._skip_infect_cities == True):
             return
         
+        # Reset Had Outbreak Flag
+        for x in self._city_list:
+            self._city_list[x].had_outbreak = False
+
         # updates the list of the cities that the quarantine specialist is connected to so they won't be infected
         # skips if there is no quarantine specialist in the game
         if not self._quarantine_list:
@@ -508,9 +515,6 @@ class GameBoard(object):
         card = self._infection_deck.top_card()
         self._infection_discard_pile.append(card)
         self.infect_city(card.city, card.color)
-
-        for x in self._city_list:
-            self._city_list[x].had_outbreak = False
 
     # infect_city()
     # Infects a city with the specified number of disease cubes; handles outbreaks appropriately
@@ -628,7 +632,7 @@ class GameBoard(object):
         player = self.get_current_player()
 
         if (player.role == 5 and isinstance(card, EventCard) and card in self._player_discard_pile and player.contingency_planner_card.value == 0):
-            player.contingency_planner_card.value = card.value
+            player.contingency_planner_card = card
             self._player_discard_pile.remove(card)
             self._actions_remaining -= 1
             return True
@@ -657,7 +661,7 @@ class GameBoard(object):
             if (isinstance(x, CityCard) and x.city == city_name):
                 card = x
 
-        if (card.city != ""):
+        if (card.city != "" and moving_player.current_city != card.city):
             self._player_discard_pile.append(card)
             dispatcher.discard(card)
             moving_player.current_city = city_name
@@ -685,7 +689,7 @@ class GameBoard(object):
             if (isinstance(x, CityCard) and x.city == moving_player.current_city):
                 card = x
 
-        if (card.city != ""):
+        if (card.city != "" and moving_player.current_city != city_name):
             self._player_discard_pile.append(card)
             dispatcher.discard(card)
             moving_player.current_city = city_name
@@ -716,6 +720,10 @@ class GameBoard(object):
         if (player1 not in self._player_list or player2 not in self._player_list):
             return False
 
+        # make sure they are in different cities
+        if (player1.current_city == player2.current_city):
+            return False
+
         player1.current_city = player2.current_city
         self._actions_remaining -= 1
 
@@ -732,11 +740,12 @@ class GameBoard(object):
         player = self.get_current_player()
 
         if (player.role == 2 and card in player.playerhand and city_name in self._city_list 
-                and self.city_list[player.current_city].has_station):
+                and self.city_list[player.current_city].has_station and self._operations_expert_action_complete == False):
             self._player_discard_pile.append(card)
             player.discard(card)
             player.current_city = city_name
             self._actions_remaining -= 1
+            self._operations_expert_action_complete = True
             return True
         else:
             return False
@@ -750,7 +759,7 @@ class GameBoard(object):
         if (self.event_card_check(player, 1) == False):
             return False
 
-        self._skip_infect_cities == True   
+        self._skip_infect_cities = True   
         return True
 
     # forecast()
@@ -818,6 +827,7 @@ class GameBoard(object):
     # Captures the current state of the board as member data for use with reset()
     def next_turn(self):
         self._actions_remaining = 4
+        self._operations_expert_action_complete = False
         if (self._player_turn == len(self._player_list)):
             self._player_turn = 1
         else:
@@ -1075,3 +1085,11 @@ class GameBoard(object):
     @property
     def infection_deck(self):
         return self._infection_deck
+
+    @property
+    def operations_expert_action_complete(self):
+        return self._operations_expert_action_complete
+
+    @skip_infect_cities.setter
+    def skip_infect_cities(self, a):
+        self._skip_infect_cities = a
