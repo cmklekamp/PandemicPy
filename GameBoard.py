@@ -216,7 +216,7 @@ class GameBoard(object):
 
         for x in self._city_list:
             if (city_name == unidecode(x) and self._city_list[player.current_city].has_station 
-                and self._citylist[x].has_station and city_name != player.current_city):
+                and self._city_list[x].has_station and city_name != player.current_city):
                 uni_city = x
                 player.current_city = uni_city
                 self._actions_remaining -= 1
@@ -385,7 +385,7 @@ class GameBoard(object):
             return False
 
         for x in discard_list:
-            if (discard_list[x].color != color or discard_list[x] not in player.playerhand):
+            if (x.color != color or x not in player.playerhand):
                 return False
 
         if (len(discard_list) == 5 or (player.role == 7 and len(discard_list) == 4)):
@@ -424,10 +424,10 @@ class GameBoard(object):
 
         #discard the cards
         for x in discard_list:
-            self._player_discard_pile.append(discard_list[x])
-            player.discard(discard_list[x])
+            self._player_discard_pile.append(x)
+            player.discard(x)
         
-        self.actions_remaining -= 1
+        self._actions_remaining -= 1
 
         #Check win condition
         if (self._red_cured and self._blue_cured and self._black_cured and self._yellow_cured):
@@ -524,7 +524,7 @@ class GameBoard(object):
         if (self._defeat == True):
             return
         
-        for x in self.player_list:
+        for x in self._player_list:
             # don't infect if quarantine specialist is in the city or a connected city
             if (x.role == 6 and (x.current_city == city_name or city_name in self._quarantine_list)):
                 return
@@ -737,7 +737,7 @@ class GameBoard(object):
         player = self.get_current_player()
 
         if (player.role == 2 and card in player.playerhand and city_name in self._city_list 
-                and self.city_list[player.current_city].has_station and self._operations_expert_action_complete == False):
+                and self._city_list[player.current_city].has_station and self._operations_expert_action_complete == False):
             self._player_discard_pile.append(card)
             player.discard(card)
             player.current_city = city_name
@@ -844,7 +844,7 @@ class GameBoard(object):
     # remove_station()
     # removes station if the remaining stations is 0
     def remove_station(self, city_name):
-        if (self.research_stations_remaining == 0 and self.city_list[city_name].remove_station()):
+        if (self._research_stations_remaining == 0 and self._city_list[city_name].remove_station()):
             self._research_stations_remaining += 1
             return True
         else:

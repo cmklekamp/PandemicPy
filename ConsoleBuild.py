@@ -541,7 +541,7 @@ def share_knowledge_action(board):
 
 # 8: Discover cure
 def discover_cure_action(board):
-    if board.get_current_player.can_turn_in():
+    if board.get_current_player().can_turn_in():
         print("Please input all five cards of one color to turn in, or type \"cancel\": ")
         card_num = 0
         card_name = ""

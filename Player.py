@@ -124,34 +124,31 @@ class Player(object):
     # Returns True if the player can turn in a set; False otherwise
     # Takes special case of Role #7 (Scientist) into consideration
     def can_turn_in(self):
-        if self._current_city.has_station():
-            # Counters that will be used to count the number of cards of each color the player holds.
-            yellowCounter = 0
-            blackCounter = 0
-            blueCounter = 0
-            redCounter = 0
-            # Counter that holds the number a player needs to successfully turn in the set.
-            goal = 5
+        # Counters that will be used to count the number of cards of each color the player holds.
+        yellowCounter = 0
+        blackCounter = 0
+        blueCounter = 0
+        redCounter = 0
+        # Counter that holds the number a player needs to successfully turn in the set.
+        goal = 5
 
-            # Increments the counters as the hand is checked.
-            for x in self._playerhand:
-                if x.color == "yellow":
-                    yellowCounter += 1
-                elif x.color == "black":
-                    blackCounter += 1
-                elif x.color == "blue":
-                    blueCounter += 1
-                else:
-                    redCounter += 1
-            
-            # Goal decreases by one if the player is the Scientist.
-            if self._role == 7:
-                goal -= 1
-
-            # Final check.
-            if yellowCounter >= goal or blackCounter >= goal or blueCounter >= goal or redCounter >= goal:
-                return True
+        # Increments the counters as the hand is checked.
+        for x in self._playerhand:
+            if x.color == "yellow":
+                yellowCounter += 1
+            elif x.color == "black":
+                blackCounter += 1
+            elif x.color == "blue":
+                blueCounter += 1
             else:
-                return False
+                redCounter += 1
+        
+        # Goal decreases by one if the player is the Scientist.
+        if self._role == 7:
+            goal -= 1
+
+        # Final check.
+        if yellowCounter >= goal or blackCounter >= goal or blueCounter >= goal or redCounter >= goal:
+            return True
         else:
             return False
