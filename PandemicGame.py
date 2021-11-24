@@ -17,6 +17,7 @@ from GameBoard import *
 
 # Relevant import statements -- custom classes (GUI)
 import MainMenu
+import Board
 
 # Relevant import statements -- tkinter
 from tkinter import *
