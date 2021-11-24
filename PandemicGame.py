@@ -62,6 +62,7 @@ class MainApplication(Frame):
     def start_game(self, playercount, playernames, difficulty):
         # Initialize game board
         self.board = GameBoard(playercount, playernames, difficulty)
+        self.selected_city = ""
 
         # -- DISPLAYS FOR TESTING --
         self.title_frame = Frame()

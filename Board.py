@@ -77,7 +77,7 @@ class BoardFrame(Frame):
             self.buttons[i].place(height = 17, width = 17, x=x_coordinate, y=y_coordinate)       
     
     def button_click(self, name):
-        print(name)        
+        self.app.selected_city = name
 
 # Main routing for testing MenuFrame
 if __name__ == "__main__":
