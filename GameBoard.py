@@ -52,6 +52,7 @@ class GameBoard(object):
 
         self._actions_remaining = 4
         self._player_turn = 1
+        self._turn_number = 1
 
         #discard pile of card objects for each type of card
         self._infection_discard_pile = []
@@ -829,6 +830,7 @@ class GameBoard(object):
             self._player_turn = 1
         else:
             self._player_turn += 1
+        self._turn_number += 1
 
     # discard()
     # Allows the player to discard when they have gone over the hand limit
@@ -1086,6 +1088,10 @@ class GameBoard(object):
     @property
     def operations_expert_action_complete(self):
         return self._operations_expert_action_complete
+    
+    @property
+    def turn_number(self):
+        return self._turn_number
 
     @skip_infect_cities.setter
     def skip_infect_cities(self, a):

@@ -8,6 +8,7 @@
 # GUI implementation of the Pandemic Board
 
 # Relevant import statements -- custom classes (logic)
+import tkinter
 from Cards import *
 from Decks import *
 from City import *
@@ -17,6 +18,7 @@ import PandemicGame
 
 # Relevant import statements -- tkinter
 from tkinter import *
+from tkinter import scrolledtext
 from tkinter.font import Font
 from PIL import ImageTk,Image
 
@@ -69,15 +71,81 @@ class BoardFrame(Frame):
 
             button_img = Image.open(path)
             new_image= ImageTk.PhotoImage(button_img)
-            new_button = Button(self, image=new_image, borderwidth=0, command=lambda i = i: self.button_click(self.names[i]))
+            new_button = Button(self, image=new_image, borderwidth=0, command=lambda i = i: self.city_click(self.names[i]))
             new_button.image = new_image
             
             x_coordinate,y_coordinate = self.coordinates[i]
             self.buttons.append(new_button)
             self.buttons[i].place(height = 17, width = 17, x=x_coordinate, y=y_coordinate)       
+
+        # Create ScrolledText Box for the log
+        self.text_log = scrolledtext.ScrolledText(self, wrap = tkinter.WORD, width = 37, height = 10, bg = 'LightGrey', font = ("Times New Roman",11))
+        self.text_log.place(x= 710, y= 41)
+
+        # Create next phase buttons
+        self.draw_phase_button = Button(self, text="Proceed to Draw Phase?", command=lambda: self.draw_phase_click(), bg = '#46b7e3', font = ("Times New Roman",10))
+        self.infect_phase_button = Button(self, text="Proceed to Infect Phase?", command=lambda: self.infect_phase_click(), bg = '#46b7e3', font = ("Times New Roman",10))
+        
+        # TEST
+        #self.show_draw_phase_button()
     
-    def button_click(self, name):
+    # Show button functions
+    def show_draw_phase_button(self):
+        self.draw_phase_button.place(height = 50, width = 150, x=450, y=515)
+
+    def show_infect_phase_button(self):
+        self.infect_phase_button.place(height = 50, width = 150, x=450, y=515)
+    
+    # Button click events
+    def city_click(self, name):
         self.app.selected_city = name
+    
+    def draw_phase_click(self):
+        self.draw_phase_button.place_forget()
+        self.app.draw_phase()
+    
+    def infect_phase_click(self):
+        self.infect_phase_button.place_forget()
+        self.app.infect_phase()
+
+    # Log functions
+    def log_next_turn(self):
+        player = self.app.board.get_current_player()
+        turn = self.app.board.turn_number
+
+        self.text_log.configure(state ='normal')
+        self.text_log.insert(tkinter.INSERT, "---------------------------------------------------")
+        self.text_log.insert(tkinter.INSERT, "\nTurn " + str(turn))       
+        self.text_log.insert(tkinter.INSERT, "\nIt is " + player.username + "'s turn!")
+        self.text_log.insert(tkinter.INSERT, "\n---------------------------------------------------")
+        self.text_log.see(tkinter.END)
+        self.text_log.configure(state ='disabled')
+    
+    def log_infect(self, city):
+        self.text_log.configure(state ='normal')
+        self.text_log.insert(tkinter.INSERT, "\n" + city + " has been infected!")      
+        self.text_log.see(tkinter.END) 
+        self.text_log.configure(state ='disabled')
+
+    def log_epidemic(self):
+        self.text_log.configure(state ='normal')
+        self.text_log.insert(tkinter.INSERT, "\n***An epidemic is occuring!***\n")       
+        self.text_log.see(tkinter.END)
+        self.text_log.configure(state ='disabled')
+
+    def log_outbreak(self, city):
+        self.text_log.configure(state ='normal')
+        self.text_log.insert(tkinter.INSERT, "\nAn outbreak occured in " + city + "!")     
+        self.text_log.see(tkinter.END)  
+        self.text_log.configure(state ='disabled')
+
+    # For printing any text you want to the log
+    def log_print(self, text):
+        self.text_log.configure(state ='normal')
+        self.text_log.insert(tkinter.INSERT, "\n" + text)    
+        self.text_log.see(tkinter.END)   
+        self.text_log.configure(state ='disabled')
+
 
 # Main routing for testing MenuFrame
 if __name__ == "__main__":
