@@ -86,8 +86,8 @@ class MainApplication(Frame):
         self.action_frame = Actions.ActionFrame(self)
         self.action_frame.grid(row=1, column=0)
 
-        # self.hand_frame = PlayerHands.HandFrame(self)
-        # self.hand_frame.grid(row=0, column=1)
+        self.hand_frame = PlayerHands.HandFrame(self)
+        self.hand_frame.grid(row=0, column=1)
 
     # player_draw_phase()
     # Handles end of turn actions

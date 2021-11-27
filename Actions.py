@@ -71,16 +71,24 @@ class ActionFrame(Frame):
     # Button click events
     # Remember to add log_print functionality (i.e. make sure actions print to the log)
     def simple_move_click(self):
-        pass
+        self.app.board_frame.log_print("Please select a city to drive to.")
+        # self.app.board_frame.wait_variable(button_clicked)
+        # if self.app.board.simple_move(self.app.board.get_current_player(), self.app.selected_city):
+        #     log_str = self.app.board.get_current_player().username + " drove to " + self.app.selected_city + "\n"
+        #     self.app.board_frame.log_print(log_str)
+        #     if self.app.board.actions_remaining == 0:
+        #         self.app.board_frame.show_draw_phase_button()
+        # else:
+        #     self.app.board_frame.log_print("Invalid city. You may only drive to a city you are next to.")
 
     def direct_flight_click(self):
-        pass
+        self.app.board_frame.log_print("Please select a city to take a direct flight to.")
 
     def charter_flight_click(self):
-        pass
+        self.app.board_frame.log_print("Please select a city to charter a flight to.")
 
     def shuttle_flight_click(self):
-        pass
+        self.app.board_frame.log_print("Please select a city to take a shuttle flight to.")
 
     def build_station_click(self):
         pass

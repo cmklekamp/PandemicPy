@@ -31,7 +31,16 @@ class HandFrame(Frame):
     # createWidgets()
     # Creates widgets upon initialization in constructor
     def createWidgets(self):
-        pass
+        if self.app.menu_frame.playercount == 2:
+            # p1_label_text = self.app.board.playernames[0] + "'s Hand"
+            # p1_label = Label(text = p1_label_text, font = ("Times New Roman",10))
+            # self.p1_label.place(x=25, y=25)
+            pass
+        elif self.app.menu_frame.playercount == 3:
+            pass
+        else:
+            pass
+
 
 # Main routing for testing HandFrame
 if __name__ == "__main__":
