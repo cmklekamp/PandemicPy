@@ -18,6 +18,8 @@ from GameBoard import *
 # Relevant import statements -- custom classes (GUI)
 import MainMenu
 import Board
+import Actions
+import PlayerHands
 
 # Relevant import statements -- tkinter
 from tkinter import *
@@ -80,6 +82,12 @@ class MainApplication(Frame):
         self.board_frame = Board.BoardFrame(self)
         self.board_frame.grid(row=0, column=0)
         self.board_frame.log_next_turn()
+
+        self.action_frame = Actions.ActionFrame(self)
+        self.action_frame.grid(row=1, column=0)
+
+        # self.hand_frame = PlayerHands.HandFrame(self)
+        # self.hand_frame.grid(row=0, column=1)
 
     # player_draw_phase()
     # Handles end of turn actions

@@ -436,6 +436,12 @@ class GameBoard(object):
 
         return True
 
+    # Takes the player's remaining actions down to zero, allowing them to "pass on" the rest of their actions.
+    def pass_actions(self):
+        self._actions_remaining = 0
+        
+        return True
+
     # - - - (2) DRAW CARDS - - -
 
     # draw_cards()
