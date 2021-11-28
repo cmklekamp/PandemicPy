@@ -130,6 +130,7 @@ class GameBoard(object):
         
         #Prepare Deck
         self._player_deck.prepare(difficulty)
+        self._difficulty = difficulty
 
 
     # - - - (1) ACTION PHASE: EIGHT MAIN ACTIONS - - -
@@ -1098,6 +1099,10 @@ class GameBoard(object):
     @property
     def turn_number(self):
         return self._turn_number
+
+    @property
+    def difficulty(self):
+        return self._difficulty
 
     @skip_infect_cities.setter
     def skip_infect_cities(self, a):
