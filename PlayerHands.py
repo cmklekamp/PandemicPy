@@ -45,28 +45,28 @@ class HandFrame(Frame):
             card_num = 0
             for i in self.app.board.player_list[0].playerhand:
                 if isinstance(i, CityCard):
-                    cardname = self.app.board.player_list[0].playerhand[card_num].city
+                    self.cardname = self.app.board.player_list[0].playerhand[card_num].city
                     text_color = "white"
                     if self.app.board.player_list[0].playerhand[card_num].color == "yellow":
                         text_color = "black"
-                    p1_card_button = Button(self, text=cardname, fg=text_color, bg=self.app.board.player_list[0].playerhand[card_num].color, command=lambda: self.card_click(cardname), font = ("Times New Roman",10), width=20)
+                    self.p1_card_button = Button(self, text=self.cardname, fg=text_color, bg=self.app.board.player_list[0].playerhand[card_num].color, command=lambda: self.card_click(self.cardname), font = ("Times New Roman",10), width=20)
                 else:
-                    val = self.app.board.player_list[0].playerhand[card_num].value
-                    if val == 1:
-                        cardname = "EVENT - One Quiet Night"
-                    elif val == 2:
-                        cardname = "EVENT - Forecast"
-                    elif val == 3:
-                        cardname = "EVENT - Government Grant"
-                    elif val == 4:
-                        cardname = "EVENT - Airlift"
-                    elif val == 5:
-                        cardname = "EVENT - Resilient Population"
+                    self.val = self.app.board.player_list[0].playerhand[card_num].value
+                    if self.val == 1:
+                        self.cardname = "EVENT - One Quiet Night"
+                    elif self.val == 2:
+                        self.cardname = "EVENT - Forecast"
+                    elif self.val == 3:
+                        self.cardname = "EVENT - Government Grant"
+                    elif self.val == 4:
+                        self.cardname = "EVENT - Airlift"
+                    elif self.val == 5:
+                        self.cardname = "EVENT - Resilient Population"
                     else:
-                        cardname = "Error - Invalid Value"
-                    p1_card_button = Button(self, text=cardname, command=lambda: self.card_click(self.cardname), font = ("Times New Roman",10), width=20)
+                        self.cardname = "Error - Invalid Value"
+                    self.p1_card_button = Button(self, text=self.cardname, command=lambda: self.card_click(self.cardname), font = ("Times New Roman",10), width=20)
 
-                self.p1_card_buttons.append(p1_card_button)
+                self.p1_card_buttons.append(self.p1_card_button)
                 self.p1_card_buttons[card_num].grid(row=row, column=0, padx=8, pady=4, ipadx=10)
                 row += 1
                 card_num += 1
@@ -81,28 +81,28 @@ class HandFrame(Frame):
             card_num = 0
             for i in self.app.board.player_list[1].playerhand:
                 if isinstance(i, CityCard):
-                    cardname = self.app.board.player_list[1].playerhand[card_num].city
+                    self.cardname = self.app.board.player_list[1].playerhand[card_num].city
                     text_color = "white"
                     if self.app.board.player_list[1].playerhand[card_num].color == "yellow":
                         text_color = "black"
-                    p2_card_button = Button(self, text=cardname, fg=text_color, bg=self.app.board.player_list[1].playerhand[card_num].color, command=lambda: self.card_click(cardname), font = ("Times New Roman",10), width=20)
+                    self.p2_card_button = Button(self, text=self.cardname, fg=text_color, bg=self.app.board.player_list[1].playerhand[card_num].color, command=lambda: self.card_click(self.cardname), font = ("Times New Roman",10), width=20)
                 else:
-                    val = self.app.board.player_list[1].playerhand[card_num].value
-                    if val == 1:
-                        cardname = "EVENT - One Quiet Night"
-                    elif val == 2:
-                        cardname = "EVENT - Forecast"
-                    elif val == 3:
-                        cardname = "EVENT - Government Grant"
-                    elif val == 4:
-                        cardname = "EVENT - Airlift"
-                    elif val == 5:
-                        cardname = "EVENT - Resilient Population"
+                    self.val = self.app.board.player_list[1].playerhand[card_num].value
+                    if self.val == 1:
+                        self.cardname = "EVENT - One Quiet Night"
+                    elif self.val == 2:
+                        self.cardname = "EVENT - Forecast"
+                    elif self.val == 3:
+                        self.cardname = "EVENT - Government Grant"
+                    elif self.val == 4:
+                        self.cardname = "EVENT - Airlift"
+                    elif self.val == 5:
+                        self.cardname = "EVENT - Resilient Population"
                     else:
-                        cardname = "Error - Invalid Value"
-                    p2_card_button = Button(self, text=cardname, command=lambda: self.card_click(self.cardname), font = ("Times New Roman",10), width=20)
+                        self.cardname = "Error - Invalid Value"
+                    self.p2_card_button = Button(self, text=self.cardname, command=lambda: self.card_click(self.cardname), font = ("Times New Roman",10), width=20)
 
-                self.p2_card_buttons.append(p2_card_button)
+                self.p2_card_buttons.append(self.p2_card_button)
                 self.p2_card_buttons[card_num].grid(row=row, column=0, padx=8, pady=4, ipadx=10)
                 row += 1
                 card_num += 1
@@ -118,28 +118,28 @@ class HandFrame(Frame):
             card_num = 0
             for i in self.app.board.player_list[2].playerhand:
                 if isinstance(i, CityCard):
-                    cardname = self.app.board.player_list[2].playerhand[card_num].city
+                    self.cardname = self.app.board.player_list[2].playerhand[card_num].city
                     text_color = "white"
                     if self.app.board.player_list[2].playerhand[card_num].color == "yellow":
                         text_color = "black"
-                    p3_card_button = Button(self, text=cardname, fg=text_color, bg=self.app.board.player_list[2].playerhand[card_num].color, command=lambda: self.card_click(cardname), font = ("Times New Roman",10), width=20)
+                    self.p3_card_button = Button(self, text=self.cardname, fg=text_color, bg=self.app.board.player_list[2].playerhand[card_num].color, command=lambda: self.card_click(self.cardname), font = ("Times New Roman",10), width=20)
                 else:
-                    val = self.app.board.player_list[2].playerhand[card_num].value
-                    if val == 1:
-                        cardname = "EVENT - One Quiet Night"
-                    elif val == 2:
-                        cardname = "EVENT - Forecast"
-                    elif val == 3:
-                        cardname = "EVENT - Government Grant"
-                    elif val == 4:
-                        cardname = "EVENT - Airlift"
-                    elif val == 5:
-                        cardname = "EVENT - Resilient Population"
+                    self.val = self.app.board.player_list[2].playerhand[card_num].value
+                    if self.val == 1:
+                        self.cardname = "EVENT - One Quiet Night"
+                    elif self.val == 2:
+                        self.cardname = "EVENT - Forecast"
+                    elif self.val == 3:
+                        self.cardname = "EVENT - Government Grant"
+                    elif self.val == 4:
+                        self.cardname = "EVENT - Airlift"
+                    elif self.val == 5:
+                        self.cardname = "EVENT - Resilient Population"
                     else:
-                        cardname = "Error - Invalid Value"
-                    p3_card_button = Button(self, text=cardname, command=lambda: self.card_click(self.cardname), font = ("Times New Roman",10), width=20)
+                        self.cardname = "Error - Invalid Value"
+                    self.p3_card_button = Button(self, text=self.cardname, command=lambda: self.card_click(self.cardname), font = ("Times New Roman",10), width=20)
 
-                self.p3_card_buttons.append(p3_card_button)
+                self.p3_card_buttons.append(self.p3_card_button)
                 self.p3_card_buttons[card_num].grid(row=row, column=0, padx=8, pady=4, ipadx=10)
                 row += 1
                 card_num += 1
@@ -155,28 +155,28 @@ class HandFrame(Frame):
             card_num = 0
             for i in self.app.board.player_list[3].playerhand:
                 if isinstance(i, CityCard):
-                    cardname = self.app.board.player_list[3].playerhand[card_num].city
+                    self.cardname = self.app.board.player_list[3].playerhand[card_num].city
                     text_color = "white"
                     if self.app.board.player_list[3].playerhand[card_num].color == "yellow":
                         text_color = "black"
-                    p4_card_button = Button(self, text=cardname, fg=text_color, bg=self.app.board.player_list[3].playerhand[card_num].color, command=lambda: self.card_click(cardname), font = ("Times New Roman",10), width=20)
+                    p4_card_button = Button(self, text=self.cardname, fg=text_color, bg=self.app.board.player_list[3].playerhand[card_num].color, command=lambda: self.card_click(self.cardname), font = ("Times New Roman",10), width=20)
                 else:
-                    val = self.app.board.player_list[3].playerhand[card_num].value
-                    if val == 1:
-                        cardname = "EVENT - One Quiet Night"
-                    elif val == 2:
-                        cardname = "EVENT - Forecast"
-                    elif val == 3:
-                        cardname = "EVENT - Government Grant"
-                    elif val == 4:
-                        cardname = "EVENT - Airlift"
-                    elif val == 5:
-                        cardname = "EVENT - Resilient Population"
+                    self.val = self.app.board.player_list[3].playerhand[card_num].value
+                    if self.val == 1:
+                        self.cardname = "EVENT - One Quiet Night"
+                    elif self.val == 2:
+                        self.cardname = "EVENT - Forecast"
+                    elif self.val == 3:
+                        self.cardname = "EVENT - Government Grant"
+                    elif self.val == 4:
+                        self.cardname = "EVENT - Airlift"
+                    elif self.val == 5:
+                        self.cardname = "EVENT - Resilient Population"
                     else:
-                        cardname = "Error - Invalid Value"
-                    p4_card_button = Button(self, text=cardname, command=lambda: self.card_click(self.cardname), font = ("Times New Roman",10), width=20)
+                        self.cardname = "Error - Invalid Value"
+                    self.p4_card_button = Button(self, text=self.cardname, command=lambda: self.card_click(self.cardname), font = ("Times New Roman",10), width=20)
 
-                self.p4_card_buttons.append(p1_card_button)
+                self.p4_card_buttons.append(p4_card_button)
                 self.p4_card_buttons[card_num].grid(row=row, column=0, padx=8, pady=4, ipadx=10)
                 row += 1
                 card_num += 1

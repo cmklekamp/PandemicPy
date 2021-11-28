@@ -111,6 +111,7 @@ class MainApplication(Frame):
             else:
                 self.board_frame.log_print(player.username + " acquired: " + "Event Card " + str(card.value))
         self.board_frame.log_print("")
+        self.hand_frame.createWidgets()
 
         # epidemic time
         if (self.board.epidemics_occuring != 0):
