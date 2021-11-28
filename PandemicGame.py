@@ -20,6 +20,8 @@ import MainMenu
 import Board
 import Actions
 import PlayerHands
+import Database
+import InfoDisplay
 
 # Relevant import statements -- tkinter
 from tkinter import *
@@ -58,6 +60,9 @@ class MainApplication(Frame):
         # Set up MenuFrame
         self.menu_frame = MainMenu.MenuFrame(self)
         self.menu_frame.grid(row=0, column=0)
+
+        # Set up DatabaseFrame
+        self.database_frame = Database.DatabaseFrame(self)
     
     # start_game()
     # Starts the game based on call from MenuFrame
@@ -79,15 +84,18 @@ class MainApplication(Frame):
         #     self.name_labels[counter].grid(row=counter + 1, column=0)
         #     counter += 1
 
+        self.info_frame = InfoDisplay.InfoFrame(self)
+        self.info_frame.grid(row=0, column=0)
+
         self.board_frame = Board.BoardFrame(self)
-        self.board_frame.grid(row=0, column=0)
+        self.board_frame.grid(row=1, column=0)
         self.board_frame.log_next_turn()
 
         self.action_frame = Actions.ActionFrame(self)
-        self.action_frame.grid(row=1, column=0)
+        self.action_frame.grid(row=2, column=0)
 
         self.hand_frame = PlayerHands.HandFrame(self)
-        self.hand_frame.grid(row=0, column=1)
+        self.hand_frame.grid(row=0, column=1, rowspan=3)
 
     # player_draw_phase()
     # Handles end of turn actions

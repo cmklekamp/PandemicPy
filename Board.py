@@ -72,6 +72,7 @@ class BoardFrame(Frame):
             button_img = Image.open(path)
             new_image= ImageTk.PhotoImage(button_img)
             new_button = Button(self, image=new_image, borderwidth=0, command=lambda i = i: self.city_click(self.names[i]))
+    
         # Create ScrolledText Box for the log
         self.text_log = scrolledtext.ScrolledText(self, wrap = tkinter.WORD, width = 37, height = 10, bg = 'LightGrey', font = ("Times New Roman",11))
         self.text_log.place(x= 710, y= 41)

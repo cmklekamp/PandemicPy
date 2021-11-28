@@ -13,6 +13,7 @@ from tkinter import *
 from tkinter.font import Font
 from GameBoard import *
 import PandemicGame
+import Database
 
 # Custom frame: MenuFrame
 class MenuFrame(Frame):
@@ -55,7 +56,7 @@ class MenuFrame(Frame):
         self.start_button.grid(row=3, column=0, pady=15)
 
         # Game History button
-        self.history_button = Button(self, text="Past Game History", font=self.button_font)
+        self.history_button = Button(self, text="Past Game History", command=self.show_game_history, font=self.button_font)
         self.history_button.grid(row=4, column=0, pady=15)
 
         # Quit button
@@ -164,6 +165,23 @@ class MenuFrame(Frame):
 
         # Call start_game() in MainApplication
         self.app.start_game(self.playercount, self.playernames, self.difficulty)
+
+    
+    # show_game_history()
+    # Shows the game history based on the database stored of past game stats
+    def show_game_history(self):
+        # Remove title screen elements from screen
+        self.items_to_delete = (self.title_text, self.subtitle_devs_text, self.subtitle_credits_text, self.start_button, self.history_button, self.quit_button)
+        for item in self.items_to_delete:
+            item.grid_forget()
+
+        # Add database information to the screen
+        self.app.database_frame.display_system_stats()
+        self.app.database_frame.grid(row=0, column=0)
+
+        # --- TESTING ---
+        # self.app.board = GameBoard(2, ["Daniel", "Jacob"], 5)
+        # self.app.database_frame.update_database()
 
 
 
