@@ -70,6 +70,8 @@ class MainApplication(Frame):
         # Initialize game board
         self.board = GameBoard(playercount, playernames, difficulty)
         self.selected_city = ""
+        self.selected_player = ""
+        self.selected_card = ""
 
         # -- DISPLAYS FOR TESTING --
         # self.title_frame = Frame()

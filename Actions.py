@@ -70,34 +70,75 @@ class ActionFrame(Frame):
 
     # Button click events
     # Remember to add log_print functionality (i.e. make sure actions print to the log)
+
+    # AFTER EVERY ACTION, MAY HAVE TO RETURN SELECTED CITY AND CARD TO EMPTY
+    # AFTER THE ACTION PHASE, DISABLE BUTTONS UNTIL NEXT ACTION PHASE
+
     def simple_move_click(self):
         self.app.board_frame.log_print("Please select a city to drive to.")
-        # self.app.board_frame.wait_variable(button_clicked)
-        # if self.app.board.simple_move(self.app.board.get_current_player(), self.app.selected_city):
-        #     log_str = self.app.board.get_current_player().username + " drove to " + self.app.selected_city + "\n"
-        #     self.app.board_frame.log_print(log_str)
-        #     if self.app.board.actions_remaining == 0:
-        #         self.app.board_frame.show_draw_phase_button()
-        # else:
-        #     self.app.board_frame.log_print("Invalid city. You may only drive to a city you are next to.")
+        self.app.board_frame.buttons[i].wait_variable(var)
+        if self.app.board.simple_move(self.app.board.get_current_player(), self.app.selected_city):
+            log_str = self.app.board.get_current_player().username + " drove to " + self.app.selected_city + "\n"
+            self.app.board_frame.log_print(log_str)
+            if self.app.board.actions_remaining == 0:
+                self.app.board_frame.show_draw_phase_button()
+        else:
+            self.app.board_frame.log_print("Invalid city. You may only drive to a city you are next to.")
 
     def direct_flight_click(self):
-        self.app.board_frame.log_print("Please select a city to take a direct flight to.")
+        self.app.board_frame.log_print("Please select a city card to take a direct flight to.")
+        # self.app.hand_frame.currentplayerhandetc.wait_variable(var)
+        if self.app.board.direct_flight(self.app.board.get_current_player(), CITYCARDNAME):
+            log_str = self.app.board.get_current_player().username + " took a direct flight to " + CITYCARDNAME + "\n"
+            self.app.board_frame.log_print(log_str)
+            if self.app.board.actions_remaining == 0:
+                self.app.board_frame.show_draw_phase_button()
+        else:
+            self.app.board_frame.log_print("Something went wrong. This error should not be reached, as the card is selected directly.")
 
     def charter_flight_click(self):
         self.app.board_frame.log_print("Please select a city to charter a flight to.")
+        self.app.board_frame.buttons[i].wait_variable(var)
+        if self.app.board.charter_flight(self.app.board.get_current_player(), self.app.selected_city):
+            log_str = self.app.board.get_current_player().username + " chartered a flight to " + self.app.selected_city + "\n"
+            self.app.board_frame.log_print(log_str)
+            if self.app.board.actions_remaining == 0:
+                self.app.board_frame.show_draw_phase_button()
+        else:
+            self.app.board_frame.log_print("You do not have the card matching your current city for this action.")
 
     def shuttle_flight_click(self):
-        self.app.board_frame.log_print("Please select a city to take a shuttle flight to.")
+        if self.app.board.get_current_player().current_city.has_station():
+            self.app.board_frame.log_print("Please select a city with a research station to take a shuttle flight to.")
+            self.app.board_frame.buttons[i].wait_variable(var)
+            if self.app.board.shuttle_flight(self.app.board.get_current_player(), self.app.selected_city):
+                log_str = self.app.board.get_current_player().username + " took a shuttle flight to " + self.app.selected_city + "\n"
+                self.app.board_frame.log_print(log_str)
+                if self.app.board.actions_remaining == 0:
+                    self.app.board_frame.show_draw_phase_button()
+            else:
+                self.app.board_frame.log_print("The selected city does not have a research station. Please try again, or select a new action.")
+        else:
+            self.app.board_frame.log_print("Your current city does not have a research station. Please select a new action.")
 
     def build_station_click(self):
-        pass
+        if board.build_station():
+            log_str = self.app.board.get_current_player().username + " built a research station in " + self.app.board.get_current_player().current_city
+            self.app.board_frame.log_print(log_str)
+        elif board.research_stations_remaining == 0:
+            self.app.board_frame.log_print("There are no more available research stations. Please click the city you would like to remove one from.")
+            # SELECT CITY HERE
+        else:
+            self.app.board_frame.log_print("You do not have the required city card to build a station here!")
 
     def treat_disease_click(self):
         pass
 
     def share_knowledge_click(self):
         pass
+        # select the city card from any player's hand, recording who's hand it's from as well as the giving player
+        # select the player name of the taking player, and then pass them both into the function (this will allow for the researcher's role to work as intended)
+        # if false, give appropriate error message; if true, proceed as normal
 
     def discover_cure_click(self):
         pass
