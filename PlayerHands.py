@@ -42,23 +42,26 @@ class HandFrame(Frame):
             row += 1
 
             self.p1_card_buttons = list()
+            card_num = 0
             for i in self.app.board.player_list[0].playerhand:
-                card_num = 0
                 if isinstance(i, CityCard):
                     cardname = self.app.board.player_list[0].playerhand[card_num].city
-                    p1_card_button = Button(self, text=cardname, fg='white', bg=self.app.board.player_list[0].playerhand[card_num].color, command=lambda: self.card_click(self.cardname), font = ("Times New Roman",10), width=20)
+                    text_color = "white"
+                    if self.app.board.player_list[0].playerhand[card_num].color == "yellow":
+                        text_color = "black"
+                    p1_card_button = Button(self, text=cardname, fg=text_color, bg=self.app.board.player_list[0].playerhand[card_num].color, command=lambda: self.card_click(cardname), font = ("Times New Roman",10), width=20)
                 else:
                     val = self.app.board.player_list[0].playerhand[card_num].value
                     if val == 1:
-                        cardname = "One Quiet Night"
+                        cardname = "EVENT - One Quiet Night"
                     elif val == 2:
-                        cardname = "Forecast"
+                        cardname = "EVENT - Forecast"
                     elif val == 3:
-                        cardname = "Government Grant"
+                        cardname = "EVENT - Government Grant"
                     elif val == 4:
-                        cardname = "Airlift"
+                        cardname = "EVENT - Airlift"
                     elif val == 5:
-                        cardname = "Resilient Population"
+                        cardname = "EVENT - Resilient Population"
                     else:
                         cardname = "Error - Invalid Value"
                     p1_card_button = Button(self, text=cardname, command=lambda: self.card_click(self.cardname), font = ("Times New Roman",10), width=20)
@@ -75,23 +78,26 @@ class HandFrame(Frame):
             row += 1
 
             self.p2_card_buttons = list()
+            card_num = 0
             for i in self.app.board.player_list[1].playerhand:
-                card_num = 0
                 if isinstance(i, CityCard):
                     cardname = self.app.board.player_list[1].playerhand[card_num].city
-                    p2_card_button = Button(self, text=cardname, fg='white', bg=self.app.board.player_list[1].playerhand[card_num].color, command=lambda: self.card_click(self.cardname), font = ("Times New Roman",10), width=20)
+                    text_color = "white"
+                    if self.app.board.player_list[1].playerhand[card_num].color == "yellow":
+                        text_color = "black"
+                    p2_card_button = Button(self, text=cardname, fg=text_color, bg=self.app.board.player_list[1].playerhand[card_num].color, command=lambda: self.card_click(cardname), font = ("Times New Roman",10), width=20)
                 else:
                     val = self.app.board.player_list[1].playerhand[card_num].value
                     if val == 1:
-                        cardname = "One Quiet Night"
+                        cardname = "EVENT - One Quiet Night"
                     elif val == 2:
-                        cardname = "Forecast"
+                        cardname = "EVENT - Forecast"
                     elif val == 3:
-                        cardname = "Government Grant"
+                        cardname = "EVENT - Government Grant"
                     elif val == 4:
-                        cardname = "Airlift"
+                        cardname = "EVENT - Airlift"
                     elif val == 5:
-                        cardname = "Resilient Population"
+                        cardname = "EVENT - Resilient Population"
                     else:
                         cardname = "Error - Invalid Value"
                     p2_card_button = Button(self, text=cardname, command=lambda: self.card_click(self.cardname), font = ("Times New Roman",10), width=20)
@@ -109,23 +115,26 @@ class HandFrame(Frame):
             row += 1
 
             self.p3_card_buttons = list()
+            card_num = 0
             for i in self.app.board.player_list[2].playerhand:
-                card_num = 0
                 if isinstance(i, CityCard):
                     cardname = self.app.board.player_list[2].playerhand[card_num].city
-                    p3_card_button = Button(self, text=cardname, fg='white', bg=self.app.board.player_list[2].playerhand[card_num].color, command=lambda: self.card_click(self.cardname), font = ("Times New Roman",10), width=20)
+                    text_color = "white"
+                    if self.app.board.player_list[2].playerhand[card_num].color == "yellow":
+                        text_color = "black"
+                    p3_card_button = Button(self, text=cardname, fg=text_color, bg=self.app.board.player_list[2].playerhand[card_num].color, command=lambda: self.card_click(cardname), font = ("Times New Roman",10), width=20)
                 else:
                     val = self.app.board.player_list[2].playerhand[card_num].value
                     if val == 1:
-                        cardname = "One Quiet Night"
+                        cardname = "EVENT - One Quiet Night"
                     elif val == 2:
-                        cardname = "Forecast"
+                        cardname = "EVENT - Forecast"
                     elif val == 3:
-                        cardname = "Government Grant"
+                        cardname = "EVENT - Government Grant"
                     elif val == 4:
-                        cardname = "Airlift"
+                        cardname = "EVENT - Airlift"
                     elif val == 5:
-                        cardname = "Resilient Population"
+                        cardname = "EVENT - Resilient Population"
                     else:
                         cardname = "Error - Invalid Value"
                     p3_card_button = Button(self, text=cardname, command=lambda: self.card_click(self.cardname), font = ("Times New Roman",10), width=20)
@@ -143,23 +152,26 @@ class HandFrame(Frame):
             row += 1
 
             self.p4_card_buttons = list()
+            card_num = 0
             for i in self.app.board.player_list[3].playerhand:
-                card_num = 0
                 if isinstance(i, CityCard):
                     cardname = self.app.board.player_list[3].playerhand[card_num].city
-                    p4_card_button = Button(self, text=cardname, fg='white', bg=self.app.board.player_list[3].playerhand[card_num].color, command=lambda: self.card_click(self.cardname), font = ("Times New Roman",10), width=20)
+                    text_color = "white"
+                    if self.app.board.player_list[3].playerhand[card_num].color == "yellow":
+                        text_color = "black"
+                    p4_card_button = Button(self, text=cardname, fg=text_color, bg=self.app.board.player_list[3].playerhand[card_num].color, command=lambda: self.card_click(cardname), font = ("Times New Roman",10), width=20)
                 else:
                     val = self.app.board.player_list[3].playerhand[card_num].value
                     if val == 1:
-                        cardname = "One Quiet Night"
+                        cardname = "EVENT - One Quiet Night"
                     elif val == 2:
-                        cardname = "Forecast"
+                        cardname = "EVENT - Forecast"
                     elif val == 3:
-                        cardname = "Government Grant"
+                        cardname = "EVENT - Government Grant"
                     elif val == 4:
-                        cardname = "Airlift"
+                        cardname = "EVENT - Airlift"
                     elif val == 5:
-                        cardname = "Resilient Population"
+                        cardname = "EVENT - Resilient Population"
                     else:
                         cardname = "Error - Invalid Value"
                     p4_card_button = Button(self, text=cardname, command=lambda: self.card_click(self.cardname), font = ("Times New Roman",10), width=20)
