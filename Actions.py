@@ -91,7 +91,6 @@ class ActionFrame(Frame):
         self.share_knowledge_button["state"] = "disabled"
         self.discover_cure_button["state"] = "disabled"
         self.role_action_button["state"] = "disabled"
-        self.play_event_button["state"] = "disabled"
         self.pass_button["state"] = "disabled"
 
 
@@ -214,6 +213,53 @@ class ActionFrame(Frame):
         pass
 
     def play_event_click(self):
+        self.app.board_frame.log_print("Pick an event card to play (any player's card will work\n")
+        self.app.confirmed_card.set('')
+
+        # WAIT ON CARD TO BE CLICKED!!!
+        self.app.hand_frame.confirm_card_button.wait_variable(self.app.confirmed_card)
+        card_name = self.app.confirmed_card.get()
+
+        discard_error = True
+        for j in self.app.board.player_list:
+            for i in j.playerhand:
+                if isinstance(i, EventCard):
+                    if (str(i.value) == card_name):
+                        discard_error = False
+                        card = i
+                        player = j
+
+        if discard_error == True:
+            self.board_frame.log_print("Invalid Card\n")
+            return
+
+        if card.value == 1:
+            self.play_one_quiet_night(player)
+        if card.value == 2:
+            self.play_forecast(player)
+        if card.value == 3:
+            self.play_government_grant(player)
+        if card.value == 4:
+            self.play_airlift(player)
+        if card.value == 5:
+            self.play_resilient_population(player)
+
+    def play_one_quiet_night(self, player):
+        self.app.board.one_quiet_night(player)
+        self.app.board_frame.log_print("The next infect phase will be skipped.\n")
+        self.app.hand_frame.confirm_card_button.grid_forget()
+        self.app.hand_frame.createWidgets()
+    
+    def play_forecast(self, player):
+        pass
+    
+    def play_government_grant(self, player):
+        pass
+
+    def play_airlift(self, player):
+        pass
+
+    def play_resilient_population(self, player):
         pass
 
     def pass_click(self):
@@ -227,7 +273,12 @@ class ActionFrame(Frame):
             self.app.board_frame.show_draw_phase_button()
 
     def reset_click(self):
-        pass
+        self.app.board = copy.deepcopy(self.app.temp_board)
+        self.app.board_frame.createWidgets()
+        self.app.board_frame.log_next_turn()
+        self.app.hand_frame.createWidgets()
+        self.app.info_frame.createWidgets()
+        self.app.action_frame.createWidgets()
 
 
 # Main routing for testing ActionFrame

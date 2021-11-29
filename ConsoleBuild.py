@@ -920,8 +920,6 @@ def play_resilient_population(board, player):
     else:
         print("\nThe " + discard_list[choice].city + " infection card was unable to be removed from the game.\n")
 
-
-
 # - - - MAIN ROUTING - - -
 if __name__ == "__main__":
     # Show title and set up the game

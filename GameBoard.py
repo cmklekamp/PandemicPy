@@ -14,7 +14,6 @@ from Decks import *
 from City import *
 from Player import *
 import copy
-from unidecode import unidecode
 
 # GameBoard class
 class GameBoard(object):
@@ -142,7 +141,7 @@ class GameBoard(object):
 
         #moves the current player if the city requested is connected to the current city
         for x in self._city_list[player.current_city].connected_cities:
-            if city_name == unidecode(x):
+            if city_name == x:
                 player.current_city = x
                 self._actions_remaining -= 1
 
@@ -157,43 +156,10 @@ class GameBoard(object):
     # direct_flight()
     # Player must discard a City card to move to the city named on the card
     def direct_flight(self, player, city_name):
-
-        # Saves the accented city name for later use.
-        uni_city = ""
-
         card = CityCard("", "", 0, 0)
         for x in player.playerhand:
-            if (isinstance(x, CityCard) and unidecode(x.city) == city_name):
+            if (isinstance(x, CityCard) and x.city == city_name):
                 card = x
-                uni_city = x.city
-
-        if (card.city != ""):
-            self._player_discard_pile.append(card)
-            player.discard(card)
-            player.current_city = uni_city
-            self._actions_remaining -= 1
-
-            # medic passive check
-            if (player.role == 3):
-                self.medic_passive(uni_city)
-
-            return True
-        else:
-            return False
-
-    # charter_flight()
-    # Player must discard the City that matches where they are to move anywhere
-    def charter_flight(self, player, city_name):
-
-        # Saves the accented city name for later use.
-        uni_city = ""
-
-        #check if the card is in the players hand
-        card = CityCard("", "", 0, 0)
-        for x in player.playerhand:
-            if (isinstance(x, CityCard) and x.city == player.current_city):
-                card = x
-                uni_city = x.city
 
         if (card.city != ""):
             self._player_discard_pile.append(card)
@@ -203,7 +169,30 @@ class GameBoard(object):
 
             # medic passive check
             if (player.role == 3):
-                self.medic_passive(uni_city)
+                self.medic_passive(card.city)
+
+            return True
+        else:
+            return False
+
+    # charter_flight()
+    # Player must discard the City that matches where they are to move anywhere
+    def charter_flight(self, player, city_name):
+        #check if the card is in the players hand
+        card = CityCard("", "", 0, 0)
+        for x in player.playerhand:
+            if (isinstance(x, CityCard) and x.city == player.current_city):
+                card = x
+
+        if (card.city != ""):
+            self._player_discard_pile.append(card)
+            player.discard(card)
+            player.current_city = city_name
+            self._actions_remaining -= 1
+
+            # medic passive check
+            if (player.role == 3):
+                self.medic_passive(city_name)
 
             return True
         else:
@@ -212,20 +201,15 @@ class GameBoard(object):
     # shuttle_flight()
     # Moves a player from a city with a research station to another city with a research station
     def shuttle_flight(self, player, city_name):
-
-        # Saves the accented city name for later use.
-        uni_city = ""
-
         for x in self._city_list:
-            if (city_name == unidecode(x) and self._city_list[player.current_city].has_station 
+            if (city_name == x and self._city_list[player.current_city].has_station 
                 and self._city_list[x].has_station and city_name != player.current_city):
-                uni_city = x
-                player.current_city = uni_city
+                player.current_city = x
                 self._actions_remaining -= 1
 
                 # medic passive check
                 if (player.role == 3):
-                    self.medic_passive(uni_city)
+                    self.medic_passive(x)
 
                 return True
             else:
@@ -356,7 +340,7 @@ class GameBoard(object):
         #check if the card is in the players hand
         card = CityCard("", "", 0, 0)
         for x in giving_player.playerhand:
-            if (isinstance(x, CityCard) and unidecode(x.city) == card_name):
+            if (isinstance(x, CityCard) and x.city == card_name):
                 card = x
         
         #return false if the giving player doesn't have the card or players aren't in the same city
@@ -364,7 +348,7 @@ class GameBoard(object):
             return False
         
         #exchange cards if the giving player is the researcher or the card matches current city
-        if (giving_player.role == 4 or unidecode(giving_player.current_city) == card_name):
+        if (giving_player.role == 4 or giving_player.current_city == card_name):
             taking_player.acquire_card(card)
             giving_player.discard(card)
             self._actions_remaining -= 1

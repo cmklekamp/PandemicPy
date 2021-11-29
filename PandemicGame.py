@@ -76,6 +76,9 @@ class MainApplication(Frame):
         self.selected_card = ""
         self.confirmed_card = StringVar('')
 
+        # copy of board used for resetting
+        self.temp_board = copy.deepcopy(self.board)
+
         # -- DISPLAYS FOR TESTING --
         # self.title_frame = Frame()
         # self.title_frame.grid(row=0, column=0)
@@ -147,7 +150,6 @@ class MainApplication(Frame):
 
             # WAIT ON CARD TO BE CLICKED!!!
             self.hand_frame.confirm_card_button.wait_variable(self.confirmed_card)
-            
             card_name = self.confirmed_card.get()
 
             discard_error = True
@@ -156,15 +158,13 @@ class MainApplication(Frame):
                     if (i.city == card_name):
                         discard_error = False
                         card = i
-                        break
                 else: 
                     if (str(i.value) == card_name):
                         discard_error = False
                         card = i
-                        break
 
             if discard_error == True:
-                self.board_frame.log_print("Invalid Card")
+                self.board_frame.log_print("Invalid Card\n")
                 continue
 
             if (isinstance(card, CityCard)):
@@ -174,7 +174,7 @@ class MainApplication(Frame):
 
             elif (isinstance(card, EventCard)):
                 if (card.value == 1):
-                    # play_one_quiet_night(board,player)
+                    self.action_frame.play_one_quiet_night(player)
                     log_str = player.username + " has played One Quiet Night."
                     self.board_frame.log_print(log_str)
                 elif (card.value == 2):
@@ -203,6 +203,7 @@ class MainApplication(Frame):
         while (self.board.epidemics_occuring != 0):
             # Update Log
             self.board_frame.log_epidemic()
+            self.action_frame.play_event_button["state"] = "disabled"
 
             # Start epidemic and display infected city
             self.board.epidemic()
@@ -266,6 +267,7 @@ class MainApplication(Frame):
 
         # Progress to next turn
         self.board.next_turn()
+        self.temp_board = copy.deepcopy(self.board)
         self.hand_frame.createWidgets()
         self.board_frame.log_print("")
         self.board_frame.log_next_turn()
