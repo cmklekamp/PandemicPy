@@ -94,6 +94,7 @@ class MainApplication(Frame):
         self.board_frame = Board.BoardFrame(self)
         self.board_frame.grid(row=1, column=0)
         self.board_frame.log_next_turn()
+        self.board_frame.confirm_city_button["state"] = "disabled"
 
         self.action_frame = Actions.ActionFrame(self)
         self.action_frame.grid(row=2, column=0)
@@ -104,16 +105,8 @@ class MainApplication(Frame):
     # player_draw_phase()
     # Handles end of turn actions
     def draw_phase(self):
-        # Grey out all action buttons.
-        self.action_frame.simple_move_button["state"] = "disabled"
-        self.action_frame.direct_flight_button["state"] = "disabled"
-        self.action_frame.charter_flight_button["state"] = "disabled"
-        self.action_frame.shuttle_flight_button["state"] = "disabled"
-        self.action_frame.build_station_button["state"] = "disabled"
-        self.action_frame.treat_disease_button["state"] = "disabled"
-        self.action_frame.share_knowledge_button["state"] = "disabled"
-        self.action_frame.discover_cure_button["state"] = "disabled"
-        self.action_frame.pass_button["state"] = "disabled"
+        # Disable reset button.
+        self.action_frame.reset_button["state"] = "disabled"
 
         # Check if the game is over
         if (self.board.victory == True or self.board.defeat == True):
@@ -243,7 +236,10 @@ class MainApplication(Frame):
         self.action_frame.treat_disease_button["state"] = "normal"
         self.action_frame.share_knowledge_button["state"] = "normal"
         self.action_frame.discover_cure_button["state"] = "normal"
+        self.action_frame.role_action_button["state"] = "normal"
+        self.action_frame.play_event_button["state"] = "normal"
         self.action_frame.pass_button["state"] = "normal"
+        self.action_frame.reset_button["state"] = "normal"
 
         # Progress to next turn
         self.board.next_turn()

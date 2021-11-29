@@ -223,13 +223,13 @@ class GameBoard(object):
                 player.current_city = uni_city
                 self._actions_remaining -= 1
 
-            # medic passive check
-            if (player.role == 3):
-                self.medic_passive(uni_city)
+                # medic passive check
+                if (player.role == 3):
+                    self.medic_passive(uni_city)
 
-            return True
-        else:
-            return False
+                return True
+            else:
+                return False
             
     # build_station()
     # Builds a research station in the city a player is in, if they discard that city
