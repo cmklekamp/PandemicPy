@@ -212,8 +212,8 @@ class GameBoard(object):
                     self.medic_passive(x)
 
                 return True
-            else:
-                return False
+        else:
+            return False
             
     # build_station()
     # Builds a research station in the city a player is in, if they discard that city
