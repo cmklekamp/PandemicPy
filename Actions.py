@@ -106,6 +106,7 @@ class ActionFrame(Frame):
         self.app.board_frame.confirm_city_button["state"] = "normal"
         self.app.board_frame.confirm_city_button.wait_variable(self.app.board_frame.board_var) 
         if self.app.board.simple_move(self.app.board.get_current_player(), self.app.confirmed_city):
+            self.app.city_viewer_frame.update_info()
             log_str = self.app.board.get_current_player().username + " drove to " + self.app.selected_city + ". " + str(self.app.board.actions_remaining) + " action(s) remaining.\n"
             self.app.board_frame.log_print(log_str)
             if self.app.board.actions_remaining == 0:
@@ -176,6 +177,8 @@ class ActionFrame(Frame):
     def build_station_click(self):
         # If station can be built, simply do so.
         if self.app.board.build_station():
+            self.app.city_viewer_frame.update_info()
+            self.app.hand_frame.createWidgets()
             log_str = self.app.board.get_current_player().username + " built a research station in " + self.app.board.get_current_player().current_city + ". " + str(self.app.board.actions_remaining) + " action(s) remaining.\n"
             self.app.board_frame.log_print(log_str)
             # Prepares for draw phase.
@@ -284,6 +287,7 @@ class ActionFrame(Frame):
         self.app.board_frame.log_next_turn()
         self.app.hand_frame.createWidgets()
         self.app.info_frame.createWidgets()
+        self.app.city_viewer_frame.createWidgets()
         self.app.action_frame.createWidgets()
 
 
