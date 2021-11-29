@@ -104,21 +104,14 @@ class ActionFrame(Frame):
     def simple_move_click(self):
         # Allows the player to select a city they are next to and drive to it.
         self.app.board_frame.log_print("Please select a city to drive to.")
-        self.app.board_frame.confirm_city_button["state"] = "normal"
-        self.app.board_frame.confirm_city_button.wait_variable(self.app.board_frame.board_var)
-        if self.app.confirmed_city != "":
-            if self.app.board.simple_move(self.app.board.get_current_player(), self.app.confirmed_city):
-                log_str = self.app.board.get_current_player().username + " drove to " + self.app.selected_city + ". " + str(self.app.board.actions_remaining) + " action(s) remaining.\n"
-                self.app.board_frame.log_print(log_str)
-                # Prepares for draw phase.
-                if self.app.board.actions_remaining == 0:
-                    self.disable_buttons()
-                    self.app.board_frame.show_draw_phase_button()
-            else:
-                self.app.board_frame.log_print("Invalid city. You may only drive to a city you are next to.\n")
+        self.app.board_frame.buttons[i].wait_variable(var)
+        if self.app.board.simple_move(self.app.board.get_current_player(), self.app.selected_city):
+            log_str = self.app.board.get_current_player().username + " drove to " + self.app.selected_city + "\n"
+            self.app.board_frame.log_print(log_str)
+            if self.app.board.actions_remaining == 0:
+                self.app.board_frame.show_draw_phase_button()
         else:
-            self.app.board_frame.log_print("You have not selected a valid city. Please try again.\n")
-        self.app.board_frame.confirm_city_button["state"] = "disabled"
+            self.app.board_frame.log_print("Invalid city. You may only drive to a city you are next to.")
 
     def direct_flight_click(self):
         # Allows the player to select a card from their hand to take a direct flight to.
