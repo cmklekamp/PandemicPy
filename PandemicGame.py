@@ -194,23 +194,26 @@ class MainApplication(Frame):
                     self.board_frame.log_outbreak(x)
 
             if (self.board.defeat == True):
-                self.end_game()
+                self.end_game() 
 
             # -- PLAY RESILIENT POPULATION --
-            # has_resilient_population = False
-            # for x in self.board.player_list:
-            #     for y in x.playerhand:
-            #         if (isinstance(y, EventCard) and y.value == 5):
-            #             resilient_population_player = x
-            #             has_resilient_population = True
+            has_resilient_population = False
+            for x in self.board.player_list:
+                for y in x.playerhand:
+                    if (isinstance(y, EventCard) and y.value == 5):
+                        resilient_population_player = x
+                        has_resilient_population = True
+                        self.board_frame.resilient_population_click()
+                        break
 
-            # if (has_resilient_population == True):
-            #     print(resilient_population_player.username + " has the Resilient Population card.")
-            #     choice = input("Would " + resilient_population_player.username + " like to play this card? (Y or N): ")
-            #     if (choice.upper() == "Y"):
-            #         play_resilient_population(board, resilient_population_player)
+            if (has_resilient_population == False):
+                self.intensify_phase()
 
-            self.board.intensify()
+    # intensify_phase()
+    # Intesify step of epidemic
+    def intensify_phase(self):
+        self.board.intensify()
+        self.board_frame.show_infect_phase_button()
 
     # infect_draw_phase()
     # -- INFECT CITIES --
@@ -247,7 +250,7 @@ class MainApplication(Frame):
         self.board_frame.log_next_turn()
 
         #TEST
-        #self.board_frame.show_draw_phase_button()
+        self.board_frame.show_draw_phase_button()
 
     def end_game(self):
         pass
