@@ -80,6 +80,21 @@ class ActionFrame(Frame):
         self.reset_button.place(height = 50, width = 70, x=930, y=25)
 
 
+    # Disable buttons function for general use. Does not include reset button, as that should be available until the draw phase starts.
+    def disable_buttons(self):
+        self.simple_move_button["state"] = "disabled"
+        self.direct_flight_button["state"] = "disabled"
+        self.charter_flight_button["state"] = "disabled"
+        self.shuttle_flight_button["state"] = "disabled"
+        self.build_station_button["state"] = "disabled"
+        self.treat_disease_button["state"] = "disabled"
+        self.share_knowledge_button["state"] = "disabled"
+        self.discover_cure_button["state"] = "disabled"
+        self.role_action_button["state"] = "disabled"
+        self.play_event_button["state"] = "disabled"
+        self.pass_button["state"] = "disabled"
+
+
     # Button click events
     # Remember to add log_print functionality (i.e. make sure actions print to the log)
 
@@ -87,62 +102,101 @@ class ActionFrame(Frame):
     # AFTER THE ACTION PHASE, DISABLE BUTTONS UNTIL NEXT ACTION PHASE
 
     def simple_move_click(self):
+        # Allows the player to select a city they are next to and drive to it.
         self.app.board_frame.log_print("Please select a city to drive to.")
-        self.wait_variable(self.app.selected_city)
-        print("hello")
-        if self.app.board.simple_move(self.app.board.get_current_player(), self.app.selected_city):
-            log_str = self.app.board.get_current_player().username + " drove to " + self.app.selected_city + "\n"
+        self.app.board_frame.confirm_city_button["state"] = "normal"
+        self.app.board_frame.confirm_city_button.wait_variable(self.app.board_frame.board_var) 
+        if self.app.board.simple_move(self.app.board.get_current_player(), self.app.confirmed_city):
+            log_str = self.app.board.get_current_player().username + " drove to " + self.app.selected_city + ". " + str(self.app.board.actions_remaining) + " action(s) remaining.\n"
             self.app.board_frame.log_print(log_str)
             if self.app.board.actions_remaining == 0:
+                self.disable_buttons()
                 self.app.board_frame.show_draw_phase_button()
         else:
-            self.app.board_frame.log_print("Invalid city. You may only drive to a city you are next to.")
+            self.app.board_frame.log_print("Invalid city. You may only drive to a city you are next to.\n")
+        self.app.board_frame.confirm_city_button["state"] = "disabled"
 
     def direct_flight_click(self):
+        # Allows the player to select a card from their hand to take a direct flight to.
         self.app.board_frame.log_print("Please select a city card to take a direct flight to.")
-        # self.app.hand_frame.currentplayerhandetc.wait_variable(var)
-        if self.app.board.direct_flight(self.app.board.get_current_player(), CITYCARDNAME):
-            log_str = self.app.board.get_current_player().username + " took a direct flight to " + CITYCARDNAME + "\n"
-            self.app.board_frame.log_print(log_str)
-            if self.app.board.actions_remaining == 0:
-                self.app.board_frame.show_draw_phase_button()
-        else:
-            self.app.board_frame.log_print("Something went wrong. This error should not be reached, as the card is selected directly.")
-
-    def charter_flight_click(self):
-        self.app.board_frame.log_print("Please select a city to charter a flight to.")
-        self.app.board_frame.buttons[i].wait_variable(var)
-        if self.app.board.charter_flight(self.app.board.get_current_player(), self.app.selected_city):
-            log_str = self.app.board.get_current_player().username + " chartered a flight to " + self.app.selected_city + "\n"
-            self.app.board_frame.log_print(log_str)
-            if self.app.board.actions_remaining == 0:
-                self.app.board_frame.show_draw_phase_button()
-        else:
-            self.app.board_frame.log_print("You do not have the card matching your current city for this action.")
-
-    def shuttle_flight_click(self):
-        if self.app.board.get_current_player().current_city.has_station():
-            self.app.board_frame.log_print("Please select a city with a research station to take a shuttle flight to.")
-            self.app.board_frame.buttons[i].wait_variable(var)
-            if self.app.board.shuttle_flight(self.app.board.get_current_player(), self.app.selected_city):
-                log_str = self.app.board.get_current_player().username + " took a shuttle flight to " + self.app.selected_city + "\n"
+        self.app.hand_frame.confirm_card_button.wait_variable(self.app.hand_frame.card_var)
+        if self.app.confirmed_card != "":
+            if self.app.board.direct_flight(self.app.board.get_current_player(), self.app.confirmed_card):
+                log_str = self.app.board.get_current_player().username + " took a direct flight to " + self.app.selected_card + ". " + str(self.app.board.actions_remaining) + " action(s) remaining.\n"
                 self.app.board_frame.log_print(log_str)
+                # Prepares for draw phase.
                 if self.app.board.actions_remaining == 0:
+                    self.disable_buttons()
                     self.app.board_frame.show_draw_phase_button()
             else:
-                self.app.board_frame.log_print("The selected city does not have a research station. Please try again, or select a new action.")
+                self.app.board_frame.log_print("Something went wrong. This error should not be reached, as the card is selected directly.\n")
         else:
-            self.app.board_frame.log_print("Your current city does not have a research station. Please select a new action.")
+            self.app.board_frame.log_print("You have not selected a valid card. Please try again.\n")
+
+    def charter_flight_click(self):
+        # Allows the player to charter a flight if they have the city card matching their current city.
+        self.app.board_frame.log_print("Please select a city to charter a flight to.")
+        self.app.board_frame.confirm_city_button["state"] = "normal"
+        self.app.board_frame.confirm_city_button.wait_variable(self.app.board_frame.board_var)   
+        if self.app.confirmed_city != "":
+            if self.app.board.charter_flight(self.app.board.get_current_player(), self.app.confirmed_city):
+                log_str = self.app.board.get_current_player().username + " chartered a flight to " + self.app.selected_city + ". " + str(self.app.board.actions_remaining) + " action(s) remaining.\n"
+                self.app.board_frame.log_print(log_str)
+                # Prepares for draw phase.
+                if self.app.board.actions_remaining == 0:
+                    self.disable_buttons()
+                    self.app.board_frame.show_draw_phase_button()
+            else:
+                self.app.board_frame.log_print("You do not have the card matching your current city for this action.\n")
+        else:
+            self.app.board_frame.log_print("You have not selected a valid city. Please try again.\n")
+        self.app.board_frame.confirm_city_button["state"] = "disabled"
+
+    def shuttle_flight_click(self):
+        # If the current city has a station, allow the player to select another research station to fly to, then carry out the action.
+        if self.app.board._city_list[self.app.board.get_current_player().current_city].has_station:
+            self.app.board_frame.log_print("Please select a city with a research station to take a shuttle flight to.")
+            self.app.board_frame.confirm_city_button["state"] = "normal"
+            self.app.board_frame.confirm_city_button.wait_variable(self.app.board_frame.board_var)       
+            if self.app.confirmed_city != "":
+                if self.app.board.shuttle_flight(self.app.board.get_current_player(), self.app.confirmed_city):
+                    log_str = self.app.board.get_current_player().username + " took a shuttle flight to " + self.app.selected_city + ". " + str(self.app.board.actions_remaining) + " action(s) remaining.\n"
+                    self.app.board_frame.log_print(log_str)
+                    # Prepares for draw phase.
+                    if self.app.board.actions_remaining == 0:
+                        self.disable_buttons()
+                        self.app.board_frame.show_draw_phase_button()
+                else:
+                    self.app.board_frame.log_print("The selected city does not have a research station. Please try again, or select a new action.\n")
+            else:
+                self.app.board_frame.log_print("You have not selected a valid city. Please try again.\n")
+        else:
+            self.app.board_frame.log_print("Your current city does not have a research station. Please select a new action.\n")
+        self.app.board_frame.confirm_city_button["state"] = "disabled"
 
     def build_station_click(self):
-        if board.build_station():
-            log_str = self.app.board.get_current_player().username + " built a research station in " + self.app.board.get_current_player().current_city
+        # If station can be built, simply do so.
+        if self.app.board.build_station():
+            log_str = self.app.board.get_current_player().username + " built a research station in " + self.app.board.get_current_player().current_city + ". " + str(self.app.board.actions_remaining) + " action(s) remaining.\n"
             self.app.board_frame.log_print(log_str)
-        elif board.research_stations_remaining == 0:
+            # Prepares for draw phase.
+            if self.app.board.actions_remaining == 0:
+                    self.disable_buttons()
+                    self.app.board_frame.show_draw_phase_button()
+        # If there aren't enough stations left, have the player remove one. Then, they can retry the action.
+        elif self.app.board.research_stations_remaining == 0:
             self.app.board_frame.log_print("There are no more available research stations. Please click the city you would like to remove one from.")
-            # SELECT CITY HERE
+            self.app.board_frame.confirm_city_button["state"] = "normal"
+            self.app.board_frame.confirm_city_button.wait_variable(self.app.board_frame.board_var)
+            if self.app.confirmed_city != "":
+                if self.app.board.remove_station(self.app.confirmed_city):
+                    self.app.board_frame.log_print("Station removed. You can now build a station.\n")
+                else:
+                    self.app.board_frame.log_print("This city does not have a research station to remove. Please try again, or select a new action.\n")
+            else:
+                self.app.board_frame.log_print("You have not selected a valid city. Please try again.\n")
         else:
-            self.app.board_frame.log_print("You do not have the required city card to build a station here!")
+            self.app.board_frame.log_print("You do not have the required city card to build a station here!\n")
 
     def treat_disease_click(self):
         pass
@@ -163,8 +217,11 @@ class ActionFrame(Frame):
         pass
 
     def pass_click(self):
+        # Sets the player's remaining actions to zero.
         self.app.board.pass_actions()
+        # Prepares for draw phase.
         if self.app.board.actions_remaining == 0:
+            self.disable_buttons()
             log_str = self.app.board.get_current_player().username + " has passed on the rest of their actions.\n"
             self.app.board_frame.log_print(log_str)
             self.app.board_frame.show_draw_phase_button()

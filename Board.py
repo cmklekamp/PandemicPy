@@ -88,7 +88,9 @@ class BoardFrame(Frame):
         self.infect_phase_button = Button(self, text="Proceed to Infect Phase?", command=lambda: self.infect_phase_click(), bg = '#46b7e3', font = ("Times New Roman",10))
         
         # Create confirm city button
-        self.confirm_city_button = Button(self, text="Confirm City", fg='white', bg='green', command=lambda: self.confirm_city_click(), font = ("Times New Roman", 10))
+        self.board_var = tkinter.IntVar()
+        self.confirm_city_button = Button(self, text="Confirm City", fg='white', bg='green', command=lambda: [self.confirm_city_click(), self.board_var.set(1)], font = ("Times New Roman", 10))
+        self.confirm_city_button.place(height = 50, width = 150, x=900, y=550)
 
         # TEST
         # self.show_draw_phase_button()
@@ -99,10 +101,9 @@ class BoardFrame(Frame):
 
     def show_infect_phase_button(self):
         self.infect_phase_button.place(height = 50, width = 150, x=450, y=515)
-
-    def show_confirm_city_button(self):
-        self.confirm_city_button.place(height = 50, width = 150, x=700, y=515)
     
+
+
     def show_resilient_population_button(self):
         self.resilient_population_button.place(height = 50, width = 150, x=700, y=515)
     
