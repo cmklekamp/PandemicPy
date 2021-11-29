@@ -250,7 +250,7 @@ class MainApplication(Frame):
         self.board_frame.log_next_turn()
 
         #TEST
-        self.board_frame.show_draw_phase_button()
+        # self.board_frame.show_draw_phase_button()
 
     def end_game(self):
         pass
