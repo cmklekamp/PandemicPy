@@ -49,7 +49,7 @@ class HandFrame(Frame):
                     text_color = "white"
                     if self.app.board.player_list[0].playerhand[card_num].color == "yellow":
                         text_color = "black"
-                    self.p1_card_button = Button(self, text=self.cardname, fg=text_color, bg=self.app.board.player_list[0].playerhand[card_num].color, command=lambda: self.card_click(self.cardname), font = ("Times New Roman",10), width=20)
+                    self.p1_card_button = Button(self, text=self.cardname, fg=text_color, bg=self.app.board.player_list[0].playerhand[card_num].color, command=lambda cardname = self.cardname: self.card_click(cardname), font = ("Times New Roman",10), width=20)
                 else:
                     self.val = self.app.board.player_list[0].playerhand[card_num].value
                     if self.val == 1:
@@ -85,7 +85,7 @@ class HandFrame(Frame):
                     text_color = "white"
                     if self.app.board.player_list[1].playerhand[card_num].color == "yellow":
                         text_color = "black"
-                    self.p2_card_button = Button(self, text=self.cardname, fg=text_color, bg=self.app.board.player_list[1].playerhand[card_num].color, command=lambda: self.card_click(self.cardname), font = ("Times New Roman",10), width=20)
+                    self.p2_card_button = Button(self, text=self.cardname, fg=text_color, bg=self.app.board.player_list[1].playerhand[card_num].color, command=lambda cardname = self.cardname: self.card_click(cardname), font = ("Times New Roman",10), width=20)
                 else:
                     self.val = self.app.board.player_list[1].playerhand[card_num].value
                     if self.val == 1:
@@ -163,15 +163,15 @@ class HandFrame(Frame):
                 else:
                     self.val = self.app.board.player_list[3].playerhand[card_num].value
                     if self.val == 1:
-                        self.cardname = "EVENT - One Quiet Night"
+                        self.cardname = "1"
                     elif self.val == 2:
-                        self.cardname = "EVENT - Forecast"
+                        self.cardname = "2"
                     elif self.val == 3:
-                        self.cardname = "EVENT - Government Grant"
+                        self.cardname = "3"
                     elif self.val == 4:
-                        self.cardname = "EVENT - Airlift"
+                        self.cardname = "4"
                     elif self.val == 5:
-                        self.cardname = "EVENT - Resilient Population"
+                        self.cardname = "5"
                     else:
                         self.cardname = "Error - Invalid Value"
                     self.p4_card_button = Button(self, text=self.cardname, command=lambda: self.card_click(self.cardname), font = ("Times New Roman",10), width=20)
@@ -193,7 +193,7 @@ class HandFrame(Frame):
         self.app.selected_card = cardname
 
     def confirm_click(self):
-        self.app.confirmed_card = self.app.selected_card
+        self.app.confirmed_card.set(self.app.selected_card)
 
 
 # Main routing for testing HandFrame

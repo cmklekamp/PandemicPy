@@ -26,6 +26,7 @@ import InfoDisplay
 # Relevant import statements -- tkinter
 from tkinter import *
 from tkinter.font import Font
+from tkinter import StringVar
 
 
 # Main application class
@@ -73,7 +74,7 @@ class MainApplication(Frame):
         self.confirmed_city = ""
         self.selected_player = ""
         self.selected_card = ""
-        self.confirmed_card = ""
+        self.confirmed_card = StringVar('')
 
         # -- DISPLAYS FOR TESTING --
         # self.title_frame = Frame()
@@ -137,51 +138,70 @@ class MainApplication(Frame):
         # epidemic time
         if (self.board.epidemics_occuring != 0):
             self.epidemic_phase()
+ 
+        if (player.over_hand_limit() == True):
+            self.discard_cards()
 
         self.board_frame.show_infect_phase_button()
 
-        # Discard cards if the player is over the hand limit.
-        discard_error = False
-        while player.over_hand_limit() == True and discard_error == False:
+    # discard_cards()
+    # Discard cards if the player is over the hand limit.
+    def discard_cards(self):
+        player = self.board.get_current_player()
+        while player.over_hand_limit() == True:
             self.board_frame.log_print("You are over the hand limit. Please click City cards to discard them, or Event cards to play them, until you are down to 7 cards.")
+            self.confirmed_card.set('')
 
             # WAIT ON CARD TO BE CLICKED!!!
-            card_name = self.selected_card
+            self.hand_frame.confirm_button.wait_variable(self.confirmed_card)
+            self.board_frame.log_print("Testing")
+            
+            card_name = self.confirmed_card.get()
 
+            discard_error = True
             for i in player.playerhand:
-                if (isinstance(i, CityCard)) and i.city == card_name:
-                    self.board.discard(i)
-                    log_str = player.username + " has discarded " + card_name + "."
+                if (isinstance(i, CityCard) and i.city == card_name):
+                    discard_error = False
+                    card = i
+                    continue
+                elif (isinstance(i, EventCard) and i.value == int(card_name)):
+                    discard_error = False
+                    card = i
+
+            if discard_error == True:
+                self.board_frame.log_print("Invalid Card")
+                continue
+            else:
+                self.board_frame.log_print(card_name)
+
+            if (isinstance(card, CityCard)):
+                self.board.discard(card)
+                log_str = player.username + " has discarded " + card_name + "."
+                self.board_frame.log_print(log_str)
+
+            elif (isinstance(card, EventCard)):
+                if (card.value == 1):
+                    # play_one_quiet_night(board,player)
+                    log_str = player.username + " has played One Quiet Night."
                     self.board_frame.log_print(log_str)
-                elif (isinstance(i, EventCard)):
-                    if (card.value == 1):
-                        # play_one_quiet_night(board,player)
-                        log_str = player.username + " has played One Quiet Night."
-                        self.board_frame.log_print(log_str)
-                    elif (card.value == 2):
-                        # play_forecast(board,player)
-                        log_str = player.username + " has played Forecast."
-                        self.board_frame.log_print(log_str)
-                    elif (card.value == 3):
-                        # play_government_grant(board,player)
-                        log_str = player.username + " has played Government Grant."
-                        self.board_frame.log_print(log_str)
-                    elif (card.value == 4):
-                        # play_airlift(board,player)
-                        log_str = player.username + " has played Airlift."
-                        self.board_frame.log_print(log_str)
-                    elif (card.value == 5):
-                        # play_resilient_population(board,player)
-                        log_str = player.username + " has played Resilient Population."
-                        self.board_frame.log_print(log_str)
-                else:
-                    self.board_frame.log_print("Discard error: this should not be seen at any point. What are you doing, Connor?")
-                    discard_error = True
-                    break
-                    
-
+                elif (card.value == 2):
+                    # play_forecast(board,player)
+                    log_str = player.username + " has played Forecast."
+                    self.board_frame.log_print(log_str)
+                elif (card.value == 3):
+                    # play_government_grant(board,player)
+                    log_str = player.username + " has played Government Grant."
+                    self.board_frame.log_print(log_str)
+                elif (card.value == 4):
+                    # play_airlift(board,player)
+                    log_str = player.username + " has played Airlift."
+                    self.board_frame.log_print(log_str)
+                elif (card.value == 5):
+                    # play_resilient_population(board,player)
+                    log_str = player.username + " has played Resilient Population."
+                    self.board_frame.log_print(log_str)
+    
             self.hand_frame.createWidgets()
-
 
     # epidemic_phase()
     # epidemic time
@@ -220,7 +240,6 @@ class MainApplication(Frame):
     # Intesify step of epidemic
     def intensify_phase(self):
         self.board.intensify()
-        self.board_frame.show_infect_phase_button()
 
     # infect_draw_phase()
     # -- INFECT CITIES --
@@ -254,7 +273,7 @@ class MainApplication(Frame):
         self.board_frame.log_next_turn()
 
         #TEST
-        self.board_frame.show_draw_phase_button()
+        #self.board_frame.show_draw_phase_button()
 
     def end_game(self):
         pass

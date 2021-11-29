@@ -101,9 +101,8 @@ class BoardFrame(Frame):
         self.infect_phase_button.place(height = 50, width = 150, x=450, y=515)
 
     def show_confirm_city_button(self):
-        self.confirm_city_button.place(height = 50, width = 150, x=450, y=515)
+        self.confirm_city_button.place(height = 50, width = 150, x=700, y=515)
     
-
     def show_resilient_population_button(self):
         self.resilient_population_button.place(height = 50, width = 150, x=700, y=515)
     
@@ -117,7 +116,6 @@ class BoardFrame(Frame):
     
     def infect_phase_click(self):
         self.infect_phase_button.place_forget()
-        #self.resilient_population_button.place_forget()
         self.app.infect_phase()
 
     def confirm_city_click(self):
