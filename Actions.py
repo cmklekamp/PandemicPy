@@ -201,6 +201,12 @@ class ActionFrame(Frame):
         pass
 
     def share_knowledge_click(self):
+        self.app.board_frame.log_print("Please select a city card to share with the player in your city.")
+        self.app.hand_frame.confirm_card_button.wait_variable(self.app.hand_frame.card_var)
+        if self.app.confirmed_card != "":
+            self.app.board_frame.log_print("Now please select the player who will be taking the card.")
+        else:
+            self.app.board_frame.log_print("You have not selected a valid card. Please try again.\n")
         pass
         # select the city card from any player's hand, recording who's hand it's from as well as the giving player
         # select the player name of the taking player, and then pass them both into the function (this will allow for the researcher's role to work as intended)
