@@ -207,6 +207,7 @@ class ActionFrame(Frame):
             self.app.board_frame.log_print("You do not have the required city card to build a station here or that city already has a research station!\n")
 
     def treat_disease_click(self):
+        # Removes one or more disease cubes from the player's current city, using the color_frame to select the color cubes to be removed.
         self.app.board_frame.log_print("Please select a color to cure from the color picker.")
         self.app.color_frame.enable_buttons()
         self.app.color_frame.red_button.wait_variable(self.app.selected_color)
@@ -231,16 +232,35 @@ class ActionFrame(Frame):
 
 
     def share_knowledge_click(self):
+        # Allows one player to select a card to give to another, as long as they are in the same city and the card matches the city they are in.
+        # If the giving player is the Researcher, they can give ANY city card to another player in their city.
         self.app.board_frame.log_print("Please select a city card to share with the player in your city.")
-        self.app.hand_frame.confirm_card_button.wait_variable(self.app.hand_frame.card_var)
-        if self.app.confirmed_card != "":
-            self.app.board_frame.log_print("Now please select the player who will be taking the card.")
+        self.app.hand_frame.confirm_card_button.wait_variable(self.app.confirmed_card)
+        card_name = self.app.confirmed_card.get()
+        giving_player_name = self.app.selected_card_player
+        self.app.board_frame.log_print("Now please select the player who will be taking the card.")
+        self.app.hand_frame.p1_name_button.wait_variable(self.app.selected_player)
+        taking_player_name = self.app.selected_player.get()
+        if card_name != "" and giving_player_name != "" and taking_player_name != "" and giving_player_name != taking_player_name:
+            for i in self.app.board._player_list:
+                if i.username == giving_player_name:
+                    giving_player = i
+                if i.username == taking_player_name:
+                    taking_player = i
+            if self.app.board.share_knowledge(giving_player, taking_player, card_name):
+                self.app.hand_frame.createWidgets()
+                log_str = "Success! " + giving_player_name + " has given " + card_name + " to " + taking_player_name + ". " + str(self.app.board.actions_remaining) + " action(s) remaining.\n"
+                self.app.board_frame.log_print(log_str)
+                self.app.discard_cards()
+                # Prepares for draw phase.
+                if self.app.board.actions_remaining == 0:
+                    self.disable_buttons()
+                    self.app.board_frame.show_draw_phase_button()
+            else:
+                self.app.board_frame.log_print("Knowledge sharing unsuccessful. You may not share a city with this player, or the card may not match the current city.\n")
         else:
-            self.app.board_frame.log_print("You have not selected a valid card. Please try again.\n")
-        pass
-        # select the city card from any player's hand, recording who's hand it's from as well as the giving player
-        # select the player name of the taking player, and then pass them both into the function (this will allow for the researcher's role to work as intended)
-        # if false, give appropriate error message; if true, proceed as normal
+            self.app.board_frame.log_print("You have not selected a valid card or player. Please try again.\n")
+
 
     def discover_cure_click(self):
         pass

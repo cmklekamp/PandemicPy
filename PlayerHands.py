@@ -49,7 +49,7 @@ class HandFrame(Frame):
                     text_color = "white"
                     if self.app.board.player_list[0].playerhand[card_num].color == "yellow":
                         text_color = "black"
-                    self.p1_card_button = Button(self, text=self.cardname, fg=text_color, bg=self.app.board.player_list[0].playerhand[card_num].color, command=lambda cardname = self.cardname: self.card_click(cardname), font = ("Times New Roman",10), width=20)
+                    self.p1_card_button = Button(self, text=self.cardname, fg=text_color, bg=self.app.board.player_list[0].playerhand[card_num].color, command=lambda cardname = self.cardname: self.card_click(cardname, self.app.board.player_list[0].username), font = ("Times New Roman",10), width=20)
                 else:
                     self.val = self.app.board.player_list[0].playerhand[card_num].value
                     if self.val == 1:
@@ -85,7 +85,7 @@ class HandFrame(Frame):
                     text_color = "white"
                     if self.app.board.player_list[1].playerhand[card_num].color == "yellow":
                         text_color = "black"
-                    self.p2_card_button = Button(self, text=self.cardname, fg=text_color, bg=self.app.board.player_list[1].playerhand[card_num].color, command=lambda cardname = self.cardname: self.card_click(cardname), font = ("Times New Roman",10), width=20)
+                    self.p2_card_button = Button(self, text=self.cardname, fg=text_color, bg=self.app.board.player_list[1].playerhand[card_num].color, command=lambda cardname = self.cardname: self.card_click(cardname, self.app.board.player_list[1].username), font = ("Times New Roman",10), width=20)
                 else:
                     self.val = self.app.board.player_list[1].playerhand[card_num].value
                     if self.val == 1:
@@ -122,7 +122,7 @@ class HandFrame(Frame):
                     text_color = "white"
                     if self.app.board.player_list[2].playerhand[card_num].color == "yellow":
                         text_color = "black"
-                    self.p3_card_button = Button(self, text=self.cardname, fg=text_color, bg=self.app.board.player_list[2].playerhand[card_num].color, command=lambda cardname = self.cardname: self.card_click(cardname), font = ("Times New Roman",10), width=20)
+                    self.p3_card_button = Button(self, text=self.cardname, fg=text_color, bg=self.app.board.player_list[2].playerhand[card_num].color, command=lambda cardname = self.cardname: self.card_click(cardname, self.app.board.player_list[2].username), font = ("Times New Roman",10), width=20)
                 else:
                     self.val = self.app.board.player_list[2].playerhand[card_num].value
                     if self.val == 1:
@@ -159,7 +159,7 @@ class HandFrame(Frame):
                     text_color = "white"
                     if self.app.board.player_list[3].playerhand[card_num].color == "yellow":
                         text_color = "black"
-                    p4_card_button = Button(self, text=self.cardname, fg=text_color, bg=self.app.board.player_list[3].playerhand[card_num].color, command=lambda cardname = self.cardname: self.card_click(cardname), font = ("Times New Roman",10), width=20)
+                    p4_card_button = Button(self, text=self.cardname, fg=text_color, bg=self.app.board.player_list[3].playerhand[card_num].color, command=lambda cardname = self.cardname: self.card_click(cardname, self.app.board.player_list[3].username), font = ("Times New Roman",10), width=20)
                 else:
                     self.val = self.app.board.player_list[3].playerhand[card_num].value
                     if self.val == 1:
@@ -189,9 +189,9 @@ class HandFrame(Frame):
     def player_click(self, username):
         self.app.selected_player.set(username)
 
-    def card_click(self, cardname):
-        cardname = str(cardname)
-        self.app.selected_card = cardname
+    def card_click(self, cardname, cardplayer):
+        self.app.selected_card = str(cardname)
+        self.app.selected_card_player = cardplayer
 
     def confirm_card_click(self):
         self.app.confirmed_card.set(self.app.selected_card)
