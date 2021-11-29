@@ -76,6 +76,7 @@ class MainApplication(Frame):
         self.selected_city = ""
         self.confirmed_city = ""
         self.selected_player = StringVar('')
+        self.selected_card_player = ""
         self.selected_card = ""
         self.confirmed_card = StringVar('')
         self.selected_color = StringVar('')
