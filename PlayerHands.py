@@ -37,8 +37,8 @@ class HandFrame(Frame):
         if self.app.menu_frame.playercount >= 2:
             # Creating buttons for first player name and cards.
             self.p1_name = self.app.board.player_list[0].username
-            self.p1_name_button = Button(self, text=self.p1_name, command=lambda p1_name = self.p1_name: self.player_click(p1_name), font = ("Times New Roman",10), width=20)
-            self.p1_name_button.grid(row=row, column=0, padx=8, pady=4, ipadx=10)
+            self.p1_name_button = Button(self, text=self.p1_name, command=lambda p1_name = self.p1_name: self.player_click(p1_name), font = ("Times New Roman",10), width=12)
+            self.p1_name_button.grid(row=row, column=0, padx=4, pady=4, ipadx=10)
             row += 1
 
             self.p1_card_buttons = list()
@@ -49,7 +49,7 @@ class HandFrame(Frame):
                     text_color = "white"
                     if self.app.board.player_list[0].playerhand[card_num].color == "yellow":
                         text_color = "black"
-                    self.p1_card_button = Button(self, text=self.cardname, fg=text_color, bg=self.app.board.player_list[0].playerhand[card_num].color, command=lambda cardname = self.cardname: self.card_click(cardname, self.app.board.player_list[0].username), font = ("Times New Roman",10), width=20)
+                    self.p1_card_button = Button(self, text=self.cardname, fg=text_color, bg=self.app.board.player_list[0].playerhand[card_num].color, command=lambda cardname = self.cardname: self.card_click(cardname, self.app.board.player_list[0].username), font = ("Times New Roman",10), width=12)
                 else:
                     self.val = self.app.board.player_list[0].playerhand[card_num].value
                     if self.val == 1:
@@ -64,17 +64,17 @@ class HandFrame(Frame):
                         self.cardname = "EVENT - Resilient Population"
                     else:
                         self.cardname = "Error - Invalid Value"
-                    self.p1_card_button = Button(self, text=self.cardname, command=lambda cardname = self.val: self.card_click(cardname), font = ("Times New Roman",10), width=20)
+                    self.p1_card_button = Button(self, text=self.cardname, command=lambda cardname = self.val: self.card_click(cardname), font = ("Times New Roman",10), width=12)
 
                 self.p1_card_buttons.append(self.p1_card_button)
-                self.p1_card_buttons[card_num].grid(row=row, column=0, padx=8, pady=4, ipadx=10)
+                self.p1_card_buttons[card_num].grid(row=row, column=0, padx=4, pady=4, ipadx=10)
                 row += 1
                 card_num += 1
 
             # Creating buttons for second player name and cards.
             self.p2_name = self.app.board.player_list[1].username
-            self.p2_name_button = Button(self, text=self.p2_name, command=lambda p2_name = self.p2_name: self.player_click(p2_name), font = ("Times New Roman",10), width=20)
-            self.p2_name_button.grid(row=row, column=0, padx=8, pady=4, ipadx=10)
+            self.p2_name_button = Button(self, text=self.p2_name, command=lambda p2_name = self.p2_name: self.player_click(p2_name), font = ("Times New Roman",10), width=12)
+            self.p2_name_button.grid(row=row, column=0, padx=4, pady=4, ipadx=10)
             row += 1
 
             self.p2_card_buttons = list()
@@ -85,7 +85,7 @@ class HandFrame(Frame):
                     text_color = "white"
                     if self.app.board.player_list[1].playerhand[card_num].color == "yellow":
                         text_color = "black"
-                    self.p2_card_button = Button(self, text=self.cardname, fg=text_color, bg=self.app.board.player_list[1].playerhand[card_num].color, command=lambda cardname = self.cardname: self.card_click(cardname, self.app.board.player_list[1].username), font = ("Times New Roman",10), width=20)
+                    self.p2_card_button = Button(self, text=self.cardname, fg=text_color, bg=self.app.board.player_list[1].playerhand[card_num].color, command=lambda cardname = self.cardname: self.card_click(cardname, self.app.board.player_list[1].username), font = ("Times New Roman",10), width=12)
                 else:
                     self.val = self.app.board.player_list[1].playerhand[card_num].value
                     if self.val == 1:
@@ -100,19 +100,20 @@ class HandFrame(Frame):
                         self.cardname = "EVENT - Resilient Population"
                     else:
                         self.cardname = "Error - Invalid Value"
-                    self.p2_card_button = Button(self, text=self.cardname, command=lambda cardname = self.val: self.card_click(cardname), font = ("Times New Roman",10), width=20)
+                    self.p2_card_button = Button(self, text=self.cardname, command=lambda cardname = self.val: self.card_click(cardname), font = ("Times New Roman",10), width=12)
 
                 self.p2_card_buttons.append(self.p2_card_button)
-                self.p2_card_buttons[card_num].grid(row=row, column=0, padx=8, pady=4, ipadx=10)
+                self.p2_card_buttons[card_num].grid(row=row, column=0, padx=4, pady=4, ipadx=10)
                 row += 1
                 card_num += 1
 
         if self.app.menu_frame.playercount >= 3:
             # Creating buttons for third player name and cards, if applicable.
+            other_row = 0
             self.p3_name = self.app.board.player_list[2].username
-            self.p3_name_button = Button(self, text=self.p3_name, command=lambda p3_name = self.p3_name: self.player_click(p3_name), font = ("Times New Roman",10), width=20)
-            self.p3_name_button.grid(row=row, column=0, padx=8, pady=4, ipadx=10)
-            row += 1
+            self.p3_name_button = Button(self, text=self.p3_name, command=lambda p3_name = self.p3_name: self.player_click(p3_name), font = ("Times New Roman",10), width=12)
+            self.p3_name_button.grid(row=other_row, column=1, padx=4, pady=4, ipadx=10)
+            other_row += 1
 
             self.p3_card_buttons = list()
             card_num = 0
@@ -122,7 +123,7 @@ class HandFrame(Frame):
                     text_color = "white"
                     if self.app.board.player_list[2].playerhand[card_num].color == "yellow":
                         text_color = "black"
-                    self.p3_card_button = Button(self, text=self.cardname, fg=text_color, bg=self.app.board.player_list[2].playerhand[card_num].color, command=lambda cardname = self.cardname: self.card_click(cardname, self.app.board.player_list[2].username), font = ("Times New Roman",10), width=20)
+                    self.p3_card_button = Button(self, text=self.cardname, fg=text_color, bg=self.app.board.player_list[2].playerhand[card_num].color, command=lambda cardname = self.cardname: self.card_click(cardname, self.app.board.player_list[2].username), font = ("Times New Roman",10), width=12)
                 else:
                     self.val = self.app.board.player_list[2].playerhand[card_num].value
                     if self.val == 1:
@@ -137,19 +138,19 @@ class HandFrame(Frame):
                         self.cardname = "EVENT - Resilient Population"
                     else:
                         self.cardname = "Error - Invalid Value"
-                    self.p3_card_button = Button(self, text=self.cardname, command=lambda cardname = self.val: self.card_click(cardname), font = ("Times New Roman",10), width=20)
+                    self.p3_card_button = Button(self, text=self.cardname, command=lambda cardname = self.val: self.card_click(cardname), font = ("Times New Roman",10), width=12)
 
                 self.p3_card_buttons.append(self.p3_card_button)
-                self.p3_card_buttons[card_num].grid(row=row, column=0, padx=8, pady=4, ipadx=10)
-                row += 1
+                self.p3_card_buttons[card_num].grid(row=other_row, column=1, padx=4, pady=4, ipadx=10)
+                other_row += 1
                 card_num += 1
 
         if self.app.menu_frame.playercount == 4:
             # Creating buttons for fourth player name and cards, if applicable.
             self.p4_name = self.app.board.player_list[3].username
-            self.p4_name_button = Button(self, text=self.p4_name, command=lambda p4_name = self.p4_name: self.player_click(p4_name), font = ("Times New Roman",10), width=20)
-            self.p4_name_button.grid(row=row, column=0, padx=8, pady=4, ipadx=10)
-            row += 1
+            self.p4_name_button = Button(self, text=self.p4_name, command=lambda p4_name = self.p4_name: self.player_click(p4_name), font = ("Times New Roman",10), width=12)
+            self.p4_name_button.grid(row=other_row, column=1, padx=4, pady=4, ipadx=10)
+            other_row += 1
 
             self.p4_card_buttons = list()
             card_num = 0
@@ -159,7 +160,7 @@ class HandFrame(Frame):
                     text_color = "white"
                     if self.app.board.player_list[3].playerhand[card_num].color == "yellow":
                         text_color = "black"
-                    p4_card_button = Button(self, text=self.cardname, fg=text_color, bg=self.app.board.player_list[3].playerhand[card_num].color, command=lambda cardname = self.cardname: self.card_click(cardname, self.app.board.player_list[3].username), font = ("Times New Roman",10), width=20)
+                    p4_card_button = Button(self, text=self.cardname, fg=text_color, bg=self.app.board.player_list[3].playerhand[card_num].color, command=lambda cardname = self.cardname: self.card_click(cardname, self.app.board.player_list[3].username), font = ("Times New Roman",10), width=12)
                 else:
                     self.val = self.app.board.player_list[3].playerhand[card_num].value
                     if self.val == 1:
@@ -174,16 +175,16 @@ class HandFrame(Frame):
                         self.cardname = "EVENT - Resilient Population"
                     else:
                         self.cardname = "Error - Invalid Value"
-                    self.p4_card_button = Button(self, text=self.cardname, command=lambda cardname = self.val: self.card_click(cardname), font = ("Times New Roman",10), width=20)
+                    self.p4_card_button = Button(self, text=self.cardname, command=lambda cardname = self.val: self.card_click(cardname), font = ("Times New Roman",10), width=12)
 
                 self.p4_card_buttons.append(p4_card_button)
-                self.p4_card_buttons[card_num].grid(row=row, column=0, padx=8, pady=4, ipadx=10)
-                row += 1
+                self.p4_card_buttons[card_num].grid(row=other_row, column=1, padx=4, pady=4, ipadx=10)
+                other_row += 1
                 card_num += 1
 
         self.card_var = tkinter.IntVar()
-        self.confirm_card_button = Button(self, text="Confirm Selection", fg='white', bg='green', command=lambda: [self.confirm_card_click(), self.card_var.set(1)], font = ("Times New Roman",10), width=20)
-        self.confirm_card_button.grid(row=row, column=0, padx=8, pady=4, ipadx=10)
+        self.confirm_card_button = Button(self, text="Confirm Selection", fg='white', bg='green', command=lambda: [self.confirm_card_click(), self.card_var.set(1)], font = ("Times New Roman",10), width=12)
+        self.confirm_card_button.grid(row=row, column=0, padx=4, pady=4, ipadx=10)
 
 
     def player_click(self, username):
