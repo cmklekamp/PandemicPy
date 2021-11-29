@@ -178,6 +178,8 @@ class ActionFrame(Frame):
         self.app.board_frame.confirm_city_button["state"] = "disabled"
 
     def build_station_click(self):
+        self.app.board_frame.log_print("Select a city to build a research station in.\n")
+
         # If station can be built, simply do so.
         if self.app.board.build_station():
             self.app.city_viewer_frame.update_info()
@@ -201,7 +203,7 @@ class ActionFrame(Frame):
             else:
                 self.app.board_frame.log_print("You have not selected a valid city. Please try again.\n")
         else:
-            self.app.board_frame.log_print("You do not have the required city card to build a station here!\n")
+            self.app.board_frame.log_print("You do not have the required city card to build a station here or that city already has a research station!\n")
 
     def treat_disease_click(self):
         pass
@@ -279,10 +281,41 @@ class ActionFrame(Frame):
         pass
     
     def play_government_grant(self, player):
-        pass
+        self.app.board_frame.log_print("Select a city to build a research station in.\n")
+
+        self.app.board_frame.confirm_city_button["state"] = "normal"
+        self.app.board_frame.confirm_city_button.wait_variable(self.app.board_frame.board_var)
+
+        if self.app.board.government_grant(player, self.app.confirmed_city):
+            self.app.board_frame.log_print("Station built successfully.\n")
+
+        # If there aren't enough stations left, have the player remove one. Then, they can retry the action.
+        elif self.app.board.research_stations_remaining == 0:
+            self.app.board_frame.log_print("There are no more available research stations. Please click the city you would like to remove one from.")
+            self.app.board_frame.confirm_city_button["state"] = "normal"
+            self.app.board_frame.confirm_city_button.wait_variable(self.app.board_frame.board_var)
+            if self.app.confirmed_city != "":
+                if self.app.board.remove_station(self.app.confirmed_city):
+                    self.app.board_frame.log_print("Station removed. You can now build a station.\n")
+                else:
+                    self.app.board_frame.log_print("This city does not have a research station to remove. Please try again, or select a new action.\n")
+            else:
+                self.app.board_frame.log_print("You have not selected a valid city. Please try again.\n")
+        else:
+            self.app.board_frame.log_print("You do not have the required city card to build a station here or that city already has a research station!\n")
 
     def play_airlift(self, player):
-        pass
+        self.app.board_frame.log_print("Please select the person that is being airlifted.")
+        self.app.hand_frame.p1_name_button.wait_variable(self.app.selected_player)
+        moving_player = self.app.selected_player
+
+        self.app.board_frame.log_print("Please select a city to airlift to.")
+        self.app.board_frame.confirm_city_button["state"] = "normal"
+        self.app.board_frame.confirm_city_button.wait_variable(self.app.board_frame.board_var)
+        city = self.app.confirmed_city
+
+        if self.app.board.airlift(player, moving_player, city):
+            pass
 
     def play_resilient_population(self, player):
         pass
@@ -303,7 +336,7 @@ class ActionFrame(Frame):
         self.app.board_frame.log_next_turn()
         self.app.hand_frame.createWidgets()
         self.app.info_frame.createWidgets()
-        self.app.city_viewer_frame.createWidgets()
+        self.app.city_viewer_frame.update_info()
         self.app.action_frame.createWidgets()
 
 
