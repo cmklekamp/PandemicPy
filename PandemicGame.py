@@ -31,7 +31,6 @@ from tkinter import *
 from tkinter.font import Font
 from tkinter import StringVar
 
-
 # Main application class
 class MainApplication(Frame):
 
@@ -173,25 +172,15 @@ class MainApplication(Frame):
             elif (isinstance(card, EventCard)):
                 if (card.value == 1):
                     self.action_frame.play_one_quiet_night(player)
-                    log_str = player.username + " has played One Quiet Night."
-                    self.board_frame.log_print(log_str)
                 elif (card.value == 2):
-                    # play_forecast(board,player)
-                    log_str = player.username + " has played Forecast."
-                    self.board_frame.log_print(log_str)
+                    self.action_frame.play_forecast(player)
                 elif (card.value == 3):
-                    # play_government_grant(board,player)
-                    log_str = player.username + " has played Government Grant."
-                    self.board_frame.log_print(log_str)
+                    self.action_frame.play_government_grant(player)
                 elif (card.value == 4):
-                    # play_airlift(board,player)
-                    log_str = player.username + " has played Airlift."
-                    self.board_frame.log_print(log_str)
+                    self.action_frame.play_airlift(player)
                 elif (card.value == 5):
-                    # play_resilient_population(board,player)
-                    log_str = player.username + " has played Resilient Population."
-                    self.board_frame.log_print(log_str)
-    
+                    self.action_frame.play_resilient_population(player)
+                    
             self.hand_frame.confirm_card_button.grid_forget()
             self.hand_frame.createWidgets()
 
@@ -213,21 +202,20 @@ class MainApplication(Frame):
                 if self.board.city_list[x].had_outbreak == True:
                     self.board_frame.log_outbreak(x)
 
+            self.info_frame.update_info()
+            self.city_viewer_frame.update_info()
+
             if (self.board.defeat == True):
                 self.end_game() 
 
             # -- PLAY RESILIENT POPULATION --
-            has_resilient_population = False
             for x in self.board.player_list:
                 for y in x.playerhand:
                     if (isinstance(y, EventCard) and y.value == 5):
                         resilient_population_player = x
-                        has_resilient_population = True
-                        self.board_frame.resilient_population_click()
-                        break
-
-            if (has_resilient_population == False):
-                self.intensify_phase()
+                        self.board_frame.resilient_population_click(resilient_population_player)
+            
+            self.intensify_phase()
 
     # intensify_phase()
     # Intesify step of epidemic
@@ -248,6 +236,12 @@ class MainApplication(Frame):
         else:
             self.board.skip_infect_cities = False
             self.board_frame.log_print("Thankfully, the infect phase has been skipped.")
+
+        self.info_frame.update_info()
+        self.city_viewer_frame.update_info()
+
+        if (self.board.defeat == True):
+            self.end_game() 
             
         # Re-enable the action buttons.
         self.action_frame.simple_move_button["state"] = "normal"

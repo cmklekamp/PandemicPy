@@ -64,7 +64,7 @@ class HandFrame(Frame):
                         self.cardname = "EVENT - Resilient Population"
                     else:
                         self.cardname = "Error - Invalid Value"
-                    self.p1_card_button = Button(self, text=self.cardname, command=lambda cardname = self.cardname: self.card_click(cardname), font = ("Times New Roman",10), width=20)
+                    self.p1_card_button = Button(self, text=self.cardname, command=lambda cardname = self.val: self.card_click(cardname), font = ("Times New Roman",10), width=20)
 
                 self.p1_card_buttons.append(self.p1_card_button)
                 self.p1_card_buttons[card_num].grid(row=row, column=0, padx=8, pady=4, ipadx=10)
@@ -100,7 +100,7 @@ class HandFrame(Frame):
                         self.cardname = "EVENT - Resilient Population"
                     else:
                         self.cardname = "Error - Invalid Value"
-                    self.p2_card_button = Button(self, text=self.cardname, command=lambda cardname = self.cardname: self.card_click(cardname), font = ("Times New Roman",10), width=20)
+                    self.p2_card_button = Button(self, text=self.cardname, command=lambda cardname = self.val: self.card_click(cardname), font = ("Times New Roman",10), width=20)
 
                 self.p2_card_buttons.append(self.p2_card_button)
                 self.p2_card_buttons[card_num].grid(row=row, column=0, padx=8, pady=4, ipadx=10)
@@ -137,7 +137,7 @@ class HandFrame(Frame):
                         self.cardname = "EVENT - Resilient Population"
                     else:
                         self.cardname = "Error - Invalid Value"
-                    self.p3_card_button = Button(self, text=self.cardname, command=lambda cardname = self.cardname: self.card_click(cardname), font = ("Times New Roman",10), width=20)
+                    self.p3_card_button = Button(self, text=self.cardname, command=lambda cardname = self.val: self.card_click(cardname), font = ("Times New Roman",10), width=20)
 
                 self.p3_card_buttons.append(self.p3_card_button)
                 self.p3_card_buttons[card_num].grid(row=row, column=0, padx=8, pady=4, ipadx=10)
@@ -174,7 +174,7 @@ class HandFrame(Frame):
                         self.cardname = "EVENT - Resilient Population"
                     else:
                         self.cardname = "Error - Invalid Value"
-                    self.p4_card_button = Button(self, text=self.cardname, command=lambda cardname = self.cardname: self.card_click(cardname), font = ("Times New Roman",10), width=20)
+                    self.p4_card_button = Button(self, text=self.cardname, command=lambda cardname = self.val: self.card_click(cardname), font = ("Times New Roman",10), width=20)
 
                 self.p4_card_buttons.append(p4_card_button)
                 self.p4_card_buttons[card_num].grid(row=row, column=0, padx=8, pady=4, ipadx=10)
@@ -190,6 +190,7 @@ class HandFrame(Frame):
         self.app.selected_player.set(username)
 
     def card_click(self, cardname):
+        cardname = str(cardname)
         self.app.selected_card = cardname
 
     def confirm_card_click(self):

@@ -19,6 +19,7 @@ import PandemicGame
 # Relevant import statements -- tkinter
 from tkinter import *
 from tkinter.font import Font
+from tkinter import simpledialog
 
 # Main application class
 class ActionFrame(Frame):
@@ -278,7 +279,7 @@ class ActionFrame(Frame):
                         player = j
 
         if discard_error == True:
-            self.board_frame.log_print("Invalid Card\n")
+            self.app.board_frame.log_print("Invalid Card\n")
             return
 
         if card.value == 1:
@@ -299,7 +300,34 @@ class ActionFrame(Frame):
         self.app.hand_frame.createWidgets()
     
     def play_forecast(self, player):
-        pass
+        card_string = "Please select the order for the top six cards on the infection deck\nFor example: \"4 5 6 1 2 3\" would put card number 3 on top of the deck\n\n"
+        counter = 1
+        infection_list = []
+        for x in range(6):
+            x = self.app.board.infection_deck.top_card()
+            card_string += str(counter) 
+            card_string += ". " 
+            card_string += x.city
+            card_string += "\n"
+            infection_list.append(x)
+            counter += 1
+            
+        answer = simpledialog.askstring("Input", card_string, parent=self)
+        if answer == None:
+            answer = "6 5 4 3 2 1"
+        choice_list = answer.split()
+
+        rearranged_list = []
+        for x in range(6):  
+            choice = int(choice_list[x]) - 1
+            rearranged_list.append(infection_list[choice])
+
+        if self.app.board.forecast(player, rearranged_list):
+            self.app.board_frame.log_print("Successfully reordered the infection discard pile!\n")
+            self.app.hand_frame.confirm_card_button.grid_forget()
+            self.app.hand_frame.createWidgets()
+        else:
+            self.app.board_frame.log_print("Something has gone wrong\n")
     
     def play_government_grant(self, player):
         self.app.board_frame.log_print("Select a city to build a research station in.\n")
@@ -309,6 +337,8 @@ class ActionFrame(Frame):
 
         if self.app.board.government_grant(player, self.app.confirmed_city):
             self.app.board_frame.log_print("Station built successfully.\n")
+            self.app.hand_frame.confirm_card_button.grid_forget()
+            self.app.hand_frame.createWidgets()
 
         # If there aren't enough stations left, have the player remove one. Then, they can retry the action.
         elif self.app.board.research_stations_remaining == 0:
@@ -325,21 +355,57 @@ class ActionFrame(Frame):
         else:
             self.app.board_frame.log_print("You do not have the required city card to build a station here or that city already has a research station!\n")
 
-    def play_airlift(self, player):
-        self.app.board_frame.log_print("Please select the person that is being airlifted.")
-        self.app.hand_frame.p1_name_button.wait_variable(self.app.selected_player)
-        moving_player = self.app.selected_player
+        self.app.city_viewer_frame.update_info()
+        
 
-        self.app.board_frame.log_print("Please select a city to airlift to.")
+    def play_airlift(self, player):
+        self.app.board_frame.log_print("Please select the person that is being airlifted.\n")
+        self.app.hand_frame.p1_name_button.wait_variable(self.app.selected_player)
+        moving_player = self.app.selected_player.get()
+
+        if moving_player == "":
+            self.app.board_frame.log_print("Invalid Player.\n")
+            return
+
+        for x in self.app.board.player_list:
+            if x.username == moving_player:
+                moving_player = x
+
+        self.app.board_frame.log_print("Please select a city to airlift to.\n")
         self.app.board_frame.confirm_city_button["state"] = "normal"
         self.app.board_frame.confirm_city_button.wait_variable(self.app.board_frame.board_var)
         city = self.app.confirmed_city
 
         if self.app.board.airlift(player, moving_player, city):
-            pass
+            self.app.board_frame.log_print(moving_player.username + " successfully moved to " + city)
+            self.app.city_viewer_frame.update_info()
+            self.app.hand_frame.confirm_card_button.grid_forget()
+            self.app.hand_frame.createWidgets()
+        else:
+            self.app.board_frame.log_print(moving_player.username + " could not move to " + city)
 
     def play_resilient_population(self, player):
-        pass
+        card_string = "Please select the number of the card you wish to remove from the game\n\n"
+        counter = 1
+        for x in self.app.board.infection_discard_pile:
+            card_string += str(counter)
+            card_string += ". " 
+            card_string += x.city
+            card_string += "\n"
+            counter += 1
+            
+        answer = simpledialog.askstring("Input", card_string, parent=self)
+        if answer == None:
+            return
+        choice = int(answer) - 1
+
+        card = self.app.board.infection_discard_pile[choice]
+        if self.app.board.resilient_population(player, card):
+            self.app.board_frame.log_print("\nSuccessfully removed the " + card.city + " infection card from the game!\n")
+            self.app.hand_frame.confirm_card_button.grid_forget()
+            self.app.hand_frame.createWidgets()
+        else:
+            self.app.board_frame.log_print("\nCould not remove the " + card.city + " infection card from the game.\n")
 
     def pass_click(self):
         # Sets the player's remaining actions to zero.
@@ -356,7 +422,7 @@ class ActionFrame(Frame):
         self.app.board_frame.createWidgets()
         self.app.board_frame.log_next_turn()
         self.app.hand_frame.createWidgets()
-        self.app.info_frame.createWidgets()
+        self.app.info_frame.update_info()
         self.app.city_viewer_frame.update_info()
         self.app.action_frame.createWidgets()
 
