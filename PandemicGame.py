@@ -70,8 +70,10 @@ class MainApplication(Frame):
         # Initialize game board
         self.board = GameBoard(playercount, playernames, difficulty)
         self.selected_city = ""
+        self.confirmed_city = ""
         self.selected_player = ""
         self.selected_card = ""
+        self.confirmed_card = ""
 
         # -- DISPLAYS FOR TESTING --
         # self.title_frame = Frame()
@@ -102,6 +104,17 @@ class MainApplication(Frame):
     # player_draw_phase()
     # Handles end of turn actions
     def draw_phase(self):
+        # Grey out all action buttons.
+        self.action_frame.simple_move_button["state"] = "disabled"
+        self.action_frame.direct_flight_button["state"] = "disabled"
+        self.action_frame.charter_flight_button["state"] = "disabled"
+        self.action_frame.shuttle_flight_button["state"] = "disabled"
+        self.action_frame.build_station_button["state"] = "disabled"
+        self.action_frame.treat_disease_button["state"] = "disabled"
+        self.action_frame.share_knowledge_button["state"] = "disabled"
+        self.action_frame.discover_cure_button["state"] = "disabled"
+        self.action_frame.pass_button["state"] = "disabled"
+
         # Check if the game is over
         if (self.board.victory == True or self.board.defeat == True):
             self.end_game()
@@ -127,30 +140,48 @@ class MainApplication(Frame):
 
         self.board_frame.show_infect_phase_button()
 
-        # -- DISCARD CARDS --
-        # while player.over_hand_limit() == True:
-        #     print("\nYou got too many cards in your pockets, either use 'em or throw 'em away.\n")
-        #     show_player_hand(player)
+        # Discard cards if the player is over the hand limit.
+        discard_error = False
+        while player.over_hand_limit() == True and discard_error == False:
+            self.board_frame.log_print("You are over the hand limit. Please click City cards to discard them, or Event cards to play them, until you are down to 7 cards.")
 
-        #     choice = input("Pick a card that you want to use or lose. (Enter the number): ")
-        #     choice = int(choice) - 1
+            # WAIT ON CARD TO BE CLICKED!!!
+            card_name = self.selected_card
 
-        #     card = player.playerhand[choice]
-        #     if (isinstance(card, CityCard)):
-        #         self.board.discard(card)
-        #         print("\nBye Bye Mr. Card, A.K.A: " + card.city + "\n")
+            for i in player.playerhand:
+                if (isinstance(i, CityCard)) and i.city == card_name:
+                    self.board.discard(i)
+                    log_str = player.username + " has discarded " + card_name + "."
+                    self.board_frame.log_print(log_str)
+                elif (isinstance(i, EventCard)):
+                    if (card.value == 1):
+                        # play_one_quiet_night(board,player)
+                        log_str = player.username + " has played One Quiet Night."
+                        self.board_frame.log_print(log_str)
+                    elif (card.value == 2):
+                        # play_forecast(board,player)
+                        log_str = player.username + " has played Forecast."
+                        self.board_frame.log_print(log_str)
+                    elif (card.value == 3):
+                        # play_government_grant(board,player)
+                        log_str = player.username + " has played Government Grant."
+                        self.board_frame.log_print(log_str)
+                    elif (card.value == 4):
+                        # play_airlift(board,player)
+                        log_str = player.username + " has played Airlift."
+                        self.board_frame.log_print(log_str)
+                    elif (card.value == 5):
+                        # play_resilient_population(board,player)
+                        log_str = player.username + " has played Resilient Population."
+                        self.board_frame.log_print(log_str)
+                else:
+                    self.board_frame.log_print("Discard error: this should not be seen at any point. What are you doing, Connor?")
+                    discard_error = True
+                    break
+                    
 
-        #     if (isinstance(card, EventCard)):
-        #         if (card.value == 1):
-        #             play_one_quiet_night(board,player)
-        #         elif (card.value == 2):
-        #             play_forecast(board,player)
-        #         elif (card.value == 3):
-        #             play_government_grant(board,player)
-        #         elif (card.value == 4):
-        #             play_airlift(board,player)
-        #         elif (card.value == 5):
-        #             play_resilient_population(board,player)
+            self.hand_frame.createWidgets()
+
 
     # epidemic_phase()
     # epidemic time
@@ -205,6 +236,17 @@ class MainApplication(Frame):
         else:
             self.board.skip_infect_cities = False
             self.board_frame.log_print("Thankfully, the infect phase has been skipped.")
+            
+        # Re-enable the action buttons.
+        self.action_frame.simple_move_button["state"] = "normal"
+        self.action_frame.direct_flight_button["state"] = "normal"
+        self.action_frame.charter_flight_button["state"] = "normal"
+        self.action_frame.shuttle_flight_button["state"] = "normal"
+        self.action_frame.build_station_button["state"] = "normal"
+        self.action_frame.treat_disease_button["state"] = "normal"
+        self.action_frame.share_knowledge_button["state"] = "normal"
+        self.action_frame.discover_cure_button["state"] = "normal"
+        self.action_frame.pass_button["state"] = "normal"
 
         # Progress to next turn
         self.board.next_turn()

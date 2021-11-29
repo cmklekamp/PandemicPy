@@ -181,12 +181,19 @@ class HandFrame(Frame):
                 row += 1
                 card_num += 1
 
+        
+        self.confirm_button = Button(self, text="Confirm Selection", fg='white', bg='green', command=lambda: self.confirm_click(), font = ("Times New Roman",10), width=20)
+        self.confirm_button.grid(row=row, column=0, padx=8, pady=4, ipadx=10)
+
 
     def player_click(self, username):
         self.app.selected_player = username
 
     def card_click(self, cardname):
         self.app.selected_card = cardname
+
+    def confirm_click(self):
+        self.app.confirmed_card = self.app.selected_card
 
 
 # Main routing for testing HandFrame
