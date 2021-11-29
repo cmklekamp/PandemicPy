@@ -117,12 +117,10 @@ class BoardFrame(Frame):
     def confirm_city_click(self):
         self.app.confirmed_city = self.app.selected_city
 
-    def resilient_population_click(self):
+    def resilient_population_click(self, player):
         res = messagebox.askyesno(title = "Resilient Population", message="Play Resilient Population?")
         if res == True:
-            # play resilient population
-            pass
-        self.app.intensify_phase()
+            self.app.action_frame.play_resilient_population(player)
 
     # Log functions
     def log_next_turn(self):
