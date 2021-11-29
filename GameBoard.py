@@ -228,7 +228,7 @@ class GameBoard(object):
 
         #check if player is operations expert      
         if (player.role == 2):
-            if (self._city_list.add_station() == False):
+            if (self._city_list[player.current_city].add_station() == False):
                 return False
             else:
                 self._actions_remaining -= 1
