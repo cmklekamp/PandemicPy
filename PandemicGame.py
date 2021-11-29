@@ -22,6 +22,8 @@ import Actions
 import PlayerHands
 import Database
 import InfoDisplay
+import CityViewer
+import EndGame
 
 # Relevant import statements -- tkinter
 from tkinter import *
@@ -87,17 +89,21 @@ class MainApplication(Frame):
         #     counter += 1
 
         self.info_frame = InfoDisplay.InfoFrame(self)
-        self.info_frame.grid(row=0, column=0)
+        self.info_frame.grid(row=0, column=1)
 
         self.board_frame = Board.BoardFrame(self)
-        self.board_frame.grid(row=1, column=0)
+        self.board_frame.grid(row=1, column=1)
         self.board_frame.log_next_turn()
 
         self.action_frame = Actions.ActionFrame(self)
-        self.action_frame.grid(row=2, column=0)
+        self.action_frame.grid(row=2, column=1)
 
         self.hand_frame = PlayerHands.HandFrame(self)
-        self.hand_frame.grid(row=0, column=1, rowspan=3)
+        self.hand_frame.grid(row=0, column=2, rowspan=3)
+
+        self.city_viewer_frame = CityViewer.CityViewerFrame(self)
+        self.city_viewer_frame.grid(row=1, column=0, rowspan=3)
+        
 
     # player_draw_phase()
     # Handles end of turn actions
@@ -211,7 +217,15 @@ class MainApplication(Frame):
         #self.board_frame.show_draw_phase_button()
 
     def end_game(self):
-        pass
+        # Clear elements currently on-screen
+        items_to_delete = (self.info_frame, self.board_frame, self.action_frame, self.city_viewer_frame, self.hand_frame)
+        for item in items_to_delete:
+            item.grid_forget()
+
+        # Add endgame screen
+        self.end_frame = EndGame.EndGameFrame(self, self.board.victory)
+        self.end_frame.grid(row=0, column=0)
+
 
 # Main game loop
 if __name__ == "__main__":

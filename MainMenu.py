@@ -179,11 +179,6 @@ class MenuFrame(Frame):
         self.app.database_frame.display_system_stats()
         self.app.database_frame.grid(row=0, column=0)
 
-        # --- TESTING ---
-        # self.app.board = GameBoard(2, ["Daniel", "Jacob"], 5)
-        # self.app.database_frame.update_database()
-
-
 
 # Main routing for testing MenuFrame
 if __name__ == "__main__":
