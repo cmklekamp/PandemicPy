@@ -146,7 +146,7 @@ class MainApplication(Frame):
             self.confirmed_card.set('')
 
             # WAIT ON CARD TO BE CLICKED!!!
-            self.hand_frame.confirm_button.wait_variable(self.confirmed_card)
+            self.hand_frame.confirm_card_button.wait_variable(self.confirmed_card)
             self.board_frame.log_print("Testing")
             
             card_name = self.confirmed_card.get()
