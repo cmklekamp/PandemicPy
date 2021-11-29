@@ -142,34 +142,34 @@ class MainApplication(Frame):
     def discard_cards(self):
         player = self.board.get_current_player()
         while player.over_hand_limit() == True:
-            self.board_frame.log_print("You are over the hand limit. Please click City cards to discard them, or Event cards to play them, until you are down to 7 cards.")
+            self.board_frame.log_print("You are over the hand limit. Please click City cards to discard them, or Event cards to play them, until you are down to 7 cards.\n")
             self.confirmed_card.set('')
 
             # WAIT ON CARD TO BE CLICKED!!!
             self.hand_frame.confirm_card_button.wait_variable(self.confirmed_card)
-            self.board_frame.log_print("Testing")
             
             card_name = self.confirmed_card.get()
 
             discard_error = True
             for i in player.playerhand:
-                if (isinstance(i, CityCard) and i.city == card_name):
-                    discard_error = False
-                    card = i
-                    continue
-                elif (isinstance(i, EventCard) and i.value == int(card_name)):
-                    discard_error = False
-                    card = i
+                if isinstance(i, CityCard):
+                    if (i.city == card_name):
+                        discard_error = False
+                        card = i
+                        break
+                else: 
+                    if (str(i.value) == card_name):
+                        discard_error = False
+                        card = i
+                        break
 
             if discard_error == True:
                 self.board_frame.log_print("Invalid Card")
                 continue
-            else:
-                self.board_frame.log_print(card_name)
 
             if (isinstance(card, CityCard)):
                 self.board.discard(card)
-                log_str = player.username + " has discarded " + card_name + "."
+                log_str = player.username + " has discarded " + card_name + ".\n"
                 self.board_frame.log_print(log_str)
 
             elif (isinstance(card, EventCard)):
@@ -194,6 +194,7 @@ class MainApplication(Frame):
                     log_str = player.username + " has played Resilient Population."
                     self.board_frame.log_print(log_str)
     
+            self.hand_frame.confirm_card_button.grid_forget()
             self.hand_frame.createWidgets()
 
     # epidemic_phase()
@@ -265,6 +266,7 @@ class MainApplication(Frame):
 
         # Progress to next turn
         self.board.next_turn()
+        self.hand_frame.createWidgets()
         self.board_frame.log_print("")
         self.board_frame.log_next_turn()
 
