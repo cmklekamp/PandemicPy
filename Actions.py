@@ -32,40 +32,52 @@ class ActionFrame(Frame):
     # Creates widgets upon initialization in constructor
     def createWidgets(self):
         # Drive/ferry button creation
-        self.simple_move_button = Button(self, text="Drive/Ferry", command=lambda: self.simple_move_click(), font = ("Times New Roman",10))
-        self.simple_move_button.place(height = 50, width = 100, x=35, y=25)
+        self.simple_move_button = Button(self, text="Drive", command=lambda: self.simple_move_click(), font = ("Times New Roman",10))
+        self.simple_move_button.place(height = 50, width = 70, x=50, y=25)
 
         # Direct flight button creation
-        self.direct_flight_button = Button(self, text="Direct Flight", command=lambda: self.direct_flight_click(), font = ("Times New Roman",10))
-        self.direct_flight_button.place(height = 50, width = 100, x=145, y=25)
+        self.direct_flight_button = Button(self, text="Direct\nFlight", command=lambda: self.direct_flight_click(), font = ("Times New Roman",10))
+        self.direct_flight_button.place(height = 50, width = 70, x=130, y=25)
 
         # Charter flight button creation
-        self.charter_flight_button = Button(self, text="Charter Flight", command=lambda: self.charter_flight_click(), font = ("Times New Roman",10))
-        self.charter_flight_button.place(height = 50, width = 100, x=255, y=25)
+        self.charter_flight_button = Button(self, text="Charter\nFlight", command=lambda: self.charter_flight_click(), font = ("Times New Roman",10))
+        self.charter_flight_button.place(height = 50, width = 70, x=210, y=25)
 
         # Shuttle flight button creation
-        self.shuttle_flight_button = Button(self, text="Shuttle Flight", command=lambda: self.shuttle_flight_click(), font = ("Times New Roman",10))
-        self.shuttle_flight_button.place(height = 50, width = 100, x=365, y=25)
+        self.shuttle_flight_button = Button(self, text="Shuttle\nFlight", command=lambda: self.shuttle_flight_click(), font = ("Times New Roman",10))
+        self.shuttle_flight_button.place(height = 50, width = 70, x=290, y=25)
 
         # Build station button creation
-        self.build_station_button = Button(self, text="Build Station", command=lambda: self.build_station_click(), font = ("Times New Roman",10))
-        self.build_station_button.place(height = 50, width = 100, x=475, y=25)
+        self.build_station_button = Button(self, text="Build\nStation", command=lambda: self.build_station_click(), font = ("Times New Roman",10))
+        self.build_station_button.place(height = 50, width = 70, x=370, y=25)
 
         # Treat disease button creation
-        self.treat_disease_button = Button(self, text="Treat Disease", command=lambda: self.treat_disease_click(), font = ("Times New Roman",10))
-        self.treat_disease_button.place(height = 50, width = 100, x=585, y=25)
+        self.treat_disease_button = Button(self, text="Treat\nDisease", command=lambda: self.treat_disease_click(), font = ("Times New Roman",10))
+        self.treat_disease_button.place(height = 50, width = 70, x=450, y=25)
 
         # Share knowledge button creation
-        self.share_knowledge_button = Button(self, text="Share Knowledge", command=lambda: self.share_knowledge_click(), font = ("Times New Roman",10))
-        self.share_knowledge_button.place(height = 50, width = 100, x=695, y=25)
+        self.share_knowledge_button = Button(self, text="Share\nKnowledge", command=lambda: self.share_knowledge_click(), font = ("Times New Roman",10))
+        self.share_knowledge_button.place(height = 50, width = 70, x=530, y=25)
 
         # Discover cure button creation
-        self.discover_cure_button = Button(self, text="Discover Cure", command=lambda: self.discover_cure_click(), font = ("Times New Roman",10))
-        self.discover_cure_button.place(height = 50, width = 100, x=805, y=25)
+        self.discover_cure_button = Button(self, text="Discover\nCure", command=lambda: self.discover_cure_click(), font = ("Times New Roman",10))
+        self.discover_cure_button.place(height = 50, width = 70, x=610, y=25)
+
+        # Player role action button creation
+        self.role_action_button = Button(self, text="Role\nAction", command=lambda: self.role_action_click(), font = ("Times New Roman",10))
+        self.role_action_button.place(height = 50, width = 70, x=690, y=25)
+
+        # Play event card button creation
+        self.play_event_button = Button(self, text="Event\nCard", command=lambda: self.play_event_click(), font = ("Times New Roman",10))
+        self.play_event_button.place(height = 50, width = 70, x=770, y=25)
 
         # Pass button creation
         self.pass_button = Button(self, text="Pass", command=lambda: self.pass_click(), font = ("Times New Roman",10))
-        self.pass_button.place(height = 50, width = 100, x=915, y=25)
+        self.pass_button.place(height = 50, width = 70, x=850, y=25)
+
+        # Reset button creation
+        self.reset_button = Button(self, text="Reset\nTurn", command=lambda: self.reset_click(), font = ("Times New Roman",10))
+        self.reset_button.place(height = 50, width = 70, x=930, y=25)
 
 
     # Button click events
@@ -143,12 +155,21 @@ class ActionFrame(Frame):
     def discover_cure_click(self):
         pass
 
+    def role_action_click(self):
+        pass
+
+    def play_event_click(self):
+        pass
+
     def pass_click(self):
         self.app.board.pass_actions()
         if self.app.board.actions_remaining == 0:
             log_str = self.app.board.get_current_player().username + " has passed on the rest of their actions.\n"
             self.app.board_frame.log_print(log_str)
             self.app.board_frame.show_draw_phase_button()
+
+    def reset_click(self):
+        pass
 
 
 # Main routing for testing ActionFrame
