@@ -84,19 +84,6 @@ class MainApplication(Frame):
         # copy of board used for resetting
         self.temp_board = copy.deepcopy(self.board)
 
-        # -- DISPLAYS FOR TESTING --
-        # self.title_frame = Frame()
-        # self.title_frame.grid(row=0, column=0)
-        # self.heading_font = Font(family="Arial", size=24, weight="normal")
-        # self.header_text = Label(self.title_frame, text="Player usernames, as retrieved from GameBoard class:", font=self.heading_font)
-        # self.header_text.grid(row=0, column=0, pady=25)
-        # self.name_labels = list()
-        # counter = 0
-        # for player in self.board.player_list:
-        #     self.name_labels.append(Label(self.title_frame, text=player.username, font=self.heading_font))
-        #     self.name_labels[counter].grid(row=counter + 1, column=0)
-        #     counter += 1
-
         self.info_frame = InfoDisplay.InfoFrame(self)
         self.info_frame.grid(row=0, column=1)
 
@@ -283,9 +270,6 @@ class MainApplication(Frame):
         self.hand_frame.createWidgets()
         self.board_frame.log_print("")
         self.board_frame.log_next_turn()
-
-        #TEST
-        # self.board_frame.show_draw_phase_button()
 
     def end_game(self):
         # Clear elements currently on-screen
