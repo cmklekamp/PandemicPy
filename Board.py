@@ -86,8 +86,11 @@ class BoardFrame(Frame):
         self.draw_phase_button = Button(self, text="Proceed to Draw Phase?", command=lambda: self.draw_phase_click(), bg = '#46b7e3', font = ("Times New Roman",10))
         self.infect_phase_button = Button(self, text="Proceed to Infect Phase?", command=lambda: self.infect_phase_click(), bg = '#46b7e3', font = ("Times New Roman",10))
         
+        # Create confirm city button
+        self.confirm_city_button = Button(self, text="Confirm City", fg='white', bg='green', command=lambda: self.confirm_city_click(), font = ("Times New Roman", 10))
+
         # TEST
-        #self.show_draw_phase_button()
+        # self.show_draw_phase_button()
     
     # Show button functions
     def show_draw_phase_button(self):
@@ -95,6 +98,9 @@ class BoardFrame(Frame):
 
     def show_infect_phase_button(self):
         self.infect_phase_button.place(height = 50, width = 150, x=450, y=515)
+
+    def show_confirm_city_button(self):
+        self.confirm_city_button.place(height = 50, width = 150, x=450, y=515)
     
     # Button click events
     def city_click(self, name):
@@ -107,6 +113,9 @@ class BoardFrame(Frame):
     def infect_phase_click(self):
         self.infect_phase_button.place_forget()
         self.app.infect_phase()
+
+    def confirm_city_click(self):
+        self.app.confirmed_city = self.app.selected_city
 
     # Log functions
     def log_next_turn(self):
