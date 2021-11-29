@@ -262,7 +262,36 @@ class ActionFrame(Frame):
 
 
     def discover_cure_click(self):
-        pass
+        # If the player has enough cards to turn in...
+        if self.app.board.get_current_player().can_turn_in():
+            # Select a color, and make sure it's valid (this should always be true).
+            self.app.board_frame.log_print("Please select a color disease to cure.")
+            self.app.color_frame.enable_buttons()
+            self.app.color_frame.red_button.wait_variable(self.app.selected_color)
+            color = self.app.selected_color.get()
+            if color != "":
+                self.app.board_frame.log_print("Please select and confirm five cards of the previously chosen color to turn in.")
+                card_num = 0
+                discard_list = []
+                while card_num < 5:
+                    self.app.hand_frame.confirm_card_button.wait_variable(self.app.confirmed_card)
+                    card_name = self.app.confirmed_card.get()
+                    for x in self.app.board.get_current_player().playerhand:
+                        if isinstance(x, CityCard):
+                            if x.city == card_name:
+                                card_num += 1
+                                discard_list.append(x)
+                                log_str = self.app.board.get_current_player().username + " has chosen " + card_name + "."
+                                self.app.board_frame.log_print(log_str)
+                if self.app.board.discover_cure(color, discard_list):
+                    log_str = "Success! " + self.app.board.get_current_player().username + " has cured the " + color + " disease. " + str(self.app.board.actions_remaining) + " action(s) remaining.\n"
+                    self.app.board_frame.log_print(log_str)
+                else:
+                    self.app.board_frame.log_print("This disease was unable to be eradicated. This could be because you did not have the proper cards, or are not positioned on a research station. Please select a new action.\n")
+            else:
+                self.app.board_frame.log_print("You did not pick a valid color. This error message should never be seen, so please try again.\n")
+        else:
+            self.app.board_frame.log_print("You do not have enough cards to turn in. Please try again, or select a new action.\n")
 
     def role_action_click(self):
         # Dispatcher: may move another pawn as if it were their own, discarding from THEIR OWN hand,

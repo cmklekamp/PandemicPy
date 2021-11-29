@@ -268,12 +268,13 @@ class MainApplication(Frame):
         self.board.next_turn()
         self.temp_board = copy.deepcopy(self.board)
         self.hand_frame.createWidgets()
+        self.info_frame.update_info()
         self.board_frame.log_print("")
         self.board_frame.log_next_turn()
 
     def end_game(self):
         # Clear elements currently on-screen
-        items_to_delete = (self.info_frame, self.board_frame, self.action_frame, self.city_viewer_frame, self.hand_frame)
+        items_to_delete = (self.info_frame, self.board_frame, self.action_frame, self.city_viewer_frame, self.hand_frame, self.color_frame)
         for item in items_to_delete:
             item.grid_forget()
 

@@ -134,14 +134,15 @@ class Player(object):
 
         # Increments the counters as the hand is checked.
         for x in self._playerhand:
-            if x.color == "yellow":
-                yellowCounter += 1
-            elif x.color == "black":
-                blackCounter += 1
-            elif x.color == "blue":
-                blueCounter += 1
-            else:
-                redCounter += 1
+            if isinstance(x, CityCard):
+                if x.color == "yellow":
+                    yellowCounter += 1
+                elif x.color == "black":
+                    blackCounter += 1
+                elif x.color == "blue":
+                    blueCounter += 1
+                else:
+                    redCounter += 1
         
         # Goal decreases by one if the player is the Scientist.
         if self._role == 7:
