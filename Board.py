@@ -21,6 +21,7 @@ from tkinter import *
 from tkinter import scrolledtext
 from tkinter.font import Font
 from PIL import ImageTk,Image
+from tkinter import messagebox
 
 # Main application class
 class BoardFrame(Frame):
@@ -86,8 +87,13 @@ class BoardFrame(Frame):
         self.draw_phase_button = Button(self, text="Proceed to Draw Phase?", command=lambda: self.draw_phase_click(), bg = '#46b7e3', font = ("Times New Roman",10))
         self.infect_phase_button = Button(self, text="Proceed to Infect Phase?", command=lambda: self.infect_phase_click(), bg = '#46b7e3', font = ("Times New Roman",10))
         
+        # Create confirm city button
+        self.board_var = tkinter.IntVar()
+        self.confirm_city_button = Button(self, text="Confirm City", fg='white', bg='green', command=lambda: [self.confirm_city_click(), self.board_var.set(1)], font = ("Times New Roman", 10))
+        self.confirm_city_button.place(height = 50, width = 150, x=900, y=550)
+
         # TEST
-        #self.show_draw_phase_button()
+        # self.show_draw_phase_button()
     
     # Show button functions
     def show_draw_phase_button(self):
@@ -95,6 +101,11 @@ class BoardFrame(Frame):
 
     def show_infect_phase_button(self):
         self.infect_phase_button.place(height = 50, width = 150, x=450, y=515)
+    
+
+
+    def show_resilient_population_button(self):
+        self.resilient_population_button.place(height = 50, width = 150, x=700, y=515)
     
     # Button click events
     def city_click(self, name):
@@ -107,6 +118,17 @@ class BoardFrame(Frame):
     def infect_phase_click(self):
         self.infect_phase_button.place_forget()
         self.app.infect_phase()
+
+    def confirm_city_click(self):
+        self.app.confirmed_city = self.app.selected_city
+
+    def resilient_population_click(self):
+        #self.resilient_population_button.place_forget()
+        res = messagebox.askyesno(title = "Resilient Population", message="Play Resilient Population?")
+        if res == True:
+            # play resilient population
+            pass
+        self.app.intensify_phase()
 
     # Log functions
     def log_next_turn(self):
