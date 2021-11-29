@@ -119,10 +119,13 @@ class ActionFrame(Frame):
     def direct_flight_click(self):
         # Allows the player to select a card from their hand to take a direct flight to.
         self.app.board_frame.log_print("Please select a city card to take a direct flight to.")
-        self.app.hand_frame.confirm_card_button.wait_variable(self.app.hand_frame.card_var)
-        if self.app.confirmed_card != "":
-            if self.app.board.direct_flight(self.app.board.get_current_player(), self.app.confirmed_card):
-                log_str = self.app.board.get_current_player().username + " took a direct flight to " + self.app.selected_card + ". " + str(self.app.board.actions_remaining) + " action(s) remaining.\n"
+        self.app.hand_frame.confirm_card_button.wait_variable(self.app.confirmed_card)
+        card_name = self.app.confirmed_card.get()
+        if card_name != "":
+            if self.app.board.direct_flight(self.app.board.get_current_player(), card_name):
+                self.app.city_viewer_frame.update_info()
+                self.app.hand_frame.createWidgets()
+                log_str = self.app.board.get_current_player().username + " took a direct flight to " + card_name + ". " + str(self.app.board.actions_remaining) + " action(s) remaining.\n"
                 self.app.board_frame.log_print(log_str)
                 # Prepares for draw phase.
                 if self.app.board.actions_remaining == 0:
@@ -219,7 +222,20 @@ class ActionFrame(Frame):
         pass
 
     def role_action_click(self):
-        pass
+        # Dispatcher: may move another pawn as if it were their own, discarding from THEIR OWN hand,
+        # or may move any pawn to a city with another pawn.
+        if(self.app.board.get_current_player().role == 1):
+            self.app.board_frame.log_print("You are the Dispatcher. You may either move another pawn as your own, or move any pawn (including your own) to any other pawn. Please click the player's name and do one of these actions.")
+        # Operations Expert: may move from a research station to ANY city by discarding ANY city card.
+        elif(self.app.board.get_current_player().role == 2):
+            self.app.board_frame.log_print("You are the Operations Expert. If you are on a research station, you may discard any card to move to any city on the board. Please click the card you will discard.")
+        # Contingency Planner: may take an event card from the discard and place it on their "role card,"
+        # not counting towards their hand limit. This card is REMOVED upon usage.
+        elif(self.app.board.get_current_player().role == 5):
+            self.app.board_frame.log_print("You are the Contingency Planner. Please pick an event card from the discard pile. This card will be added to your hand, but will not count towards your hand limit. Upon usage, this card will be removed from the game.")
+        # No unique action.
+        else:
+            self.app.board_frame.log_print("Your role does not have a unique action associated with it. Please select a new action.")
 
     def play_event_click(self):
         self.app.board_frame.log_print("Pick an event card to play (any player's card will work\n")
