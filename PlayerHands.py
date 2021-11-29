@@ -192,7 +192,7 @@ class HandFrame(Frame):
     def card_click(self, cardname):
         self.app.selected_card = cardname
 
-    def confirm_click(self):
+    def confirm_card_click(self):
         self.app.confirmed_card.set(self.app.selected_card)
 
 
