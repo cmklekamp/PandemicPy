@@ -76,7 +76,8 @@ class ActionFrame(Frame):
 
     def simple_move_click(self):
         self.app.board_frame.log_print("Please select a city to drive to.")
-        self.app.board_frame.buttons[i].wait_variable(var)
+        self.wait_variable(self.app.selected_city)
+        print("hello")
         if self.app.board.simple_move(self.app.board.get_current_player(), self.app.selected_city):
             log_str = self.app.board.get_current_player().username + " drove to " + self.app.selected_city + "\n"
             self.app.board_frame.log_print(log_str)
