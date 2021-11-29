@@ -23,6 +23,7 @@ import PlayerHands
 import Database
 import InfoDisplay
 import CityViewer
+import ColorDisplay
 import EndGame
 
 # Relevant import statements -- tkinter
@@ -78,6 +79,7 @@ class MainApplication(Frame):
         self.confirmed_player = None
         self.selected_card = ""
         self.confirmed_card = StringVar('')
+        self.selected_color = StringVar('')
 
         # copy of board used for resetting
         self.temp_board = copy.deepcopy(self.board)
@@ -111,6 +113,9 @@ class MainApplication(Frame):
 
         self.city_viewer_frame = CityViewer.CityViewerFrame(self)
         self.city_viewer_frame.grid(row=1, column=0, rowspan=3)
+
+        self.color_frame = ColorDisplay.ColorFrame(self)
+        self.color_frame.grid(row=2, column=2)
         
 
     # player_draw_phase()

@@ -204,7 +204,28 @@ class ActionFrame(Frame):
             self.app.board_frame.log_print("You do not have the required city card to build a station here!\n")
 
     def treat_disease_click(self):
-        pass
+        self.app.board_frame.log_print("Please select a color to cure from the color picker.")
+        self.app.color_frame.enable_buttons()
+        self.app.color_frame.red_button.wait_variable(self.app.selected_color)
+        color = self.app.selected_color.get()
+        if color != "":
+            if self.app.board.treat_disease(color):
+                self.app.city_viewer_frame.update_info()
+                self.app.hand_frame.createWidgets()
+                if self.app.board.get_current_player().role == 3:
+                    log_str = self.app.board.get_current_player().username + " (Medic) removed all " + color + " disease cubes from their city. " + str(self.app.board.actions_remaining) + " action(s) remaining.\n"
+                else:
+                    log_str = self.app.board.get_current_player().username + " removed a " + color + " disease cube(s) from their city. " + str(self.app.board.actions_remaining) + " action(s) remaining.\n"
+                self.app.board_frame.log_print(log_str)
+                # Prepares for draw phase.
+                if self.app.board.actions_remaining == 0:
+                    self.disable_buttons()
+                    self.app.board_frame.show_draw_phase_button()
+            else:
+                self.app.board_frame.log_print("There are no disease cubes of this color in the selected city.\n")
+        else:
+            self.app.board_frame.log_print("You have not selected a valid color. Please try again.\n")
+
 
     def share_knowledge_click(self):
         self.app.board_frame.log_print("Please select a city card to share with the player in your city.")
