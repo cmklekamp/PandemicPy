@@ -75,8 +75,7 @@ class MainApplication(Frame):
         self.board = GameBoard(playercount, playernames, difficulty)
         self.selected_city = ""
         self.confirmed_city = ""
-        self.selected_player = None
-        self.confirmed_player = None
+        self.selected_player = StringVar('')
         self.selected_card = ""
         self.confirmed_card = StringVar('')
         self.selected_color = StringVar('')
