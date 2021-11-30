@@ -72,7 +72,8 @@ class HandFrame(Frame):
                 card_num += 1
 
                 # If player is contingency planner.
-                if self.app.board.player_list[0].role == 5 and self.app.board.player_list[0].contingency_planner_card != EventCard(0):
+                if self.app.board.player_list[0].role == 5 and self.app.board.player_list[0].contingency_planner_card.value != 0:
+                    self.val = self.app.board.player_list[0].contingency_planner_card.value
                     if self.app.board.player_list[0].contingency_planner_card.value == 1:
                         self.cardname = "OpEx - One Quiet Night"
                     elif self.app.board.player_list[0].contingency_planner_card.value == 2:
@@ -128,7 +129,8 @@ class HandFrame(Frame):
                 card_num += 1
 
                 # If player is contingency planner.
-                if self.app.board.player_list[1].role == 5 and self.app.board.player_list[1].contingency_planner_card != EventCard(0):
+                if self.app.board.player_list[1].role == 5 and self.app.board.player_list[1].contingency_planner_card.value != 0:
+                    self.val = self.app.board.player_list[1].contingency_planner_card.value
                     if self.app.board.player_list[1].contingency_planner_card.value == 1:
                         self.cardname = "OpEx - One Quiet Night"
                     elif self.app.board.player_list[1].contingency_planner_card.value == 2:
@@ -185,7 +187,8 @@ class HandFrame(Frame):
                 card_num += 1
 
                 # If player is contingency planner.
-                if self.app.board.player_list[2].role == 5 and self.app.board.player_list[2].contingency_planner_card != EventCard(0):
+                if self.app.board.player_list[2].role == 5 and self.app.board.player_list[2].contingency_planner_card.value != 0:
+                    self.val = self.app.board.player_list[2].contingency_planner_card.value
                     if self.app.board.player_list[2].contingency_planner_card.value == 1:
                         self.cardname = "OpEx - One Quiet Night"
                     elif self.app.board.player_list[2].contingency_planner_card.value == 2:
@@ -218,7 +221,7 @@ class HandFrame(Frame):
                     text_color = "white"
                     if self.app.board.player_list[3].playerhand[card_num].color == "yellow":
                         text_color = "black"
-                    p4_card_button = Button(self, text=self.cardname, fg=text_color, bg=self.app.board.player_list[3].playerhand[card_num].color, command=lambda cardname = self.cardname: self.card_click(cardname, self.app.board.player_list[3].username), font = ("Times New Roman",10), width=12)
+                    self.p4_card_button = Button(self, text=self.cardname, fg=text_color, bg=self.app.board.player_list[3].playerhand[card_num].color, command=lambda cardname = self.cardname: self.card_click(cardname, self.app.board.player_list[3].username), font = ("Times New Roman",10), width=12)
                 else:
                     self.val = self.app.board.player_list[3].playerhand[card_num].value
                     if self.val == 1:
@@ -235,13 +238,14 @@ class HandFrame(Frame):
                         self.cardname = "Error - Invalid Value"
                     self.p4_card_button = Button(self, text=self.cardname, command=lambda cardname = self.val: self.card_click(cardname), font = ("Times New Roman",10), width=12)
 
-                self.p4_card_buttons.append(p4_card_button)
+                self.p4_card_buttons.append(self.p4_card_button)
                 self.p4_card_buttons[card_num].grid(row=other_row, column=1, padx=4, pady=4, ipadx=10)
                 other_row += 1
                 card_num += 1
 
                 # If player is contingency planner.
-                if self.app.board.player_list[3].role == 5 and self.app.board.player_list[3].contingency_planner_card != EventCard(0):
+                if self.app.board.player_list[3].role == 5 and self.app.board.player_list[3].contingency_planner_card.value != 0:
+                    self.val = self.app.board.player_list[3].contingency_planner_card.value
                     if self.app.board.player_list[3].contingency_planner_card.value == 1:
                         self.cardname = "OpEx - One Quiet Night"
                     elif self.app.board.player_list[3].contingency_planner_card.value == 2:
@@ -267,7 +271,7 @@ class HandFrame(Frame):
     def player_click(self, username):
         self.app.selected_player.set(username)
 
-    def card_click(self, cardname, cardplayer):
+    def card_click(self, cardname, cardplayer=""):
         self.app.selected_card = str(cardname)
         self.app.selected_card_player = cardplayer
 

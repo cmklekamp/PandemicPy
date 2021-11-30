@@ -87,10 +87,10 @@ class CityViewerFrame(Frame):
         self.display_list[-1].grid(row=row_num, column=0, columnspan=2, padx=30, pady=10)
         row_num += 1
         for player in self.app.board.player_list:
-            self.display_list.append(Label(self, text=player.username + " is in:", font=self.display_font, bg="blue", fg="white"))
+            display_string = player.username + " (" + self.get_role_name(player.role) + ") is in:\n"
+            display_string += player.current_city
+            self.display_list.append(Label(self, text=display_string, font=self.display_font, bg="blue", fg="white"))
             self.display_list[-1].grid(row=row_num, column=0, padx=30, pady=5)
-            self.display_list.append(Label(self, text=player.current_city, font=self.display_font, bg="blue", fg="white"))
-            self.display_list[-1].grid(row=row_num, column=1, padx=30, pady=5)
             row_num +=1
 
         # Create list of research station labels
@@ -192,6 +192,25 @@ class CityViewerFrame(Frame):
         for label in self.display_list:
             label.grid_forget()
         self.title_text.grid_forget()
+
+    
+    # get_role_name()
+    # Returns the string representation of the player's role
+    def get_role_name(self, role_num):
+        if role_num == 1:
+            return "Dispatcher"
+        elif role_num == 2:
+            return "Operations Expert"
+        elif role_num == 3:
+            return "Medic"
+        elif role_num == 4:
+            return "Researcher"
+        elif role_num == 5:
+            return "Contingency Planner"
+        elif role_num == 6:
+            return "Quarantine Specialist"
+        else:
+            return "Scientist"
 
 
 # Main routing for testing InfoFrame

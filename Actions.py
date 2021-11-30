@@ -303,12 +303,12 @@ class ActionFrame(Frame):
         # or may move any pawn to a city with another pawn.
         if(self.app.board.get_current_player().role == 1):
             self.app.board_frame.log_print("You are the Dispatcher. You may either move another pawn as your own, or move any pawn (including your own) to any other pawn. Please choose an action.")
-            card_string = "Please select the event card you would like to store for later.\n\n"
-            card_string += "1. Simple Move a player."
-            card_string += "2. Direct Flight a player."
-            card_string += "3. Charter Flight a player."
-            card_string += "4. Shuttle Flight a player."
-            card_string += "5. Move one player to another (including yourself)."
+            card_string = "Please select the action you would like to take as the Dispatcher.\n\n"
+            card_string += "1. Simple Move a player.\n"
+            card_string += "2. Direct Flight a player.\n"
+            card_string += "3. Charter Flight a player.\n"
+            card_string += "4. Shuttle Flight a player.\n"
+            card_string += "5. Move one player to another (including yourself).\n"
             
             answer = simpledialog.askstring("Input", card_string, parent=self)
             if answer != None:
@@ -436,7 +436,7 @@ class ActionFrame(Frame):
                             self.disable_buttons()
                             self.app.board_frame.show_draw_phase_button()
                     else:
-                        elf.app.board_frame.log_print("The Dispatcher action was unable to be completed. Please try again, or select a new action.\n")
+                        self.app.board_frame.log_print("The Dispatcher action was unable to be completed. Please try again, or select a new action.\n")
                 else:
                     self.app.board_frame.log_print("You did not select a valid choice. Please try again, or select a new action.\n")
             else:
@@ -448,7 +448,9 @@ class ActionFrame(Frame):
                 self.app.hand_frame.confirm_card_button.wait_variable(self.app.confirmed_card)
                 card_name = self.app.confirmed_card.get()
                 self.app.board_frame.log_print("Now, select the city you wish to move to.")
+                self.app.board_frame.confirm_city_button["state"] = "normal"
                 self.app.board_frame.confirm_city_button.wait_variable(self.app.board_frame.board_var) 
+                self.app.board_frame.confirm_city_button["state"] = "disabled"
                 if self.app.board.operations_expert_move(card_name, self.app.confirmed_city):
                     log_str = self.app.board.get_current_player().username + " special moved to " + self.app.selected_city + ". " + str(self.app.board.actions_remaining) + " action(s) remaining.\n"
                     self.app.board_frame.log_print(log_str)
@@ -471,15 +473,15 @@ class ActionFrame(Frame):
                 if isinstance(x, EventCard):
                     card_string += str(counter)
                     card_string += ". "
-                    if x.val == 1:
+                    if x.value == 1:
                         card_string += "EVENT - One Quiet Night"
-                    elif x.val == 2:
+                    elif x.value == 2:
                         card_string += "EVENT - Forecast"
-                    elif x.val == 3:
+                    elif x.value == 3:
                         card_string += "EVENT - Government Grant"
-                    elif x.val == 4:
+                    elif x.value == 4:
                         card_string += "EVENT - Airlift"
-                    elif x.val == 5:
+                    elif x.value == 5:
                         card_string += "EVENT - Resilient Population"
                     else:
                         card_string += "Error - Invalid Value"
@@ -491,7 +493,7 @@ class ActionFrame(Frame):
             if answer != None:
                 choice = int(answer) - 1
                 card = event_discard_list[choice]
-                if contingency_planner_take(card):
+                if self.app.board.contingency_planner_take(card):
                     self.app.board_frame.log_print("Success! The event card has been taken from the discard pile and added to your hand. This will not count towards your total.\n")
                     # Prepares for draw phase.
                     if self.app.board.actions_remaining == 0:
@@ -520,6 +522,11 @@ class ActionFrame(Frame):
                     if (str(i.value) == card_name):
                         discard_error = False
                         card = i
+                        player = j
+            if j.role == 5:
+                if j.contingency_planner_card.value != 0:
+                    if str(j.contingency_planner_card.value) == card_name:
+                        card = j.contingency_planner_card
                         player = j
 
         if discard_error == True:

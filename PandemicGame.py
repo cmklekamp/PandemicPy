@@ -113,6 +113,7 @@ class MainApplication(Frame):
         # Check if the game is over
         if (self.board.victory == True or self.board.defeat == True):
             self.end_game()
+            return
 
         # draw cards
         player = self.board.get_current_player()
@@ -208,6 +209,7 @@ class MainApplication(Frame):
 
             if (self.board.defeat == True):
                 self.end_game() 
+                return
 
             # -- PLAY RESILIENT POPULATION --
             for x in self.board.player_list:
