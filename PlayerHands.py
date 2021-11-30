@@ -71,6 +71,26 @@ class HandFrame(Frame):
                 row += 1
                 card_num += 1
 
+                # If player is contingency planner.
+                if self.app.board.player_list[0].role == 5 and self.app.board.player_list[0].contingency_planner_card != EventCard(0):
+                    if self.app.board.player_list[0].contingency_planner_card.value == 1:
+                        self.cardname = "OpEx - One Quiet Night"
+                    elif self.app.board.player_list[0].contingency_planner_card.value == 2:
+                        self.cardname = "OpEx - Forecast"
+                    elif self.app.board.player_list[0].contingency_planner_card.value == 3:
+                        self.cardname = "OpEx - Government Grant"
+                    elif self.app.board.player_list[0].contingency_planner_card.value == 4:
+                        self.cardname = "OpEx - Airlift"
+                    elif self.app.board.player_list[0].contingency_planner_card.value == 5:
+                        self.cardname = "OpEx - Resilient Population"
+                    else:
+                        self.cardname = "Error - Invalid Value"
+                    self.p1_card_button = Button(self, text=self.cardname, command=lambda cardname = self.val: self.card_click(cardname), font = ("Times New Roman",10), width=12)
+                    self.p1_card_buttons.append(self.p1_card_button)
+                    self.p1_card_buttons[card_num].grid(row=row, column=0, padx=4, pady=4, ipadx=10)
+                    row += 1
+
+
             # Creating buttons for second player name and cards.
             self.p2_name = self.app.board.player_list[1].username
             self.p2_name_button = Button(self, text=self.p2_name, command=lambda p2_name = self.p2_name: self.player_click(p2_name), font = ("Times New Roman",10), width=12)
@@ -106,6 +126,25 @@ class HandFrame(Frame):
                 self.p2_card_buttons[card_num].grid(row=row, column=0, padx=4, pady=4, ipadx=10)
                 row += 1
                 card_num += 1
+
+                # If player is contingency planner.
+                if self.app.board.player_list[1].role == 5 and self.app.board.player_list[1].contingency_planner_card != EventCard(0):
+                    if self.app.board.player_list[1].contingency_planner_card.value == 1:
+                        self.cardname = "OpEx - One Quiet Night"
+                    elif self.app.board.player_list[1].contingency_planner_card.value == 2:
+                        self.cardname = "OpEx - Forecast"
+                    elif self.app.board.player_list[1].contingency_planner_card.value == 3:
+                        self.cardname = "OpEx - Government Grant"
+                    elif self.app.board.player_list[1].contingency_planner_card.value == 4:
+                        self.cardname = "OpEx - Airlift"
+                    elif self.app.board.player_list[1].contingency_planner_card.value == 5:
+                        self.cardname = "OpEx - Resilient Population"
+                    else:
+                        self.cardname = "Error - Invalid Value"
+                    self.p2_card_button = Button(self, text=self.cardname, command=lambda cardname = self.val: self.card_click(cardname), font = ("Times New Roman",10), width=12)
+                    self.p2_card_buttons.append(self.p2_card_button)
+                    self.p2_card_buttons[card_num].grid(row=row, column=0, padx=4, pady=4, ipadx=10)
+                    row += 1
 
         if self.app.menu_frame.playercount >= 3:
             # Creating buttons for third player name and cards, if applicable.
@@ -145,6 +184,25 @@ class HandFrame(Frame):
                 other_row += 1
                 card_num += 1
 
+                # If player is contingency planner.
+                if self.app.board.player_list[2].role == 5 and self.app.board.player_list[2].contingency_planner_card != EventCard(0):
+                    if self.app.board.player_list[2].contingency_planner_card.value == 1:
+                        self.cardname = "OpEx - One Quiet Night"
+                    elif self.app.board.player_list[2].contingency_planner_card.value == 2:
+                        self.cardname = "OpEx - Forecast"
+                    elif self.app.board.player_list[2].contingency_planner_card.value == 3:
+                        self.cardname = "OpEx - Government Grant"
+                    elif self.app.board.player_list[2].contingency_planner_card.value == 4:
+                        self.cardname = "OpEx - Airlift"
+                    elif self.app.board.player_list[2].contingency_planner_card.value == 5:
+                        self.cardname = "OpEx - Resilient Population"
+                    else:
+                        self.cardname = "Error - Invalid Value"
+                    self.p3_card_button = Button(self, text=self.cardname, command=lambda cardname = self.val: self.card_click(cardname), font = ("Times New Roman",10), width=12)
+                    self.p3_card_buttons.append(self.p3_card_button)
+                    self.p3_card_buttons[card_num].grid(row=row, column=0, padx=4, pady=4, ipadx=10)
+                    row += 1
+
         if self.app.menu_frame.playercount == 4:
             # Creating buttons for fourth player name and cards, if applicable.
             self.p4_name = self.app.board.player_list[3].username
@@ -181,6 +239,25 @@ class HandFrame(Frame):
                 self.p4_card_buttons[card_num].grid(row=other_row, column=1, padx=4, pady=4, ipadx=10)
                 other_row += 1
                 card_num += 1
+
+                # If player is contingency planner.
+                if self.app.board.player_list[3].role == 5 and self.app.board.player_list[3].contingency_planner_card != EventCard(0):
+                    if self.app.board.player_list[3].contingency_planner_card.value == 1:
+                        self.cardname = "OpEx - One Quiet Night"
+                    elif self.app.board.player_list[3].contingency_planner_card.value == 2:
+                        self.cardname = "OpEx - Forecast"
+                    elif self.app.board.player_list[3].contingency_planner_card.value == 3:
+                        self.cardname = "OpEx - Government Grant"
+                    elif self.app.board.player_list[3].contingency_planner_card.value == 4:
+                        self.cardname = "OpEx - Airlift"
+                    elif self.app.board.player_list[3].contingency_planner_card.value == 5:
+                        self.cardname = "OpEx - Resilient Population"
+                    else:
+                        self.cardname = "Error - Invalid Value"
+                    self.p4_card_button = Button(self, text=self.cardname, command=lambda cardname = self.val: self.card_click(cardname), font = ("Times New Roman",10), width=12)
+                    self.p4_card_buttons.append(self.p4_card_button)
+                    self.p4_card_buttons[card_num].grid(row=row, column=0, padx=4, pady=4, ipadx=10)
+                    row += 1
 
         self.card_var = tkinter.IntVar()
         self.confirm_card_button = Button(self, text="Confirm Selection", fg='white', bg='green', command=lambda: [self.confirm_card_click(), self.card_var.set(1)], font = ("Times New Roman",10), width=12)

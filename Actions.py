@@ -303,7 +303,144 @@ class ActionFrame(Frame):
         # or may move any pawn to a city with another pawn.
         if(self.app.board.get_current_player().role == 1):
             self.app.board_frame.log_print("You are the Dispatcher. You may either move another pawn as your own, or move any pawn (including your own) to any other pawn. Please choose an action.")
+            card_string = "Please select the event card you would like to store for later.\n\n"
+            card_string += "1. Simple Move a player."
+            card_string += "2. Direct Flight a player."
+            card_string += "3. Charter Flight a player."
+            card_string += "4. Shuttle Flight a player."
+            card_string += "5. Move one player to another (including yourself)."
             
+            answer = simpledialog.askstring("Input", card_string, parent=self)
+            if answer != None:
+                if answer == "1":
+                    self.app.board_frame.log_print("Please select the moving player.")
+                    self.app.hand_frame.p1_name_button.wait_variable(self.app.selected_player)
+                    moving_player_name = self.app.selected_player.get()
+                    if moving_player_name != "":
+                        for i in self.app.board._player_list:
+                            if i.username == moving_player_name:
+                                moving_player = i
+                    self.app.board_frame.log_print("Now, please select the city to move to.")
+                    self.app.board_frame.confirm_city_button["state"] = "normal"
+                    self.app.board_frame.confirm_city_button.wait_variable(self.app.board_frame.board_var) 
+                    if self.app.confirmed_city != "":
+                        if self.app.board.dispatcher_simple_move(moving_player, self.app.confirmed_city):
+                            self.app.city_viewer_frame.update_info()
+                            log_str = moving_player_name + " drove (Dispatcher action) to " + self.app.selected_city + ". " + str(self.app.board.actions_remaining) + " action(s) remaining.\n"
+                            self.app.board_frame.log_print(log_str)
+                            # Prepares for draw phase.
+                            if self.app.board.actions_remaining == 0:
+                                self.disable_buttons()
+                                self.app.board_frame.show_draw_phase_button()
+                        else:
+                            self.app.board_frame.log_print("The Dispatcher action was unable to be completed. Please try again, or select a new action.\n")
+                    else:
+                        self.app.board_frame.log_print("You did not select a valid city. Please try again, or select a new action.\n")
+                    self.app.board_frame.confirm_city_button["state"] = "disabled"
+                elif answer == "2":
+                    self.app.board_frame.log_print("Please select the moving player.")
+                    self.app.hand_frame.p1_name_button.wait_variable(self.app.selected_player)
+                    moving_player_name = self.app.selected_player.get()
+                    if moving_player_name != "":
+                        for i in self.app.board._player_list:
+                            if i.username == moving_player_name:
+                                moving_player = i
+                    self.app.board_frame.log_print("Now, please select the city to move to.")
+                    self.app.board_frame.confirm_city_button["state"] = "normal"
+                    self.app.board_frame.confirm_city_button.wait_variable(self.app.board_frame.board_var) 
+                    if self.app.confirmed_city != "":
+                        if self.app.board.dispatcher_direct_flight(moving_player, self.app.confirmed_city):
+                            self.app.city_viewer_frame.update_info()
+                            log_str = moving_player_name + " took a direct flight (Dispatcher action) to " + self.app.selected_city + ". " + str(self.app.board.actions_remaining) + " action(s) remaining.\n"
+                            self.app.board_frame.log_print(log_str)
+                            # Prepares for draw phase.
+                            if self.app.board.actions_remaining == 0:
+                                self.disable_buttons()
+                                self.app.board_frame.show_draw_phase_button()
+                        else:
+                            self.app.board_frame.log_print("The Dispatcher action was unable to be completed. Please try again, or select a new action.\n")
+                    else:
+                        self.app.board_frame.log_print("You did not select a valid city. Please try again, or select a new action.\n")
+                    self.app.board_frame.confirm_city_button["state"] = "disabled"
+                elif answer == "3":
+                    self.app.board_frame.log_print("Please select the moving player.")
+                    self.app.hand_frame.p1_name_button.wait_variable(self.app.selected_player)
+                    moving_player_name = self.app.selected_player.get()
+                    if moving_player_name != "":
+                        for i in self.app.board._player_list:
+                            if i.username == moving_player_name:
+                                moving_player = i
+                    self.app.board_frame.log_print("Now, please select the city to move to.")
+                    self.app.board_frame.confirm_city_button["state"] = "normal"
+                    self.app.board_frame.confirm_city_button.wait_variable(self.app.board_frame.board_var) 
+                    if self.app.confirmed_city != "":
+                        if self.app.board.dispatcher_charter_flight(moving_player, self.app.confirmed_city):
+                            self.app.city_viewer_frame.update_info()
+                            log_str = moving_player_name + " chartered a flight (Dispatcher action) to " + self.app.selected_city + ". " + str(self.app.board.actions_remaining) + " action(s) remaining.\n"
+                            self.app.board_frame.log_print(log_str)
+                            # Prepares for draw phase.
+                            if self.app.board.actions_remaining == 0:
+                                self.disable_buttons()
+                                self.app.board_frame.show_draw_phase_button()
+                        else:
+                            self.app.board_frame.log_print("The Dispatcher action was unable to be completed. Please try again, or select a new action.\n")
+                    else:
+                        self.app.board_frame.log_print("You did not select a valid city. Please try again, or select a new action.\n")
+                    self.app.board_frame.confirm_city_button["state"] = "disabled"
+                elif answer == "4":
+                    self.app.board_frame.log_print("Please select the moving player.")
+                    self.app.hand_frame.p1_name_button.wait_variable(self.app.selected_player)
+                    moving_player_name = self.app.selected_player.get()
+                    if moving_player_name != "":
+                        for i in self.app.board._player_list:
+                            if i.username == moving_player_name:
+                                moving_player = i
+                    self.app.board_frame.log_print("Now, please select the city to move to.")
+                    self.app.board_frame.confirm_city_button["state"] = "normal"
+                    self.app.board_frame.confirm_city_button.wait_variable(self.app.board_frame.board_var) 
+                    if self.app.confirmed_city != "":
+                        if self.app.board.dispatcher_shuttle_flight(moving_player, self.app.confirmed_city):
+                            self.app.city_viewer_frame.update_info()
+                            log_str = moving_player_name + " took a shuttle flight (Dispatcher action) to " + self.app.selected_city + ". " + str(self.app.board.actions_remaining) + " action(s) remaining.\n"
+                            self.app.board_frame.log_print(log_str)
+                            # Prepares for draw phase.
+                            if self.app.board.actions_remaining == 0:
+                                self.disable_buttons()
+                                self.app.board_frame.show_draw_phase_button()
+                        else:
+                            self.app.board_frame.log_print("The Dispatcher action was unable to be completed. Please try again, or select a new action.\n")
+                    else:
+                        self.app.board_frame.log_print("You did not select a valid city. Please try again, or select a new action.\n")
+                    self.app.board_frame.confirm_city_button["state"] = "disabled"
+                elif answer == "5":
+                    self.app.board_frame.log_print("Please select the moving player.")
+                    self.app.hand_frame.p1_name_button.wait_variable(self.app.selected_player)
+                    moving_player_name = self.app.selected_player.get()
+                    if moving_player_name != "":
+                        for i in self.app.board._player_list:
+                            if i.username == moving_player_name:
+                                moving_player = i
+                    self.app.board_frame.log_print("Please select the player to move to.")
+                    self.app.hand_frame.p1_name_button.wait_variable(self.app.selected_player)
+                    to_player_name = self.app.selected_player.get()
+                    if to_player_name != "":
+                        for i in self.app.board._player_list:
+                            if i.username == to_player_name:
+                                to_player = i
+                    if self.app.board.dispatcher_move_p2p(moving_player, to_player):
+                        self.app.city_viewer_frame.update_info()
+                        log_str = moving_player_name + " moved (Dispatcher action) to " + to_player_name + ". " + str(self.app.board.actions_remaining) + " action(s) remaining.\n"
+                        self.app.board_frame.log_print(log_str)
+                        # Prepares for draw phase.
+                        if self.app.board.actions_remaining == 0:
+                            self.disable_buttons()
+                            self.app.board_frame.show_draw_phase_button()
+                    else:
+                        elf.app.board_frame.log_print("The Dispatcher action was unable to be completed. Please try again, or select a new action.\n")
+                else:
+                    self.app.board_frame.log_print("You did not select a valid choice. Please try again, or select a new action.\n")
+            else:
+                self.app.board_frame.log_print("You did not select a valid choice. Please try again, or select a new action.\n")
         # Operations Expert: may move from a research station to ANY city by discarding ANY city card.
         elif(self.app.board.get_current_player().role == 2):
             if (self.app.board.operations_expert_action_complete != True):
@@ -327,6 +464,43 @@ class ActionFrame(Frame):
         # not counting towards their hand limit. This card is REMOVED upon usage.
         elif(self.app.board.get_current_player().role == 5):
             self.app.board_frame.log_print("You are the Contingency Planner. Please pick an event card from the discard pile. This card will be added to your hand, but will not count towards your hand limit. Upon usage, this card will be removed from the game.")
+            card_string = "Please select the event card you would like to store for later.\n\n"
+            counter = 1
+            event_discard_list = list()
+            for x in self.app.board.player_discard_pile:
+                if isinstance(x, EventCard):
+                    card_string += str(counter)
+                    card_string += ". "
+                    if x.val == 1:
+                        card_string += "EVENT - One Quiet Night"
+                    elif x.val == 2:
+                        card_string += "EVENT - Forecast"
+                    elif x.val == 3:
+                        card_string += "EVENT - Government Grant"
+                    elif x.val == 4:
+                        card_string += "EVENT - Airlift"
+                    elif x.val == 5:
+                        card_string += "EVENT - Resilient Population"
+                    else:
+                        card_string += "Error - Invalid Value"
+                    card_string += "\n"
+                    counter += 1
+                    event_discard_list.append(x)
+            
+            answer = simpledialog.askstring("Input", card_string, parent=self)
+            if answer != None:
+                choice = int(answer) - 1
+                card = event_discard_list[choice]
+                if contingency_planner_take(card):
+                    self.app.board_frame.log_print("Success! The event card has been taken from the discard pile and added to your hand. This will not count towards your total.\n")
+                    # Prepares for draw phase.
+                    if self.app.board.actions_remaining == 0:
+                        self.disable_buttons()
+                        self.app.board_frame.show_draw_phase_button()
+                else:
+                    self.app.board_frame.log_print("The event card could not be taken. You may have made an invalid choice, please try again or select a new action.\n")
+            else:
+                self.app.board_frame.log_print("You did not select a valid choice. Please try again, or select a new action.\n")
         # No unique action.
         else:
             self.app.board_frame.log_print("Your role does not have a unique action associated with it. Please select a new action.\n")
