@@ -287,6 +287,10 @@ class ActionFrame(Frame):
                 if self.app.board.discover_cure(color, discard_list):
                     log_str = "Success! " + self.app.board.get_current_player().username + " has cured the " + color + " disease. " + str(self.app.board.actions_remaining) + " action(s) remaining.\n"
                     self.app.board_frame.log_print(log_str)
+                    # Prepares for draw phase.
+                    if self.app.board.actions_remaining == 0:
+                        self.disable_buttons()
+                        self.app.board_frame.show_draw_phase_button()
                 else:
                     self.app.board_frame.log_print("This disease was unable to be eradicated. This could be because you did not have the proper cards, or are not positioned on a research station. Please select a new action.\n")
             else:
@@ -298,17 +302,34 @@ class ActionFrame(Frame):
         # Dispatcher: may move another pawn as if it were their own, discarding from THEIR OWN hand,
         # or may move any pawn to a city with another pawn.
         if(self.app.board.get_current_player().role == 1):
-            self.app.board_frame.log_print("You are the Dispatcher. You may either move another pawn as your own, or move any pawn (including your own) to any other pawn. Please click the player's name and do one of these actions.")
+            self.app.board_frame.log_print("You are the Dispatcher. You may either move another pawn as your own, or move any pawn (including your own) to any other pawn. Please choose an action.")
+            
         # Operations Expert: may move from a research station to ANY city by discarding ANY city card.
         elif(self.app.board.get_current_player().role == 2):
-            self.app.board_frame.log_print("You are the Operations Expert. If you are on a research station, you may discard any card to move to any city on the board. Please click the card you will discard.")
+            if (self.app.board.operations_expert_action_complete != True):
+                self.app.board_frame.log_print("You are the Operations Expert. If you are on a research station, you may discard any card to move to any city on the board. Please click the card you will discard.")
+                self.app.hand_frame.confirm_card_button.wait_variable(self.app.confirmed_card)
+                card_name = self.app.confirmed_card.get()
+                self.app.board_frame.log_print("Now, select the city you wish to move to.")
+                self.app.board_frame.confirm_city_button.wait_variable(self.app.board_frame.board_var) 
+                if self.app.board.operations_expert_move(card_name, self.app.confirmed_city):
+                    log_str = self.app.board.get_current_player().username + " special moved to " + self.app.selected_city + ". " + str(self.app.board.actions_remaining) + " action(s) remaining.\n"
+                    self.app.board_frame.log_print(log_str)
+                    # Prepares for draw phase.
+                    if self.app.board.actions_remaining == 0:
+                        self.disable_buttons()
+                        self.app.board_frame.show_draw_phase_button()
+                else:
+                    self.app.board_frame.log_print("You were not able to fulfill this action. This may be because you were not in a city with a research station, or you did not discard a valid city card.\n")
+            else:
+                self.app.board_frame.log_print("You have already used your Operations Expert special action once this turn, and can not use it again. Please select a different action.\n")
         # Contingency Planner: may take an event card from the discard and place it on their "role card,"
         # not counting towards their hand limit. This card is REMOVED upon usage.
         elif(self.app.board.get_current_player().role == 5):
             self.app.board_frame.log_print("You are the Contingency Planner. Please pick an event card from the discard pile. This card will be added to your hand, but will not count towards your hand limit. Upon usage, this card will be removed from the game.")
         # No unique action.
         else:
-            self.app.board_frame.log_print("Your role does not have a unique action associated with it. Please select a new action.")
+            self.app.board_frame.log_print("Your role does not have a unique action associated with it. Please select a new action.\n")
 
     def play_event_click(self):
         self.app.board_frame.log_print("Pick an event card to play (any player's card will work\n")
